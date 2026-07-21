@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Produtos</title>
+    <!-- CSS do Bootstrap mantido para organizar o formulário e a tabela -->
+   
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #4caf50);
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            margin: 0;
+            user-select: none; /* Impede seleção de texto acidental ao arrastar o menu */
+        }
+        .box-custom {
+            background: rgba(0, 0, 0, 0.45);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+        h2, h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: #ff9800;
+            box-shadow: none;
+        }
+        .form-select option { background: #2c3e50; color: white; }
+        
+        .table-custom { color: white !important; }
+        .table-custom th {
+            background: rgba(0, 0, 0, 0.3) !important;
+            color: #ff9800 !important;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .table-custom tbody tr { cursor: pointer; }
+        .table-custom tbody tr:hover { background: rgba(255, 255, 255, 0.05) !important; }
+        
+        /* Destaque objetivo da linha selecionada */
+        .table-custom tr.selecionado td {
+            background: rgba(255, 152, 0, 0.3) !important;
+            color: white !important;
+            font-weight: bold;
+            border-top: 1px solid #ff9800;
+            border-bottom: 1px solid #ff9800;
+        }
+
+        /* 👑 REESTRUTURAÇÃO DO PAINEL VERTICAL COM BORDA E TEXTO SECO 👑 */
+        .painel-flutuante {
+            position: fixed;
+            top: 220px;
+            right: 40px;
+            width: 145px;
+            background: rgba(15, 25, 35, 0.9); /* Fundo contrastante escuro */
+            border: 2px solid #ff9800; /* Borda externa em laranja */
+            outline: 1px solid rgba(255, 255, 255, 0.2); /* Borda interna fina em neon */
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7);
+            z-index: 2000;
+        }
+
+        /* Barra superior de movimentação */
+        .painel-header {
+            padding-bottom: 8px;
+            cursor: move; /* Transmite visual de mover */
+            text-align: center;
+            color: #ff9800;
+            border-bottom: 1px dashed rgba(255, 152, 0, 0.4);
+            margin-bottom: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .painel-corpo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* Espaço encurtado para foco na operação */
+        }
+
+        /* Botões verticais objetivos em texto puro */
+        .btn-menu-vertical {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase; /* Caixa alta mandatória */
+            text-align: center;
+            transition: 0.15s ease-in-out;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-menu-vertical:hover {
+            transform: scale(1.03);
+            filter: brightness(1.15);
+        }
+
+        /* Cores operacionais limpas */
+        .btn-incluir { background: #27ae60; }
+        .btn-alterar { background: #2980b9; }
+        .btn-excluir { background: #c0392b; }
+        .btn-voltar  { background: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid max-width-1200">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="m-0">🌿 Gerenciamento de Produtos</h2>
+        </div>
+
+        <div class="row g-4">
+            <!-- Formulário de Entrada -->
+            <div class="col-lg-4">
+                <div class="box-custom">
+                    <h4 id="tituloFormulario">Cadastrar Produto</h4>
+                    <form id="formProduto">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">Nome do Produto</label>
+                            <input type="text" class="form-control" id="nome" required placeholder="Ex: Tijolo Baiano">
+                        </div>
+                        <div class="mb-4">
+                            <label for="fornecedorId" class="form-label">Fornecedor</label>
+                            <select class="form-select" id="fornecedorId" required>
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-action w-100" style="background: #ff9800; border: none; padding: 10px; font-weight: bold; border-radius: 6px; color: white;" id="btnSalvar">Salvar Produto</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Listagem de Controle Integrado -->
+            <div class="col-lg-8">
+                <div class="box-custom d-flex flex-column justify-content-between h-100">
+                    <div>
+                        <h4>Produtos Cadastrados</h4>
+                        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                            <table class="table table-custom align-middle m-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">ID</th>
+                                        <th style="width: 50%;">Nome</th>
+                                        <th style="width: 40%;">Fornecedor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaProdutos">
+                                    <!-- Preenchido via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🛠️ NOVO PAINEL VERTICAL DE AÇÕES COM BORDA DUPLA E ARRASTÁVEL -->
+    <div id="meuPainelFlutuante" class="painel-flutuante">
+        <!-- Ponto para clicar e arrastar -->
+        <div id="meuPainelHeader" class="painel-header">
+            ::: MENU :::
+        </div>
+        <div class="painel-corpo">
+            <button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()">Incluir</button>
+            <button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()">Alterar</button>
+            <button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()">Excluir</button>
+            <button class="btn-menu-vertical btn-voltar" onclick="window.location.href='menu.html'">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Script de engenharia de movimentação do quadro -->
+    <script>
+        const painel = document.getElementById("meuPainelFlutuante");
+        const header = document.getElementById("meuPainelHeader");
+
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        if (header) {
+            header.onmousedown = iniciarArrasto;
+        } else {
+            painel.onmousedown = iniciarArrasto;
+        }
+
+        function iniciarArrasto(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = pararArrasto;
+            document.onmousemove = arrastandoPainel;
+        }
+
+        function arrastandoPainel(e) {
+            e = e || window.event;
+            e.preventDefault();
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            painel.style.top = (painel.offsetTop - pos2) + "px";
+            painel.style.left = (painel.offsetLeft - pos1) + "px";
+            painel.style.right = "auto"; // Libera a âncora lateral padrão do CSS
+        }
+
+        function pararArrasto() {
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    </script>
+
+    <script src="appProduto.js"></script>
+</body>
+</html>

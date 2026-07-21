@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Diagrama Interativo Árvore</title>
+<style>
+body { font-family: sans-serif; background: #f0f0f0; display:flex; justify-content:center; padding:50px; }
+.diagram { display: flex; flex-direction: column; align-items: center; }
+.box { background: #4caf50; color: white; padding: 20px 30px; margin: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 8px rgba(0,0,0,0.2); min-width: 250px; position: relative; cursor:pointer; transition: transform 0.2s; }
+.box:hover { transform: scale(1.05); }
+.arrow { width: 2px; height: 40px; background: #333; margin: 0 auto; position: relative; }
+.arrow::after { content: ''; position: absolute; top: 40px; left: -6px; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid #333; }
+.sub-box { background: #2196f3; margin: 10px 0; }
+.note { font-size: 0.85em; color: #222; margin-top: 5px; }
+</style>
+</head>
+<body>
+	<div style="text-align:center;">
+	    <a href="/diagrama.html" target="_blank" class="tree-btn">
+	        🌳 TreeFenomeno
+	    </a>
+	</div>
+<div class="diagram">
+    <div class="box" onclick="alert('Login válido → redireciona para arvore.html')">
+        login.html
+        <div class="note">Usuário entra: admin / 123</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="box" onclick="alert('Árvore carregada → selecione pessoa para CRUD')">
+        arvore.html
+        <div class="note">Árvore genealógica completa<br>Seleção de pessoas → CRUD</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="box sub-box" onclick="alert('Detalhes da pessoa → alterar, incluir filhos, notas')">
+        Tela-1
+        <div class="note">Detalhes da pessoa selecionada</div>
+    </div>
+    <div class="arrow"></div>
+    <div class="box sub-box" onclick="alert('Informações complementares / histórico')">
+        Tela-2
+        <div class="note">Informações complementares</div>
+    </div>
+</div>
+
+</body>
+</html>
