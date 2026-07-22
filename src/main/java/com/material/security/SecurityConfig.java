@@ -23,13 +23,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // O Spring lê esta propriedade de forma dinâmica. Se não achar nada, usa o padrão do localhost.
+    @Value("${app.cors.allowed-origins:http://localhost:8080}")
+    private String allowedOrigin;
+
+    
     private final JwtFilter jwtFilter;
-    
-          @Value("${app.cors.allowed-origins:http://localhost:8080}")
-    private String allowedOrigin;	
-    
-   
-        private String allowedOrigin;
+         private String allowedOrigin;
 
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
