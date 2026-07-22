@@ -29,8 +29,7 @@ public class SecurityConfig {
 
     
     private final JwtFilter jwtFilter;
-         private String allowedOrigin;
-
+        
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
