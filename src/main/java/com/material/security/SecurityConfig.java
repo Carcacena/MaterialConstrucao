@@ -28,7 +28,7 @@ public class SecurityConfig {
     private String allowedOrigin;
     
     CorsConfiguration configuration = new CorsConfiguration();
-
+        //https://materialconstrucao-production.up.railway.app/
     configuration.setAllowedOrigins(List.of(
          "https://materialconstrucao-production.up.railway.app"
     ));
