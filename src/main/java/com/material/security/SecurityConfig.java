@@ -26,8 +26,12 @@ public class SecurityConfig {
     // O Spring lê esta propriedade de forma dinâmica. Se não achar nada, usa o padrão do localhost.
     @Value("${app.cors.allowed-origins:http://localhost:8080}")
     private String allowedOrigin;
-
     
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setAllowedOrigins(List.of(
+        "https://materialconstrucao-production.up.railway.app"
+    ));
     private final JwtFilter jwtFilter;
         
     public SecurityConfig(JwtFilter jwtFilter) {
