@@ -38,40 +38,45 @@ async function logar() {
 	}
 	}
 
-async function logar(event) {
+	async function logar(event) {
+	    // Evita que a página recarregue ao submeter o formulário
+	    if (event) event.preventDefault(); 
 
-    if (event) event.preventDefault();
+	    const login = document.getElementById("login").value;
+	    const senha = document.getElementById("senha").value;
 
-    const login = document.getElementById("login").value;
-    const senha = document.getElementById("senha").value;
+	    // CONFIGURAÇÃO AUTOMÁTICA DA URL:
+	    // Se estiver no Railway, usa o link da nuvem. Se estiver local na porta 5500 (Live Server), aponta para o Spring (8080)
+	    let API_URL = window.location.origin;
+	    if (API_URL.includes("localhost:") && !API_URL.includes(":8080")) {
+	        API_URL = "http://localhost:8080";
+	    }
 
-    try {
+	    try {
+	        const response = await fetch(`${API_URL}/auth/login`, {
+	            method: "POST",
+	            headers: { 
+	                "Content-Type": "application/json" 
+	            },
+	            body: JSON.stringify({ login: login, senha: senha })
+	        });
 
-        const API_URL = window.location.origin;
+	        if (!response.ok) {
+	            throw new Error("Login ou senha inválidos.");
+	        }
 
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                login,
-                senha
-            })
-        });
+	        // Lê o token como TEXTO PURO (conforme o padrão do seu backend)
+	        const token = await response.text();
+	        
+	        // Salva as informações no navegador
+	        localStorage.setItem("token", token);
+	        sessionStorage.setItem("tipo", "0"); 
+	        
+	        console.log("Login efetuado com sucesso! Redirecionando...");
+	        window.location.href = "menu.html";
 
-        if (!response.ok) {
-            throw new Error("Erro ao autenticar. Verifique suas credenciais.");
-        }
-
-        const dadosResposta = await response.json();
-
-        localStorage.setItem("token", dadosResposta.token);
-
-        window.location.href = "menu.html";
-
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
-}
+	    } catch (error) {
+	        console.error("Erro na autenticação:", error);
+	        alert(error.message);
+	    }
+	}

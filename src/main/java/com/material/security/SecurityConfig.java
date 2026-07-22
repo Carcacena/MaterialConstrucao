@@ -38,6 +38,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+        // Mantido List.of() - Sintaxe moderna ideal para Java 21
         configuration.setAllowedOrigins(List.of(allowedOrigin));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
@@ -53,15 +54,15 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
-                // 1. Liberação de rotas públicas de autenticação e opções do navegador
+                // 1. Rotas públicas e pre-flight (OPTIONS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/auth/**", "/api/auth/**", "/public/**").permitAll()
                 
-                // 2. 📂 Liberação limpa de arquivos estáticos e recursos do Front-end
+                // 2. Arquivos estáticos do Front-end embutido
                 .requestMatchers(
                     "/", 
-                    "/*.html",   // Libera todas as telas (.html) de static
-                    "/*.js",     // Libera todos os scripts (.js) de static
+                    "/*.html",   
+                    "/*.js",     
                     "/*.css", 
                     "/*.png", 
                     "/*.jpg", 
@@ -71,13 +72,13 @@ public class SecurityConfig {
                     "/error"
                 ).permitAll()
                 
-                // 3. 🔐 Proteção unificada das rotas de dados (APIs do Back-end)
+                // 3. APIs protegidas por JWT
                 .requestMatchers("/admin/**", "/usuario/**").authenticated()
                 .requestMatchers("/produtos", "/produtos/**").authenticated() 
                 .requestMatchers("/clientes", "/clientes/**").authenticated()
-                .requestMatchers("/fornecedores", "/fornecedores/**").authenticated() // 🎯 Rota de fornecedores protegida via JWT
+                .requestMatchers("/fornecedores", "/fornecedores/**").authenticated() 
                 
-                // 4. Qualquer outra rota não mapeada exige autenticação por padrão
+                // 4. Qualquer outra rota exige login
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
