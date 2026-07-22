@@ -1,7 +1,8 @@
-package com.material.security;
+package br.com.jose.security;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,46 +24,54 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // O Spring lê esta propriedade de forma dinâmica. Se não achar nada, usa o padrão do localhost.
-    @Value("${app.cors.allowed-origins:http://localhost:8080}")
-    private String allowedOrigin;
+    @Autowired
+    private JwtFilter jwtFilter;
     
-    CorsConfiguration configuration = new CorsConfiguration();
-        //https://materialconstrucao-production.up.railway.app/
-    configuration.setAllowedOrigins(List.of(
-         "https://materialconstrucao-production.up.railway.app"
-    ));
-    private final JwtFilter jwtFilter;
-        
-    public SecurityConfig(JwtFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
+ @Bean
+CorsConfigurationSource corsConfigurationSource() {
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        // Mantido List.of() - Sintaxe moderna ideal para Java 21
-        configuration.setAllowedOrigins(List.of(allowedOrigin));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    CorsConfiguration configuration = new CorsConfiguration();
+
+    configuration.setAllowedOrigins(List.of(
+        "https://materialconstrucao-production.up.railway.app"
+    ));
+
+    configuration.setAllowedMethods(List.of(
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+    ));
+
+    configuration.setAllowedHeaders(List.of("*"));
+    configuration.setAllowCredentials(true);
+
+    UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+    source.registerCorsConfiguration("/**", configuration);
+
+    return source;
+}
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         return http
-            .csrf(csrf -> csrf.disable())
-            .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(auth -> auth
-                // 1. Rotas públicas e pre-flight (OPTIONS)
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/auth/**", "/api/auth/**", "/public/**").permitAll()
-                
-                // 2. Arquivos estáticos do Front-end embutido
-                .requestMatchers(
+
+                .csrf(csrf -> csrf.disable())
+
+                .cors(Customizer.withDefaults())
+
+                .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .requestMatchers("/auth/**").permitAll()
+                                       
+                         .requestMatchers("/api/auth/**", "/public/**").permitAll() // Public routes
+                      .requestMatchers(
                     "/", 
                     "/*.html",   
                     "/*.js",     
@@ -80,23 +89,31 @@ public class SecurityConfig {
                 .requestMatchers("/produtos", "/produtos/**").authenticated() 
                 .requestMatchers("/clientes", "/clientes/**").authenticated()
                 .requestMatchers("/fornecedores", "/fornecedores/**").authenticated() 
-                
-                // 4. Qualquer outra rota exige login
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+                   
+
+                        .anyRequest().authenticated()
+                )
+
+                .sessionManagement(sess ->
+                        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .addFilterBefore(jwtFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+
+                .build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+            AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 }
