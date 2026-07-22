@@ -24,9 +24,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
-
-    @Value("${app.cors.allowed-origins:http://localhost:8080}")
-    private String allowedOrigin;
+    
+    @ configuration.setAllowedOrigins(List.of(
+        "https://materialconstrucao-production.up.railway.app"
+    //));Value("${app.cors.allowed-origins:http://localhost:8080}")
+   
+        private String allowedOrigin;
 
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
