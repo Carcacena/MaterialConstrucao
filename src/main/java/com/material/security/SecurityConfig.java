@@ -25,9 +25,9 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     
-    @ configuration.setAllowedOrigins(List.of(
-        "https://materialconstrucao-production.up.railway.app"
-    //));Value("${app.cors.allowed-origins:http://localhost:8080}")
+          @Value("${app.cors.allowed-origins:http://localhost:8080}")
+    private String allowedOrigin;	
+    
    
         private String allowedOrigin;
 
