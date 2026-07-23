@@ -33,7 +33,7 @@ CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
     configuration.setAllowedOrigins(List.of(
-        "https://materialconstrucao-production.up.railway.app/"
+        "https://materialconstrucao-production.up.railway.app/login.html"
        
     ));
 
