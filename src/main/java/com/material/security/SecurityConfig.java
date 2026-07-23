@@ -63,38 +63,31 @@ CorsConfigurationSource corsConfigurationSource() {
         return http
 
                 .csrf(csrf -> csrf.disable())
-
                 .cors(Customizer.withDefaults())
-
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        .requestMatchers("/auth/**").permitAll()
-                                       
-                         .requestMatchers("/api/auth/**", "/public/**").permitAll() // Public routes
+                       .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                       .requestMatchers("/auth/**").permitAll()
+                       .requestMatchers("/api/auth/**", "/public/**").permitAll() // Public routes
                       .requestMatchers(
-                    "/", 
-                    "/*.html",   
-                    "/*.js",     
-                    "/*.css", 
-                    "/*.png", 
-                    "/*.jpg", 
-                    "/*.mp3", 
-                    "/mp3/**", 
-                    "/favicon.ico", 
-                    "/error"
-                ).permitAll()
+                        "/", 
+                        "/*.html",   
+                        "/*.js",     
+                        "/*.css", 
+                        "/*.png", 
+                        "/*.jpg", 
+                        "/*.mp3", 
+                        "/mp3/**", 
+                        "/favicon.ico", 
+                        "/error"
+                    ).permitAll()
                 
                 // 3. APIs protegidas por JWT
                 .requestMatchers("/admin/**", "/usuario/**").authenticated()
                 .requestMatchers("/produtos", "/produtos/**").authenticated() 
                 .requestMatchers("/clientes", "/clientes/**").authenticated()
                 .requestMatchers("/fornecedores", "/fornecedores/**").authenticated() 
-                   
-
-                        .anyRequest().authenticated()
-                )
+                .anyRequest().authenticated()
+              )
 
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
