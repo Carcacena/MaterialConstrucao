@@ -1,0 +1,24 @@
+<div class="box-custom" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+    <div>
+        <h4>2. Itens do Cupom</h4>
+        <div style="max-height: 280px; overflow-y: auto;">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th style="width: 55%;">Descrição do Produto</th>
+                        <th style="width: 15%; text-align: center;">Qtd</th>
+                        <th style="width: 30%; text-align: right;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabelaItens">
+                    <!-- Itens em standby entram via JS -->
+                </tbody>
+            </table>
+            <div id="tabelaItensVazia" style="text-align: center; color: #bdc3c7; padding: 40px 0;">Mesa vazia. Aguardando itens...</div>
+        </div>
+    </div>
+    <div>
+        <div class="form-label" style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Total Geral do Pedido:</div>
+        <div class="total-caixa" id="labelTotalVenda">R$ 0,00</div>
+    </div>
+</div>

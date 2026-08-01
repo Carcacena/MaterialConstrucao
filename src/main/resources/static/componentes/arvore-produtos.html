@@ -1,0 +1,76 @@
+<!-- Cabeçalho Interno do Modal -->
+<div class="d-flex justify-content-between align-items-center mb-3 pb-2" style="border-bottom: 1px solid rgba(255, 152, 0, 0.25);">
+    <h4 class="m-0" style="color: #ff9800;">🛠️ Seleção de Produtos em Árvore</h4>
+    <button onclick="fecharModalArvoreProdutos()" style="background: none; border: none; color: #bdc3c7; font-size: 20px; cursor: pointer;">&times;</button>
+</div>
+
+<!-- Grid de Duas Colunas do Modal -->
+<div class="d-flex gap-3 style-scroll-modal" style="flex: 1; min-height: 0; overflow: hidden;">
+    
+    <!-- Coluna 1: A Árvore de Categorias (Esquerda) -->
+    <div style="flex: 1.4; background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; overflow-y: auto; max-height: 100%;">
+        <div class="legenda-arvore mb-2" style="font-size: 11px; color: #bdc3c7;">
+            <span>📁 Categoria</span> | <span>🛠️ Produto</span>
+        </div>
+        
+        <!-- O container onde seu JS vai injetar os nós da árvore -->
+        <div id="arvore-categorias-container">
+            <!-- Exemplo Visual da Hierarquia -->
+            <div class="grupo-produto">
+                <div class="fornecedor-header" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block'">
+                    <span class="produto-header-esquerda">
+                        <span class="produto-seta">▶</span>📁 MATERIAL BÁSICO
+                    </span>
+                </div>
+                <div class="produtos-lista" style="display: none;">
+                    <div class="produto-item" onclick="adicionarAoLoteTemporario(7, 'Corda de nylon azul', 7.10)">
+                        <div class="produto-line-principal">
+                            <span>🛠️ Corda de nylon azul</span>
+                            <span class="produto-preco">R$ 7.10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna 2: Lista Temporária de Escolhidos (Direita) -->
+    <div style="flex: 1.1; background: rgba(0, 0, 0, 0.45); padding: 15px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between;">
+        
+        <div style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+            <h5 style="color: #ff9800; font-size: 14px; margin-bottom: 10px; font-weight: bold; text-transform: uppercase;">
+                🛒 Itens Escolhidos no Lote
+            </h5>
+            <!-- Lista de conferência antes do envio definitivo -->
+            <div id="lista-lote-temporario" style="flex: 1; overflow-y: auto; border: 1px dashed rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; margin-bottom: 10px;">
+                <div class="mensagem-vazia" style="padding: 20px 0; font-size: 13px;">Nenhum item selecionado.</div>
+            </div>
+        </div>
+
+        <!-- 🟢 NOVO PERFUME: Painel de Produto Selecionado com o Botão Mover Integrado na Coluna Direita -->
+        <div id="painelProdutoSelecionado" style="padding: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 152, 0, 0.2); border-radius: 6px; margin-top: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                <div style="flex: 1;">
+                    <div id="textoSelecionadoTitulo" style="color: #5eff5e; font-weight: bold; font-size: 13px;">Nenhum item pego</div>
+                    <div id="textoSelecionadoDetalhes" style="color: #bdc3c7; font-size: 11px;">Selecione para mover.</div>
+                </div>
+                <div>
+                    <button id="btnMoverParaCupom" class="btn" style="background: #27ae60; color: white; font-weight: bold; padding: 6px 12px; border: none; border-radius: 4px; text-transform: uppercase; font-size: 11px; display: none;" onclick="acionarMoverProduto()">
+                        Mover ➡️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Rodapé de Ações Finais do Lote -->
+<div class="d-flex justify-content-end gap-2 mt-3 pt-2" style="border-top: 1px solid rgba(255, 255, 255, 0.1);">
+    <button class="btn btn-secondary" onclick="fecharModalArvoreProdutos()" style="font-size: 13px; font-weight: bold; text-transform: uppercase;">
+        Cancelar
+    </button>
+    <button class="btn btn-warning" id="btn-confirma-lote-modal" style="font-size: 13px; font-weight: bold; text-transform: uppercase; background: #ff9800; color: black; border: none;">
+        ✔ Confirma Lote
+    </button>
+</div>
