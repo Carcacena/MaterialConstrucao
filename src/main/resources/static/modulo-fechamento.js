@@ -1,152 +1,295 @@
-async function carregarClientesPDV() {
-  try {
-    const response = await fetch(`${API_URL}/clientes`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
+async function cancelarOperacao() { 
+    // 1. Validação de segurança: impede cancelar se o caixa já estiver zerado
+    if (!window.itensCupomMemoria || window.itensCupomMemoria.length === 0) {
+        alert("O carrinho de negociação já está vazio! Lance um item antes de cancelar.");
+        return;
+    }
+
+    if (!confirm("Deseja mesmo cancelar e esvaziar a mesa de negociação atual?")) { 
+        return; 
+    } 
+
+    const urlServidor = window.API_URL || "http://localhost:8080"; 
+    let tokenSeguro = ""; 
     
-    const select = document.getElementById("selectClienteModal");
-    if (!select) return;
+    // Força a extração do token JWT do SUPERADMIN direto do localStorage no clique
+    try { 
+        const usuarioDadosBrutos = localStorage.getItem("usuario"); 
+        if (usuarioDadosBrutos) { 
+            const usuarioObjeto = JSON.parse(usuarioDadosBrutos); 
+            tokenSeguro = usuarioObjeto.token || ""; 
+            window.token = tokenSeguro; 
+        } 
+    } catch (e) { 
+        console.error("Erro crítico ao ler token no cancelamento:", e); 
+    } 
 
-    if (response.ok) {
-      const clientes = await response.json();
-      select.innerHTML = '<option value="">Selecione o Cliente...</option>';
-      
-      clientes.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c.id;
-        opt.textContent = `${c.id} - ${c.nome}`;
-        if (c.nome.toUpperCase().includes("BALCAO") || c.id === 1) opt.selected = true;
-        select.appendChild(opt);
-      });
+    try { 
+        console.log(`💾 REGISTRANDO HISTÓRICO DE CANCELAMENTO PARA CONTA CORRENTE. ITENS: ${window.itensCupomMemoria.length}`);
 
-      // 🛑 REMOVIDO: A chamada automática para carregarCarrinhoDoBanco() foi tirada daqui
-      // Isso impede que a renderização inicial entre em loop cíclico.
-    }
-  } catch (e) {
-    console.error("Erro clientes:", e);
-  }
-}
+        // 2. 🔥 AQUI ESTÁ A MÁGICA: Varre os itens REAIS da tela e envia um por um pro MySQL com status 2
+        for (const item of window.itensCupomMemoria) {
+            const itemPayload = { 
+                cliente: { id: 1 }, // ID do cliente padrão/Balcão
+                produto: { id: item.produtoId }, // Usa o ID REAL do produto que estava na tabela
+                quantidade: item.quantidade, 
+                precoPraticado: item.precoPraticado, 
+                
+                // 🌟 REGRA DO DIRETOR: 2 = Cancelado (Persiste fisicamente no MySQL)
+                status: 2, 
+                
+                numeroPedido: window.numeroPedidoAtual, 
+                numero_pedido: window.numeroPedidoAtual 
+            }; 
 
-// 📦 APERTOU F10: INFLA O POP-UP DE FECHAMENTO COM O VALOR ATUALIZADO
-// 📦 APERTOU F10: INFLA O POP-UP DE FECHAMENTO COM O VALOR ATUALIZADO
-async function abrirPainelFechamento() {
-  if (totalAcumuladoCupom <= 0) {
-    alert("O carrinho de negociação está vazio! Lance um item antes de fechar.");
-    return;
-  }
+            console.log("-> Enviando item cancelado ao banco:", itemPayload);
 
-  document.getElementById("totalModalDisplay").textContent = `R$ ${totalAcumuladoCupom.toFixed(2).replace('.', ',')}`;
-
-  const modalElement = document.getElementById("modalFecharPedido");
-
-  // 🚀 SEGUNDA OPÇÃO: Carrega o Bootstrap sob demanda para fugir do loop do HTML
-  if (typeof bootstrap === "undefined") {
-    console.log("Injetando Bootstrap dinamicamente para evitar loops...");
-    await new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://jsdelivr.net";
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Não foi possível carregar o Bootstrap."));
-      document.body.appendChild(script);
-    });
-  }
-
-  // Com a biblioteca carregada de forma isolada, abre o modal normalmente
-  if (typeof bootstrap !== "undefined") {
-    const modalInstance = new bootstrap.Modal(modalElement);
-    modalInstance.show();
-  } else {
-    alert("Erro ao inicializar os componentes do modal.");
-  }
-}
-
-// 💾 CONFIRMAR E EMITIR: FINALIZA, ATUALIZA CONTA CORRENTE E LIMPA TEMPORÁRIO
-async function confirmarFaturamentoDefinitivo() {
-  const clienteId = parseInt(document.getElementById("selectClienteModal").value);
-  const labelStatus = document.getElementById("labelStatusCarrinho");
-
-  if (!clienteId) {
-    alert("Por favor, selecione o cliente definitivo para este cupom!");
-    return;
-  }
-
-  try {
-    // 🔥 CORREÇÃO DA ROTA: Aponta para /carrinho/faturar/cliente/{id} conforme o seu Java Controller
-    const URL_FATURAR = `${API_URL}/carrinho/faturar/cliente/${clienteId}`;
-    console.log("Enviando requisição de faturamento para:", URL_FATURAR);
-
-    const response = await fetch(URL_FATURAR, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`
-        // Removido Content-Type e Body porque o seu Java usa apenas o @PathVariable
-      }
-    });
-
-    if (response.ok) {
-      // Captura a mensagem de sucesso customizada do seu Java ("Venda faturada com sucesso no Spring Boot, piá!")
-      const mensagemSucesso = await response.text();
-      alert(mensagemSucesso);
-      
-      // Fecha o modal do Bootstrap de forma segura
-      if (typeof bootstrap !== "undefined") {
-        const modalElement = document.getElementById("modalFecharPedido");
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) modalInstance.hide();
-      }
-
-      if (labelStatus) {
-        labelStatus.textContent = "3 - Finalizado";
-        labelStatus.className = "status-badge bg-success text-white";
-      }
-
-      // Atualiza a tela com o carrinho agora vazio
-      if (typeof carregarCarrinhoDoBanco === "function") carregarCarrinhoDoBanco();
-    } else {
-      // Se cair aqui, o Spring Boot retornou 400 BadRequest (ex: Falta de estoque)
-      const mensagemErro = await response.text();
-      console.error("O servidor Spring Boot retornou um erro:", mensagemErro);
-      alert(`Atenção: ${mensagemErro}`);
-    }
-  } catch (e) {
-    console.error("Falha ao faturar:", e);
-  }
-}
-
-// ❌ CANCELAR CUPOM (LIMPA A MESA DE NEGOCIAÇÃO)
-async function cancelarOperacao() {
-  if (confirm("Deseja mesmo cancelar e esvaziar a mesa de negociação atual?")) {
-    try {
-      await fetch(`${API_URL}/carrinho/cliente/1`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": `Bearer ${token}`
+            // Bate no endpoint @PostMapping que você acabou de reconstruir no Java
+            await fetch(`${urlServidor}/carrinho`, { 
+                method: "POST", 
+                headers: { 
+                    "Content-Type": "application/json", 
+                    "Authorization": `Bearer ${tokenSeguro}` 
+                }, 
+                body: JSON.stringify(itemPayload) 
+            }); 
         }
-      });
-      
-      produtoSelecionadoId = null;
-      document.getElementById("inputQuantidade").value = "1";
-      
-      const labelStatus = document.getElementById("labelStatusCarrinho");
-      if (labelStatus) {
-        labelStatus.textContent = "2 - Cancelado";
-        labelStatus.className = "status-badge bg-danger text-white";
-      }
 
-      if (typeof carregarCarrinhoDoBanco === "function") carregarCarrinhoDoBanco();
-    } catch (e) {
-      console.error("Erro ao cancelar:", e);
-    }
-  }
+        console.log("✅ Todos os itens foram persistidos no MySQL com status 2.");
+
+        // 3. 🧹 LIMPEZA TOTAL DA INTERFACE APÓS A CONFIRMAÇÃO DO BANCO
+        window.itensCupomMemoria = []; 
+        window.numeroPedidoAtual = `PED-${Date.now()}`; // Gera um novo número para a próxima venda
+
+        produtoSelecionadoId = null; 
+        document.getElementById("inputQuantidade").value = "1"; 
+        
+        const labelStatus = document.getElementById("labelStatusCarrinho"); 
+        if (labelStatus) { 
+            labelStatus.textContent = "2 - Cancelado"; 
+            labelStatus.className = "status-badge bg-danger text-white"; 
+        } 
+
+        // Limpa visualmente o grid da direita
+        if (typeof renderizarCupomDaMemoria === "function") { 
+            renderizarCupomDaMemoria(); 
+        } else { 
+            const tbody = document.getElementById("corpoTabelaItens") || document.getElementById("corpoTabelaCupom"); 
+            if (tbody) tbody.innerHTML = ""; 
+        } 
+
+        alert("Operação cancelada! Histórico gravado no MySQL e caixa resetado."); 
+
+		 } catch (erroFetch) {
+		        console.error(
+		            "Erro na rota de persistência do cancelamento:",
+		            erroFetch
+		        );
+
+		        alert(
+		            "Falha de rede ao tentar registrar o cancelamento no banco."
+		        );
+		    }
+
+		} // FECHA cancelarOperacao()
+	
+	async function carregarClientesPDV() {
+	    try {
+	        const response = await fetch(`${API_URL}/clientes`, {
+	            method: "GET",
+	            headers: {
+	                "Authorization": `Bearer ${token}`
+	            }
+	        });
+
+	        if (!response.ok) {
+	            console.error(
+	                "Erro ao carregar clientes. Status:",
+	                response.status
+	            );
+	            return;
+	        }
+
+	        const clientes = await response.json();
+
+	        const select =
+	            document.getElementById("selectClienteModal");
+
+	        if (!select) {
+	            console.error(
+	                'Select "selectClienteModal" não encontrado.'
+	            );
+	            return;
+	        }
+
+	        select.innerHTML =
+	            '<option value="">Selecione o Cliente...</option>';
+
+	        clientes.forEach(cliente => {
+	            const option = document.createElement("option");
+
+	            option.value = cliente.id;
+	            option.textContent =
+	                `${cliente.id} - ${cliente.nome}`;
+
+	            select.appendChild(option);
+	        });
+
+	    } catch (erro) {
+	        console.error("Erro ao carregar clientes:", erro);
+	    }
+	}
+	
+	
+	
+	
+	
+	async function abrirPainelFechamento() {
+	    if (!window.itensCupomMemoria ||
+	        window.itensCupomMemoria.length === 0) {
+
+	        alert("O carrinho está vazio!");
+	        return;
+	    }
+		
+		await carregarClientesPDV();
+
+		const total = window.itensCupomMemoria.reduce(
+		    (soma, item) => {
+		        const quantidade = Number(item.quantidade || 0);
+		        const preco = Number(item.precoPraticado || 0);
+
+		        return soma + (quantidade * preco);
+		    },
+		    0
+		);
+
+	    const totalModal =
+	        document.getElementById("totalModalDisplay");
+
+	    if (totalModal) {
+	        totalModal.textContent =
+	            `R$ ${total.toFixed(2).replace(".", ",")}`;
+	    }
+
+	    const modalElemento =
+	        document.getElementById("modalFecharPedido");
+
+	    if (!modalElemento) {
+	        console.error(
+	            'Modal "modalFecharPedido" não encontrado.'
+	        );
+	        return;
+	    }
+
+	    const modal =
+	        bootstrap.Modal.getOrCreateInstance(modalElemento);
+
+	    modal.show();
+	}
+	async function confirmarFaturamentoDefinitivo() {
+	    if (
+	        !window.itensCupomMemoria ||
+	        window.itensCupomMemoria.length === 0
+	    ) {
+	        alert("O carrinho está vazio.");
+	        return;
+	    }
+
+	    const selectCliente =
+	        document.getElementById("selectClienteModal");
+
+	    const selectPagamento =
+	        document.getElementById("selectPagamentoModal");
+
+	    const clienteId = Number(selectCliente?.value || 0);
+	    const formaPagamento = selectPagamento?.value || "";
+
+	    if (!clienteId) {
+	        alert("Selecione o cliente.");
+	        return;
+	    }
+
+	    if (!formaPagamento) {
+	        alert("Selecione a forma de pagamento.");
+	        return;
+	    }
+
+		const numeroPedido = window.numeroPedidoAtual;
+
+		if (!numeroPedido) {
+		    alert("Número do pedido não foi gerado.");
+		    return;
+		}
+
+		try {
+		    const response = await fetch(
+		        `${API_URL}/carrinho/faturar/pedido/${encodeURIComponent(numeroPedido)}/cliente/${clienteId}`,
+		        {
+		            method: "POST",
+		            headers: {
+		                "Authorization": `Bearer ${token}`
+		            }
+		        }
+		    );
+
+		    if (!response.ok) {
+		        const mensagemErro = await response.text();
+
+		        console.error(
+		            "Erro ao faturar pedido:",
+		            response.status,
+		            mensagemErro
+		        );
+
+		        alert(
+		            `Não foi possível faturar o pedido.\n\n` +
+		            `${mensagemErro || `Status: ${response.status}`}`
+		        );
+
+		        return;
+		    }
+
+		    const mensagemSucesso = await response.text();
+
+		    alert(mensagemSucesso || "Venda faturada com sucesso!");
+
+		    window.itensCupomMemoria = [];
+		    window.numeroPedidoAtual = `PED-${Date.now()}`;
+
+		    if (typeof renderizarCupomDaMemoria === "function") {
+		        renderizarCupomDaMemoria();
+		    }
+
+		    if (typeof carregarProdutosPDV === "function") {
+		        await carregarProdutosPDV();
+		    }
+
+		    const modalElemento =
+		        document.getElementById("modalFecharPedido");
+
+		    const modal =
+		        bootstrap.Modal.getInstance(modalElemento);
+
+		    if (modal) {
+		        modal.hide();
+		    }
+
+		    const labelStatus =
+		        document.getElementById("labelStatusCarrinho");
+
+		    if (labelStatus) {
+		        labelStatus.textContent = "2 - Faturado";
+		        labelStatus.className =
+		            "status-badge bg-success text-white";
+		    }
+
+		} catch (erro) {
+		    console.error(
+		        "Falha de comunicação ao faturar:",
+		        erro
+		    );
+
+		    alert("Falha de comunicação com o servidor.");
+		}
 }
-
-// 🔄 INICIALIZADOR SEGURO: Roda uma única vez quando a página termina de carregar
-document.addEventListener("DOMContentLoaded", async () => {
-  // Executa as funções sequencialmente e de forma isolada
-  if (typeof carregarProdutosPDV === "function") await carregarProdutosPDV();
-  if (typeof carregarClientesPDV === "function") await carregarClientesPDV();
-  if (typeof carregarCarrinhoDoBanco === "function") carregarCarrinhoDoBanco();
-});

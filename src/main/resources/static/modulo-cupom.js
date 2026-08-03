@@ -2,71 +2,223 @@
 // ⚡ CONEXÃO DO MOTOR DO BALCÃO: INTERCEPTORES E GRAVAÇÃO DE FLUXO RÁPIDO
 // =========================================================================
 
-// 🧠 O RECEPTOR DO BOTÃO MOVER: Conecta a Árvore da Esquerda ao Cupom da Direita
-function adicionarProdutoAoCupom(id, nome, quantidade, precoVenda, precoCusto) {
-    console.log(`➡️ [Mesa de Negociação] Movendo Produto ID: ${id} | Qtd: ${quantidade} | Custo: R$ ${precoCusto} | Venda: R$ ${precoVenda}`);
-    
-    // 1. Injeta os dados nas variáveis globais que o seu script já utiliza
-    produtoSelecionadoId = parseInt(id);
-    precoPraticadoVenda = parseFloat(precoVenda);
-    
-    // 2. Alinha a quantidade na caixa de texto para que o método nativo consiga ler o valor correto
-    document.getElementById("inputQuantidade").value = quantidade;
-    
-    // 3. Dispara a rotina oficial de persistência e carga no MySQL
-    adicionarItemNaLista();
+// --- 1. TOPO DO ARQUIVO: DECLARAÇÃO DO BUFFER LOCAL E VARIÁVEIS GLOBAIS ---
+if (typeof window.API_URL === 'undefined') {
+    window.API_URL = "http://localhost:8080";
 }
 
-// 🔍 CARREGA O CARRINHO PENDENTE DO MYSQL VIA REPOSITÓRIO/SERVICE
-async function carregarCarrinhoDoBanco() {
-    let clienteId = 1;
-    const selectModal = document.getElementById("selectClienteModal");
-    if (selectModal && selectModal.value) {
-        clienteId = parseInt(selectModal.value);
+// Inicia o array do cupom na memória e gera o número do pedido fixo para esta sessão
+window.itensCupomMemoria = [];
+if (!window.numeroPedidoAtual) {
+    window.numeroPedidoAtual = `PED-${Date.now()}`;
+}
+
+// --- 2. O RECEPTOR DO BOTÃO MOVER (ÁRVORE CENTRAL) ---
+// Modificado para NÃO fazer fetch. Ele apenas joga o item no array local e desenha na tela.
+async function adicionarProdutoAoCupom(
+    id,
+    nome,
+    quantidade,
+    precoVenda,
+    precoCusto
+) {
+    console.log(
+        `➡ Gravando Produto ID: ${id} | Qtd: ${quantidade}`
+    );
+
+    const idLimpo = Number(id);
+    const qtdeLimpa = Number(quantidade);
+    const precoLimpo = Number(precoVenda);
+
+    if (!Number.isFinite(idLimpo) || idLimpo <= 0) {
+        alert("Produto inválido.");
+        return;
     }
+
+    if (!Number.isFinite(qtdeLimpa) || qtdeLimpa <= 0) {
+        alert("Quantidade inválida.");
+        return;
+    }
+
+    if (!window.numeroPedidoAtual) {
+        window.numeroPedidoAtual = `PED-${Date.now()}`;
+    }
+
+    const itemPayload = {
+        numeroPedido: window.numeroPedidoAtual,
+        cliente: {
+            id: 1
+        },
+        produto: {
+            id: idLimpo
+        },
+        quantidade: qtdeLimpa,
+        precoPraticado: precoLimpo,
+        status: 1
+    };
+
+    console.log("PAYLOAD CARRINHO:", itemPayload);
+
     try {
-        const response = await fetch(`${API_URL}/carrinho/cliente/${clienteId}`, {
-            method: "GET",
-            headers: { "Authorization": `Bearer ${token}` }
+        const response = await fetch(`${API_URL}/carrinho`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(itemPayload)
         });
+
+        if (!response.ok) {
+            const respostaErro = await response.text();
+
+            console.error(
+                "Erro ao gravar item:",
+                response.status,
+                respostaErro
+            );
+
+            alert(
+                `Não foi possível gravar o item.\n\n` +
+                `Status: ${response.status}\n` +
+                `${respostaErro || "Sem detalhes do backend."}`
+            );
+
+            return;
+        }
+
+        const itemSalvo = await response.json();
+
+        console.log("✅ ITEM GRAVADO NO MYSQL:", itemSalvo);
+
+        /*
+         * Só entra na memória e na tela
+         * depois de o MySQL confirmar a gravação.
+         */
+        const itemExistente =
+            window.itensCupomMemoria.find(
+                item => Number(item.produtoId) === idLimpo
+            );
+
+        if (itemExistente) {
+            itemExistente.quantidade += qtdeLimpa;
+            itemExistente.subtotal =
+                itemExistente.quantidade *
+                itemExistente.precoPraticado;
+        } else {
+            window.itensCupomMemoria.push({
+                carrinhoId: itemSalvo.id,
+                produtoId: idLimpo,
+                nome: nome || "Produto",
+                quantidade: qtdeLimpa,
+                precoPraticado: precoLimpo,
+                subtotal: qtdeLimpa * precoLimpo
+            });
+        }
+
+        produtoSelecionadoId = null;
+
+        const inputQtde =
+            document.getElementById("inputQuantidade");
+
+        if (inputQtde) {
+            inputQtde.value = "1";
+        }
+
+        document
+            .querySelectorAll(".produto-item")
+            .forEach(item => {
+                item.classList.remove("selecionado");
+            });
+
+        renderizarCupomDaMemoria();
+
+    } catch (erro) {
+        console.error(
+            "Falha de comunicação ao gravar item:",
+            erro
+        );
+
+        alert("Falha de comunicação com o servidor.");
+    }
+}
+
+
+// 🔍 CARREGA O CARRINHO PENDENTE DO MYSQL VIA REPOSITÓRIO/SERVICE
+async function carregarCarrinhoDoBanco(numeroPedido) {
+    // 1. Pega a URL de contingência do navegador
+    const urlServidor = window.API_URL || (typeof API_URL !== 'undefined' ? API_URL : "http://localhost:8080");
+    const tokenSeguro = window.token || (typeof token !== 'undefined' ? token : "");
+    
+    // 2. Garante o número estável da memória do payload enviado
+    const pedidoAtivo = numeroPedido || window.numeroPedidoAtual;
+    
+    if (!pedidoAtivo) {
+        console.warn("Nenhum número de pedido ativo para listar.");
+        return;
+    }
+
+    console.log("🔍 BUSCANDO ITENS DO PEDIDO NO MYSQL:", pedidoAtivo);
+
+    try {
+        // 3. ROTA CORRETA: Bate no endpoint novo do Spring Boot por número do pedido
+        const response = await fetch(`${urlServidor}/pedido/${pedidoAtivo}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${tokenSeguro}`
+            }
+        });
+
         if (response.ok) {
             const itensSalvos = await response.json();
-            const tbody = document.getElementById("corpoTabelaItens");
-            const divVazia = document.getElementById("tabelaItensVazia");
+            console.log("📦 ITENS RETORNADOS DO BANCO:", itensSalvos);
+
+            // Ajustado para bater exatamente com os IDs da sua tabela da direita no HTML
+            const tbody = document.getElementById("corpoTabelaItens") || document.getElementById("corpoTabelaCupom");
+            const divVazia = document.querySelector(".Mesa-vazia-aguardando-itens") || document.getElementById("tabelaItensVazia");
             const labelStatus = document.getElementById("labelStatusCarrinho");
-            
+
             if (!tbody) return;
             tbody.innerHTML = "";
-            totalAcumuladoCupom = 0;
-            
-            if (itensSalvos.length === 0) {
+            let totalAcumuladoCupom = 0;
+
+            if (!itensSalvos || itensSalvos.length === 0) {
                 if (divVazia) divVazia.style.display = "block";
                 if (labelStatus) {
-                    labelStatus.textContent = "Sem Pedido";
+                    labelStatus.textContent = "SEM PEDIDO";
                     labelStatus.className = "status-badge bg-secondary text-white";
                 }
             } else {
                 if (divVazia) divVazia.style.display = "none";
                 if (labelStatus) {
-                    labelStatus.textContent = "1 - Em Andamento";
+                    labelStatus.textContent = "1 - EM ANDAMENTO";
                     labelStatus.className = "status-badge status-andamento";
                 }
+
+                // Varre a lista do MySQL e desenha na tela instantaneamente
                 itensSalvos.forEach((item, index) => {
-                    const subtotal = item.quantidade * item.precoPraticado;
+                    const preco = item.precoPraticado || item.preco_praticado || 0;
+                    const subtotal = item.quantidade * preco;
                     totalAcumuladoCupom += subtotal;
-                    
+
+                    // Mapeamento seguro das chaves relacionais da Entity do Java
+                    const nomeProduto = item.produto && item.produto.nome ? item.produto.nome : (item.nome || 'Produto');
+                    const nomeFornecedor = item.produto && item.produto.fornecedor && item.produto.fornecedor.nome ? item.produto.fornecedor.nome : 'S/M';
+
                     const tr = document.createElement("tr");
                     tr.className = "item-linha";
                     tr.innerHTML = `
-                        <td><strong>${index + 1}</strong> - ${item.produto.nome} (${item.produto.fornecedor ? item.produto.fornecedor.nome : 'S/M'})</td>
+                        <td><strong>${index + 1}</strong> - ${nomeProduto} (${nomeFornecedor})</td>
                         <td class="text-center">${item.quantidade}</td>
                         <td class="text-end text-success fw-bold">R$ ${subtotal.toFixed(2)}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             }
+
+            // Alimenta a memória global do F10 e sincroniza os dois visores da interface
+            window.totalAcumuladoCupom = totalAcumuladoCupom;
             
-            // Injeta o total acumulado nos dois visores do caixa para manter a simetria
             const lblTotalVenda = document.getElementById("labelTotalVenda");
             if (lblTotalVenda) lblTotalVenda.textContent = `R$ ${totalAcumuladoCupom.toFixed(2).replace('.', ',')}`;
             
@@ -74,9 +226,14 @@ async function carregarCarrinhoDoBanco() {
             if (totalGeralCupom) totalGeralCupom.textContent = totalAcumuladoCupom.toFixed(2);
         }
     } catch (e) {
-        console.error("Erro ao carregar carrinho:", e);
+        console.error("Erro ao carregar carrinho do banco:", e);
     }
 }
+
+async function carregarCarrinhoDoBanco() {
+    renderizarCupomDaMemoria();
+}
+
 
 // 🛒 CONVERSA COM O SPRING BOOT: Salva o item da mesa direto na tabela do banco
 async function adicionarItemNaLista() {
@@ -91,35 +248,62 @@ async function adicionarItemNaLista() {
         alert("Digite uma quantidade válida!");
         return;
     }
+	if (!window.numeroPedidoAtual) {
+	    window.numeroPedidoAtual = `PED-${Date.now()}`;
+	}
+
+	const itemPayload = {
+	    cliente: { id: 1 },
+	    produto: { id: produtoSelecionadoId },
+	    quantidade: quantidade,
+	    precoPraticado: precoPraticadoVenda,
+
+	    status: 1,
+
+	    numeroPedido: window.numeroPedidoAtual,
+	    numero_pedido: window.numeroPedidoAtual
+	};
+
+	
+	
     
-    const itemPayload = {
-        cliente: { id: clienteId },
-        produto: { id: produtoSelecionadoId },
-        quantidade: quantidade,
-        precoPraticado: precoPraticadoVenda
-    };
+   
     
     console.log("PAYLOAD ENVIADO AO CARRINHO:", itemPayload);
     
     try {
-        const response = await fetch(`${API_URL}/carrinho`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(itemPayload)
-        });
-        
-        if (response.ok) {
-            // Limpa as seleções temporárias para deixar o caixa pronto para o próximo "Jogo Rápido!"
-            produtoSelecionadoId = null;
-            document.getElementById("inputQuantidade").value = "1";
-            document.querySelectorAll(".produto-item").forEach(item => item.classList.remove("selecionado"));
-            
-            // Recarrega o lado direito puxando a lista atualizada do MySQL
-            carregarCarrinhoDoBanco();
-        } else {
+       
+		console.log("PAYLOAD CARRINHO:", itemPayload);
+
+		const response = await fetch(`${API_URL}/carrinho`, {
+		    method: "POST",
+		    headers: {
+		        "Content-Type": "application/json",
+		        "Authorization": `Bearer ${token}`
+		    },
+		    body: JSON.stringify(itemPayload)
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		if (response.ok) { 
+		           // Limpa as seleções temporárias para deixar o caixa pronto para o próximo item
+		           produtoSelecionadoId = null; 
+		           document.getElementById("inputQuantidade").value = "1"; 
+		           document.querySelectorAll(".produto-item").forEach(item => item.classList.remove("selecionado")); 
+		           
+		           // 🔥 AQUI ESTÁ A CORREÇÃO: Passa o mesmo número que foi salvo no MySQL para a listagem puxar na hora!
+		           carregarCarrinhoDoBanco(window.numeroPedidoAtual); 
+		           
+		       } else {
+		
+		
             const respostaErro = await response.text();
             console.error("STATUS HTTP:", response.status);
             console.error("RESPOSTA DO BACKEND:", respostaErro);
@@ -159,6 +343,59 @@ function adicionarProdutoAoCupomReal(id, nome, preco, quantidade) {
     atualisBadgeContadorCaixa();
 }
 
+function renderizarCupomDaMemoria() {
+    const tbody = document.getElementById("corpoTabelaItens") || document.getElementById("corpoTabelaCupom");
+    const divVazia = document.querySelector(".Mesa-vazia-aguardando-itens") || document.getElementById("tabelaItensVazia");
+    const labelStatus = document.getElementById("labelStatusCarrinho");
+
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    let totalAcumuladoCupom = 0;
+
+    if (window.itensCupomMemoria.length === 0) {
+        if (divVazia) divVazia.style.display = "block";
+        if (labelStatus) {
+            labelStatus.textContent = "SEM PEDIDO";
+            labelStatus.className = "status-badge bg-secondary text-white";
+        }
+    } else {
+        if (divVazia) divVazia.style.display = "none";
+        if (labelStatus) {
+            labelStatus.textContent = "1 - EM ANDAMENTO";
+            labelStatus.className = "status-badge status-andamento";
+        }
+
+        // Varre o array da memória e desenha as linhas no HTML na hora
+        window.itensCupomMemoria.forEach((item, index) => {
+            totalAcumuladoCupom += item.subtotal;
+
+            const tr = document.createElement("tr");
+            tr.className = "item-linha";
+            tr.innerHTML = `
+                <td><strong>${index + 1}</strong> - ${item.nome}</td>
+                <td class="text-center">${item.quantidade}</td>
+                <td class="text-end text-success fw-bold">R$ ${item.subtotal.toFixed(2)}</td>
+                <td class="text-center">
+                    <button onclick="removerItemDoCupomLocal(${index})" class="btn" style="background: #c0392b; color: white; font-size: 10px; padding: 2px 6px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">X</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Sincroniza os totais e visores da tela
+    window.totalAcumuladoCupom = totalAcumuladoCupom;
+    const lblTotalVenda = document.getElementById("labelTotalVenda");
+    if (lblTotalVenda) lblTotalVenda.textContent = `R$ ${totalAcumuladoCupom.toFixed(2).replace('.', ',')}`;
+    const totalGeralCupom = document.getElementById("totalGeralCupom");
+    if (totalGeralCupom) totalGeralCupom.textContent = totalAcumuladoCupom.toFixed(2);
+}
+
+function removerItemDoCupomLocal(index) {
+    window.itensCupomMemoria.splice(index, 1);
+    renderizarCupomDaMemoria();
+}
+
 function atualisBadgeContadorCaixa() {
     if (typeof carrinho !== 'undefined') {
         const totalPecas = carrinho.reduce((acumulador, item) => acumulador + item.quantidade, 0);
@@ -167,4 +404,58 @@ function atualisBadgeContadorCaixa() {
             badge.textContent = totalPecas;
         }
     }
+}
+async function deixarPedidoPendente() {
+	    if (
+	        !window.itensCupomMemoria ||
+	        window.itensCupomMemoria.length === 0
+	    ) {
+	        alert("Não existe pedido em andamento.");
+	        return;
+	    }
+
+	    const numeroPedido = window.numeroPedidoAtual;
+
+	    if (!numeroPedido) {
+	        alert("Número do pedido não foi gerado.");
+	        return;
+	    }
+
+	    if (!confirm(
+	        `Deseja deixar o pedido ${numeroPedido} pendente?`
+	    )) {
+	        return;
+	    }
+
+	    // O pedido já está gravado no MySQL com status 1.
+	    // Não baixa estoque e não grava novamente.
+
+	    window.itensCupomMemoria = [];
+
+	    if (typeof renderizarCupomDaMemoria === "function") {
+	        renderizarCupomDaMemoria();
+	    }
+
+	    const inputQuantidade =
+	        document.getElementById("inputQuantidade");
+
+	    if (inputQuantidade) {
+	        inputQuantidade.value = "1";
+	    }
+
+	    const labelStatus =
+	        document.getElementById("labelStatusCarrinho");
+
+	    if (labelStatus) {
+	        labelStatus.textContent = "1 - Pendente";
+	        labelStatus.className =
+	            "status-badge bg-warning text-dark";
+	    }
+
+	    alert(`Pedido ${numeroPedido} mantido pendente no MySQL.`);
+
+	    window.numeroPedidoAtual = `PED-${Date.now()}`;
+
+	
+	
 }
