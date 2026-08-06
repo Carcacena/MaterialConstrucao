@@ -35,12 +35,20 @@
 </div>
 
 <!-- 🛠️ MENU CRUD VERTICAL FLUTUANTE -->
-<div id="painelCaixa" class="painel-flutuante">
-    <div id="painelCaixaHeader" class="painel-header">::: CRUD CAIXA :::</div>
-    <div class="painel-corpo">
-        <button class="btn-menu-vertical btn-incluir" onclick="deixarPedidoPendente()"">Pendente (F2)</button>
-        <button class="btn-menu-vertical btn-fechar" onclick="abrirPainelFechamento()">Fechar (F10)</button>
-        <button class="btn-menu-vertical btn-excluir" onclick="cancelarOperacao()">Cancelar</button>
-        <button class="btn-menu-vertical btn-voltar" onclick="window.location.href='menu.html'">Voltar</button>
-    </div>
+<div id="painelCaixa" class="painel-flutuante"> 
+    <div id="painelCaixaHeader" class="painel-header">::: CRUD CAIXA :::</div> 
+    <div class="painel-corpo"> 
+        <!-- 🔥 BOTÕES ALINHADOS COM A NOVA ARQUITETURA SÊNIOR -->
+        <button class="btn-menu-vertical btn-incluir" onclick="deixarPedidoPendente()">Pendente (F2)</button> 
+        <button class="btn-menu-vertical btn-fechar" onclick="abrirPainelFechamento()">Fechar (F10)</button> 
+        <button class="btn-menu-vertical btn-excluir" onclick="cancelarOperacao()">Cancelar</button> 
+        <button class="btn-menu-vertical btn-carrinho" onclick="pesquisaCarrinho()">Pesquisa Carrinho</button> 
+    	<button class="btn-menu-vertical btn-devolucao" onclick="devolucaoCarrinho()">Devolucao Produto</button> 
+		<button class="btn-menu-vertical btn-voltar" onclick="window.location.href='menu.html'">Voltar</button> 
+	 </div> 
 </div>
+
+
+
+
+

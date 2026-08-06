@@ -471,6 +471,17 @@
         .btn-voltar {
             background: #7f8c8d;
         }
+		
+		.btn-carrinho {
+		            background: #c0492b;
+		        }
+		
+		
+				.btn-devolucao {
+						            background: #EE82EE;
+						        }		
+				
+		
 
         /* ======================================================
            RESPONSIVIDADE
@@ -489,7 +500,16 @@
             .bloco-carrinho {
                 min-width: 100%;
             }
+			
+			.bloco-devolve-prodduto,
+            .bloco-devolucao {
+	            min-width: 100%;
+	         }
 
+			
+			
+			
+			
             .barra-localizacao {
                 grid-template-columns: 1fr;
             }
@@ -632,12 +652,17 @@
 
                 configurarPainelArrastavel();
 		
-                const arquivosLogica = [
-                    "venda.js",
-                    "modulo-localizar.js",
-                    "modulo-cupom.js",
-                    "modulo-fechamento.js"
-                ];
+				const arquivosLogica = [ 
+				    'venda.js', 
+				    'modulo-localizar.js', 
+				    'modulo-cupom.js',
+					'/componentes-js/devolucao.js',
+					'/componentes-js/cancelarPedido.js',
+					'/componentes-js/carrinho.js',
+					
+				    'modulo-fechamento.js'
+				    ];
+					
 
                 for (const src of arquivosLogica) {
                     await carregarArquivoJavaScript(src);

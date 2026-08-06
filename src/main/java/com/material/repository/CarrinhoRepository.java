@@ -1,16 +1,33 @@
-package com.material.repository; 
+package com.material.repository;
 
-import com.material.model.Carrinho; 
-import org.springframework.data.jpa.repository.JpaRepository; 
-import org.springframework.stereotype.Repository; 
-import java.util.List; 
+import com.material.model.Carrinho;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.time.LocalDateTime;
 
-@Repository 
-public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> { 
+@Repository
+public interface CarrinhoRepository extends JpaRepository<Carrinho, Long> {
 
-    // 🔍 NEW: Filtra no MySQL os itens de um PEDIDO específico que estão em standby (Status 1)
-    List<Carrinho> findByNumeroPedidoAndStatus(String numeroPedido, Integer status); 
+    List<Carrinho> findByNumeroPedidoAndStatus(String numeroPedido, Integer status);
 
-    // 🗑️ NEW: Remove do rascunho os itens vinculados a um número de pedido específico
+    List<Carrinho> findByDataCriacaoBetweenOrderByDataCriacaoDesc(
+        LocalDateTime inicio, LocalDateTime fim
+    );
+
+    List<Carrinho> findByNumeroPedidoOrderByIdAsc(String numeroPedido);
+
     void deleteByNumeroPedido(String numeroPedido);
+
+    // ====================================================================
+    // 🔥 A SOLUÇÃO COMPLETA: Força o carregamento do Produto e Cliente
+    // ====================================================================
+    @Query("SELECT c FROM Carrinho c " +
+           "JOIN FETCH c.produto " +
+           "JOIN FETCH c.cliente " +
+           "WHERE c.numeroPedido = :numeroPedido " +
+           "ORDER BY c.id ASC")
+    List<Carrinho> buscarPedidoComRelacionamentos(@Param("numeroPedido") String numeroPedido);
 }
