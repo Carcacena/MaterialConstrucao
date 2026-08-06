@@ -1,3 +1,5 @@
+
+
 async function pesquisaCarrinho() {
     console.log("🔍 [Filtro Avançado] Abrindo painel de tráfego por período...");
 
