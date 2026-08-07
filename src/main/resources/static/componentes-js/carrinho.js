@@ -1,4 +1,7 @@
-
+// --- 1. TOPO DO ARQUIVO: DECLARAÇÃO DO BUFFER LOCAL E VARIÁVEIS GLOBAIS ---
+if (typeof window.API_URL === 'undefined') {
+    window.API_URL = "http://localhost:8080";
+}
 
 async function pesquisaCarrinho() {
     console.log("🔍 [Filtro Avançado] Abrindo painel de tráfego por período...");
