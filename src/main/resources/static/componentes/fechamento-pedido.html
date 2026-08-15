@@ -1,0 +1,53 @@
+<!-- 📦 JANELA POP-UP (MODAL) -->
+<div class="modal fade" id="modalFecharPedido" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #2c3e50; border: 2px solid #ff9800; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <div class="modal-header text-white" style="border-bottom: 1px dashed rgba(255, 152, 0, 0.4);">
+                <h5 class="modal-title font-monospace" style="color: #ff9800;">💰 FECHAMENTO DO PEDIDO</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-white">
+                <div class="mb-4">
+                    <label class="form-label">Identificar Cliente (Ih)</label>
+                    <select id="selectClienteModal" class="form-select"></select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Forma de Pagamento</label>
+                    <select id="selectPagamentoModal" class="form-select">
+                        <option value="DINHEIRO">💸 Dinheiro à Vista</option>
+                        <option value="PIX">⚡ Transferência PIX</option>
+                        <option value="DEBITO">💳 Cartão de Débito</option>
+                        <option value="CREDITO">💳 Cartão de Crédito</option>
+                        <option value="CREDIARIO">📓 No Caderno (Conta Corrente)</option>
+                    </select>
+                </div>
+                <div class="mt-3 text-center">
+                    <h4 style="color: #bdc3c7;">Valor Líquido a Pagar:</h4>
+                    <div id="totalModalDisplay" style="font-size: 36px; font-weight: bold; color: #5eff5e;">R$ 0,00</div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px dashed rgba(255, 152, 0, 0.4); background: rgba(0,0,0,0.2);">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                <button type="button" class="btn btn-success fw-bold" onclick="confirmarFaturamentoDefinitivo()" style="padding: 10px 20px;">CONFIRMAR FATURAMENTO (F10)</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🛠️ MENU CRUD VERTICAL FLUTUANTE -->
+<div id="painelCaixa" class="painel-flutuante"> 
+    <div id="painelCaixaHeader" class="painel-header">::: CRUD CAIXA :::</div> 
+    <div class="painel-corpo"> 
+        <!-- 🔥 BOTÕES ALINHADOS COM A NOVA ARQUITETURA SÊNIOR -->
+        <button class="btn-menu-vertical btn-incluir" onclick="deixarPedidoPendente()">Pendente (F2)</button> 
+        <button class="btn-menu-vertical btn-fechar" onclick="abrirPainelFechamento()">Fechar (F10)</button> 
+        <button class="btn-menu-vertical btn-excluir" onclick="cancelarOperacao()">Cancelar</button> 
+        <button class="btn-menu-vertical btn-carrinho" onclick="pesquisaCarrinho()">Pesquisa Carrinho</button> 
+ 		<button class="btn-menu-vertical btn-voltar" onclick="window.location.href='menu.html'">Voltar</button> 
+	 </div> 
+</div>
+
+
+
+
+

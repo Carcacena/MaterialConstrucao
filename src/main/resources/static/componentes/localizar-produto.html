@@ -1,0 +1,67 @@
+<div class="box-custom bloco-localizar-produto" style="display: flex; flex-direction: column; height: 100%; min-height: 560px;"> 
+    
+    <!-- 1. Cabeçalho Hierárquico Inteligente --> 
+    <div class="cabecalho-arvore" style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); gap: 15px;"> 
+        
+        <!-- Título do Catálogo -->
+        <div> 
+            <h4 style="margin: 0; color: white; font-weight: bold;">🌳 Catálogo de Produtos</h4> 
+            <small style="color: #bdc3c7; font-size: 11px;">Abra o produto raiz para visualizar as marcas e preços.</small> 
+        </div> 
+
+        <!-- 🚀 AFINAÇÃO DA VIOLA: Itens e Quantidade lado a lado, mas modelados na vertical por dentro -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+            
+            <!-- Bloco 1: Contador de Itens (Vertical) -->
+            <div class="contador-catalogo" style="min-width: 75px; padding: 5px; text-align: center; background: rgba(255, 152, 0, 0.12); border: 1px solid rgba(255, 152, 0, 0.35); border-radius: 8px;"> 
+                <span id="contadorProdutosCatalogo" style="display: block; color: #ff9800; font-size: 20px; font-weight: bold; line-height: 1.1;">0</span> 
+                <small style="color: #bdc3c7; font-size: 10px; text-transform: uppercase;">itens</small> 
+            </div> 
+
+            <!-- Bloco 2: Seletor de Quantidade (Mesmo modelo vertical do bloco de itens) -->
+            <div style="min-width: 75px; padding: 5px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 152, 0, 0.25); border-radius: 8px; display: flex; flex-direction: column; align-items: center;">
+                <input type="number" id="inputQuantidade" value="1" min="1" step="1" 
+                       style="width: 55px; background: #111; border: none; color: #5eff5e; font-size: 20px; font-weight: bold; text-align: center; outline: none; height: 26px; line-height: 26px; padding: 0;">
+                <small style="color: #bdc3c7; font-size: 10px; text-transform: uppercase; margin-top: 2px;">Qtde</small>
+            </div>
+
+        </div> 
+    </div> 
+
+    <!-- 2. Container da Árvore (Onde o JS joga a hierarquia pura) --> 
+    <div id="containerArvoreVendas" class="arvore-produtos" style="flex: 1; min-height: 250px; max-height: 380px; overflow-y: auto; padding-right: 5px; margin-top: 15px; margin-bottom: 15px;"> 
+        <div class="mensagem-carregamento" style="padding: 20px; text-align: center; color: #bdc3c7;">Carregando catálogo de produtos...</div> 
+    </div> 
+
+    <!-- 3. 🟢 PAINEL SEGURO: Rodapé de Comando --> 
+    <div id="painelProdutoSelecionado" style="padding: 12px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 8px; margin-top: auto;"> 
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;"> 
+            <div style="flex: 1;"> 
+                <div id="textoSelecionadoTitulo" style="color: #5eff5e; font-weight: bold; font-size: 14px; margin-bottom: 2px;">Nenhum produto pego</div> 
+                <div id="textoSelecionadoDetalhes" style="color: #bdc3c7; font-size: 12px;">Clique em uma marca para habilitar o botão.</div> 
+            </div> 
+            <div> 
+                <button id="btnMoverParaCupom" class="btn" style="background: #27ae60; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 6px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; cursor: pointer; display: none;" onclick="acionarMoverProduto()"> 
+                    Mover ➡%EF%B8%8F 
+                </button> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+
+<!-- ⚡ FILTRO ULTRA RÁPIDO DO BALCÃO -->
+<script>
+function filtrarArvoreLocalmente() {
+    const termo = document.getElementById("inputPesquisaProduto").value.toLowerCase().trim();
+    const blocosRaiz = document.querySelectorAll("#containerArvoreVendas > div");
+    
+    blocosRaiz.forEach(bloco => {
+        const textoBloco = bloco.textContent.toLowerCase();
+        if (textoBloco.includes(termo)) {
+            bloco.style.display = "block";
+        } else {
+            bloco.style.display = "none";
+        }
+    });
+}
+</script>
