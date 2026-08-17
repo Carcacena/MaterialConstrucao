@@ -38,14 +38,13 @@ async function logar() {
 	}
 	}
 	async function logar(event) {
-	    // Evita que a página recarregue ao submeter o formulário
+	    // 🌟 Evita que a página recarregue ao submeter o formulário
 	    if (event) event.preventDefault(); 
 
 	    const login = document.getElementById("login").value;
 	    const senha = document.getElementById("senha").value;
 
-	    // CONFIGURAÇÃO AUTOMÁTICA DA URL:
-	    // Se estiver no Railway, usa o link da nuvem. Se estiver local na porta 5500 (Live Server), aponta para o Spring (8080)
+	    // 🌐 CONFIGURAÇÃO AUTOMÁTICA DA URL (Local ou Railway)
 	    let API_URL = window.location.origin;
 	    if (API_URL.includes("localhost:") && !API_URL.includes(":8080")) {
 	        API_URL = "http://localhost:8080";
@@ -64,18 +63,29 @@ async function logar() {
 	            throw new Error("Login ou senha inválidos.");
 	        }
 
-	        // Lê o token como TEXTO PURO (conforme o padrão do seu backend)
+	        // 🔑 Lê o token como TEXTO PURO (Padrão do seu backend)
 	        const token = await response.text();
 	        
-	        // Salva as informações no navegador
+	        // 💾 Salva as informações de autenticação no navegador
 	        localStorage.setItem("token", token);
 	        sessionStorage.setItem("tipo", "0"); 
 	        
 	        console.log("Login efetuado com sucesso! Redirecionando...");
-	        window.location.href = "menu.html";
+	        
+	        // ⚡ CORREÇÃO: Caminho absoluto com a barra inicial para encontrar o menu na raiz
+	        window.location.href = "/menu.html";
 
 	    } catch (error) {
 	        console.error("Erro na autenticação:", error);
 	        alert(error.message);
 	    }
+	}
+
+	// 🚪 FUNÇÃO DE SAIR (Cole esta função logo abaixo no mesmo arquivo JS)
+	function sair() {
+	    localStorage.removeItem("token");
+	    sessionStorage.removeItem("tipo");
+	    
+	    // ⚡ CORREÇÃO: Caminho absoluto com barra inicial para retornar à tela de login
+	    window.location.href = "/login.html"; 
 	}
