@@ -653,17 +653,16 @@
                 configurarPainelArrastavel();
 		
 				const arquivosLogica = [ 
-				  '/componentes-js/utils.js',          // 🌟 NOVO: primeiro de todos
-				  'venda.js', 
-				  'modulo-localizar.js', 
-				  'modulo-cupom.js', 
+				  '/componentes-js/utils.js',          // 🌟 primeiro de todos (está certo)
+				  '/vendas/venda.js',                  // ⚡ Corrigido: Aponta para a nova pasta física /vendas
+				  '/vendas/modulo-localizar.js',       // ⚡ Corrigido
+				  '/vendas/modulo-cupom.js',           // ⚡ Corrigido
 				  '/componentes-js/devolucao.js', 
 				  '/componentes-js/cancelarPedido.js', 
 				  '/componentes-js/carrinho.js',
-				  '/componentes-js/imprimeCarrinho.js', // 🌟 NOVO: depois do carrinho.js
-				  'modulo-fechamento.js' 
+				  '/componentes-js/imprimeCarrinho.js', // 🌟 depois do carrinho.js
+				  '/vendas/modulo-fechamento.js'        // ⚡ Corrigido
 				];
-					
 
                 for (const src of arquivosLogica) {
                     await carregarArquivoJavaScript(src);
@@ -743,9 +742,9 @@
 	<!-- 1. O Bootstrap DEVE ser o primeiro da lista -->
 	 <!--<script src="https://jsdelivr.net"></script>
 
-	<!-- 2. Seus scripts locais vêm DEPOIS do Bootstrap -->
-	<script src="modulo-produtos.js" defer></script>
-	<script src="modulo-cupom.js" defer></script>
+		<!-- 2. Seus scripts locais vêm DEPOIS do Bootstrap -->
+		<script src="/Produtos/modulo-produtos.js" defer></script> <!-- ⚡ Ajustado para a pasta /Produtos -->
+		<script src="/vendas/modulo-cupom.js" defer></script>      <!-- ⚡ Ajustado para a pasta /vendas -->
 	
 </body>
 </html>

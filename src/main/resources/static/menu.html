@@ -73,21 +73,20 @@
 	<div class="box">
 		<h2>🌳 Sistema Material Construção</h2>
 
-		<!-- ⚡ NOVO BOTÃO DO PONTO DE VENDA (PDV) NO TOPO DO MENU -->
-		<button class="btn-pdv" onclick="irVendas()">⚡ Lançar Venda (PDV)</button>
+		<!-- ⚡ Código Corrigido: Aponta direto para a nova pasta física /vendas -->
+		<button class="btn-pdv" onclick="location.href='/vendas/vendas.html'">⚡ Lançar Venda (PDV)</button>
 		<hr>
-
-		<button onclick="irExpandida()">🌲 Fornecedores</button>
-		<button onclick="irProdutos()">🌿 Produtos</button>
-		<button onclick="irClientes()">🌿 Clientes</button>
-		<button onclick="irUsuario()">👤 Cadastro Usuário</button>
-		<!-- Insira este botão no seu arquivo menu.html -->
-		<button class="btn-laranja" onclick="location.href='entradaProduto.html'">
+	<button onclick="location.href='/Fonecedores/crudFornecedor.html'">🌲 Fornecedores</button>
+		
+	<button class="btn-laranja" onclick="location.href='/Produtos/crudProduto.html'">
+			    📦 Cadastro de Produto
+			</button>
+			<hr>
+	
+		<button onclick="location.href='/Clientes/crudCliente.html'">🌲 Clientes<button>
+		<button class="btn-laranja" onclick="location.href='/Entradas/entradaProduto.html'">
 		    📦 Entrada de Produto (Nota Fiscal)
 		</button>
-		
-		
-		
 		<hr>
 
 		<button onclick="sair()">🚪 Sair</button>
