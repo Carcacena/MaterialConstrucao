@@ -27,16 +27,36 @@ public class FornecedorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Fornecedor> atualizar(@PathVariable Long id, @RequestBody Fornecedor fornecedorDados) {
+    public ResponseEntity<Fornecedor> atualizar(
+            @PathVariable Long id,
+            @RequestBody Fornecedor fornecedorDados) {
+
         return fornecedorRepository.findById(id)
                 .map(fornecedor -> {
+
+                    // CPF/CNPJ NÃO ALTERA - permanece o que já está no banco
+
                     fornecedor.setNome(fornecedorDados.getNome());
-  //                  fornecedor.setEndereco(fornecedorDados.getEndereco());
-                    Fornecedor atualizado = fornecedorRepository.save(fornecedor);
+                    fornecedor.setInscricaoEstadual(fornecedorDados.getInscricaoEstadual());
+                    fornecedor.setEmail(fornecedorDados.getEmail());
+                    fornecedor.setTelefone(fornecedorDados.getTelefone());
+                    fornecedor.setCep(fornecedorDados.getCep());
+                    fornecedor.setUf(fornecedorDados.getUf());
+                    fornecedor.setLogradouro(fornecedorDados.getLogradouro());
+                    fornecedor.setNumero(fornecedorDados.getNumero());
+                    fornecedor.setComplemento(fornecedorDados.getComplemento());
+                    fornecedor.setBairro(fornecedorDados.getBairro());
+                    fornecedor.setCidade(fornecedorDados.getCidade());
+
+                    Fornecedor atualizado =
+                            fornecedorRepository.save(fornecedor);
+
                     return ResponseEntity.ok(atualizado);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+    
+   
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {

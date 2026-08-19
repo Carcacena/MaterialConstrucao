@@ -74,21 +74,25 @@
 		}
 
 		.form-control {
-			width: 100%;
-			padding: 10px;
-			background: rgba(255, 255, 255, 0.1);
-			border: 1px solid rgba(255, 255, 255, 0.2);
-			color: white;
-			border-radius: 6px;
-			box-sizing: border-box;
-			font-size: 14px;
+		    width: 100%;
+		    padding: 10px;
+
+		    background: white;
+		    color: black;
+
+		    border: 1px solid #ccc;
+		    border-radius: 6px;
+		    box-sizing: border-box;
+		    font-size: 14px;
 		}
 
 		.form-control:focus {
-			background: rgba(255, 255, 255, 0.2);
-			outline: none;
-			border-color: #ff9800;
+		    background: white;
+		    color: black;
+		    outline: none;
+		    border-color: #ff9800;
 		}
+
 
 		.btn-salvar-form {
 			width: 100%;
@@ -225,178 +229,225 @@
 		}
 	</style>
 </head>
-               <!-- ************ body **************-->
+<!-- ************ body **************-->
+
 <body>
 	<div class="container-sistema">
-			<div class="titulo-pagina">
-				<h2 style="margin: 0;">🌲 Gerenciamento de Fornecedores</h2>
+		<div class="titulo-pagina">
+			<h2 style="margin: 0;">🌲 Gerenciamento de Fornecedores</h2>
+		</div>
+
+		<!-- Formulário de Entrada -->
+		<div class="coluna-formulario">
+			<div class="box-custom">
+				<h4 id="tituloFormulario">Cadastrar Fornecedor</h4>
+				<form id="formFornecedor">
+					<!-- Campo Oculto para ID (Útil para Alterações) -->
+					<input type="hidden" id="id">
+
+					<div class="campo-grupo">
+						<label for="nome" class="form-label">Nome / Razão Social</label>
+						<input type="text" class="form-control" id="nome" required maxlength="150"
+							placeholder="Ex: Lorenzetti S/A">
+					</div>
+
+					<!-- 🔘 Seleção do Tipo de Pessoa (Física ou Jurídica) -->
+					<!-- 🔘 Seleção do Tipo de Pessoa (Física ou Jurídica) -->
+					<div class="campo-grupo">
+						<label class="form-label">Tipo de Fornecedor:</label>
+						<div class="radio-grupo" style="display: flex; gap: 15px; margin-bottom: 10px;">
+							<label>
+								<input type="radio" name="tipoPessoa" value="CNPJ" checked
+									onclick="ajustarTipoFormulario()"> Jurídica (CNPJ)
+							</label>
+							<label>
+								<input type="radio" name="tipoPessoa" value="CPF" onclick="ajustarTipoFormulario()">
+								Física (CPF)
+							</label>
+						</div>
+					</div>
+
+
+					<!-- 📊 LINHA HORIZONTAL: CNPJ/CPF ao lado da Inscrição Estadual -->
+					<div class="linha-documentos" style="display: flex; gap: 20px; margin-bottom: 15px; width: 100%;">
+
+						<!-- Bloco CNPJ/CPF -->
+						<div class="campo-grupo" style="flex: 1; max-width: 250px;">
+							<label id="label-documento" for="documento" class="form-label">CNPJ (Apenas números)</label>
+							<input type="text" class="form-control" id="documento" required maxlength="18"
+								placeholder="Ex: 12.345.678/0001-99" oninput="aplicarMascaraDocumento(this)">
+						</div>
+
+						<!-- Bloco Inscrição Estadual -->
+						<div class="campo-grupo" style="flex: 1; max-width: 250px;">
+						    <label for="inscricaoEstadual" class="form-label">
+						        Inscrição Estadual
+						    </label>
+
+						    <input type="text"
+						           class="form-control"
+						           id="inscricaoEstadual"
+						           maxlength="11"
+						           placeholder="Ex: 99999999-99"
+						           oninput="aplicarMascaraIE(this)">
+					
+						</div>
+					</div>
+
+
+			<div class="linha-campos">
+				<div class="campo-grupo">
+					<label for="email" class="form-label">E-mail</label>
+					<input type="email" class="form-control" id="email" maxlength="100"
+						placeholder="Ex: contato@empresa.com">
+				</div>
+				<div class="campo-grupo">
+					<label for="telefone" class="form-label">Telefone</label>
+					<input type="text" class="form-control" id="telefone" maxlength="20"
+						placeholder="Ex: (41) 3333-3333">
+				</div>
 			</div>
+			
+			<div class="linha-campos" style="display: flex; gap: 15px; margin-bottom: 15px;">
+			    <!-- 📬 Campo CEP (Largura flexível) -->
+			    <div class="campo-grupo" style="flex: 2;">
+			        <label for="cep" class="form-label">CEP</label>
+			        <!-- ⚡ AJUSTADO: maxlength mudou para 10 para caber o ponto e o hífen juntos! -->
+			        <input type="text" class="form-control" id="cep" required maxlength="10" placeholder="Ex: 80.820-080"
+			            oninput="aplicarMascaraCEP(this)">
+			    </div>
+			
+			
+				<!-- 🗺️ Campo UF (Lado a lado com o CEP) -->
+				<div class="campo-grupo" style="flex: 1;">
+					<label for="uf" class="form-label">UF</label>
+					<input type="text" class="form-control" id="uf" required maxlength="2" placeholder="EX: PR">
+				</div>
+			</div> <!-- ⚡ div de linha fechada corretamente aqui! -->
 
-			<!-- Formulário de Entrada -->
-			<div class="coluna-formulario">
-				<div class="box-custom">
-					<h4 id="tituloFormulario">Cadastrar Fornecedor</h4>
-					<form id="formFornecedor">
-						<!-- Campo Oculto para ID (Útil para Alterações) -->
-						<input type="hidden" id="id">
-
-						<div class="campo-grupo">
-							<label for="nome" class="form-label">Nome / Razão Social</label>
-							<input type="text" class="form-control" id="nome" required maxlength="150"
-								placeholder="Ex: Lorenzetti S/A">
-						</div>
-
-						<div class="campo-grupo">
-							<label for="cnpj" class="form-label">CNPJ (Apenas números)</label>
-							<input type="text" class="form-control" id="cnpj" required pattern="\d{14}" maxlength="14"
-								placeholder="Ex: 12345678000199">
-						</div>
-
-						<div class="linha-campos">
-							<div class="campo-grupo">
-								<label for="email" class="form-label">E-mail</label>
-								<input type="email" class="form-control" id="email" maxlength="100"
-									placeholder="Ex: contato@empresa.com">
-							</div>
-							<div class="campo-grupo">
-								<label for="telefone" class="form-label">Telefone</label>
-								<input type="text" class="form-control" id="telefone" maxlength="20"
-									placeholder="Ex: (41) 3333-3333">
-							</div>
-						</div>
-
-						<div class="linha-campos">
-							<div class="campo-grupo" style="flex: 2;">
-								<label for="cep" class="form-label">CEP</label>
-								<input type="text" class="form-control" id="cep" required pattern="\d{8}" maxlength="8"
-									placeholder="Ex: 80000000">
-							</div>
-							<div class="campo-grupo" style="flex: 1;">
-								<label for="uf" class="form-label">UF</label>
-								<input type="text" class="form-control" id="uf" required maxlength="2" placeholder="EX: PR">
-							</div>
-						</div>
-
-						<div class="linha-campos">
-							<div class="campo-grupo" style="flex: 3;">
-								<label for="logradouro" class="form-label">Logradouro / Rua</label>
-								<input type="text" class="form-control" id="logradouro" required maxlength="150"
-									placeholder="Ex: Av. das Nações">
-							</div>
-							<div class="campo-grupo" style="flex: 1;">
-								<label for="numero" class="form-label">Número</label>
-								<input type="text" class="form-control" id="numero" required maxlength="20"
-									placeholder="Ex: 201">
-							</div>
-						</div>
-
-						<div class="campo-grupo">
-							<label for="complemento" class="form-label">Complemento</label>
-							<input type="text" class="form-control" id="complemento" maxlength="100"
-								placeholder="Ex: Bloco B / Sala 10">
-						</div>
-
-						<div class="linha-campos">
-							<div class="campo-grupo">
-								<label for="bairro" class="form-label">Bairro</label>
-								<input type="text" class="form-control" id="bairro" required maxlength="80"
-									placeholder="Ex: Centro">
-							</div>
-							<div class="campo-grupo">
-								<label for="cidade" class="form-label">Cidade</label>
-								<input type="text" class="form-control" id="cidade" required maxlength="100"
-									placeholder="Ex: Curitiba">
-							</div>
-						</div>
-
-						<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Fornecedor</button>
-					</form>
+			<div class="linha-campos">
+				<div class="campo-grupo" style="flex: 3;">
+					<label for="logradouro" class="form-label">Logradouro / Rua</label>
+					<input type="text" class="form-control" id="logradouro" required maxlength="150"
+						placeholder="Ex: Av. das Nações">
+				</div>
+				<div class="campo-grupo" style="flex: 1;">
+					<label for="numero" class="form-label">Número</label>
+					<input type="text" class="form-control" id="numero" required maxlength="20" placeholder="Ex: 201">
 				</div>
 			</div>
 
-			<!-- Listagem de Fornecedores -->
-			<div class="coluna-tabela">
-			    <div class="box-custom">
-			        <h4>Fornecedores Cadastrados</h4>
-
-			        <div class="tabela-container-scroll">
-			            <table class="table-custom">
-							<thead>
-							    <tr>
-							        <th>ID</th>
-							        <th>Nome / Razão Social</th>
-							        <th>CNPJ / CPF</th>
-							        <th>Telefone</th>
-							        <th>E-mail</th>
-							        <th>CEP</th>
-							        <th>UF</th>
-							        <th>Logradouro</th>
-							        <th>Número</th>
-							        <th>Bairro</th>
-							        <th>Cidade</th>
-							    </tr>
-							</thead>
-			                <tbody id="tabelaFornecedores">
-			                    <!-- Preenchido via JS (appFornecedor.js) -->
-			                </tbody>
-			            </table>
-			        </div>
-
-			    </div>
+			<div class="campo-grupo">
+				<label for="complemento" class="form-label">Complemento</label>
+				<input type="text" class="form-control" id="complemento" maxlength="100"
+					placeholder="Ex: Bloco B / Sala 10">
 			</div>
-		
-		<!-- 👑 QUADRO VERTICAL FLUTUANTE ARRASTÁVEL -->
-			<div id="meuPainelFlutuante" class="painel-flutuante">
-				<div id="meuPainelHeader" class="painel-header">::: MENU :::</div>
-				<div class="painel-corpo">
-					<button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()"><u>I</u>ncluir</button>
-					<button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()"><u>A</u>lterar</button>
-					<button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()"><u>E</u>xcluir</button>
-					<!-- Código Corrigido: Adicionada a / antes de menu.html -->
-					<button class="btn-menu-vertical btn-voltar"
-					        onclick="window.location.href='/menu.html'"><u>V</u>oltar</button>
-			</div>	
-		
-			<!-- ************ script **************-->
-	<script>
-		
-		// Lógica física de arrastar o painel flutuante
-				const painel = document.getElementById("meuPainelFlutuante");
-				const header = document.getElementById("meuPainelHeader");
-				let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
 
-				if (header) {header.onmousedown = iniciarArrasto;}
+			<div class="linha-campos">
+				<div class="campo-grupo">
+					<label for="bairro" class="form-label">Bairro</label>
+					<input type="text" class="form-control" id="bairro" required maxlength="80"
+						placeholder="Ex: Centro">
+				</div>
+				<div class="campo-grupo">
+					<label for="cidade" class="form-label">Cidade</label>
+					<input type="text" class="form-control" id="cidade" required maxlength="100"
+						placeholder="Ex: Curitiba">
+				</div>
+			</div>
 
-				function iniciarArrasto(e) {
-					e = e || window.event;
-					e.preventDefault();
-					pos3 = e.clientX;
-					pos4 = e.clientY;
-					document.onmouseup = pararArrasto;
-					document.onmousemove = arrastandoPainel;
-				}
+			<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Fornecedor</button>
+			</form>
+		</div>
+	</div>
 
-				function arrastandoPainel(e) {
-							e = e || window.event;
-							e.preventDefault();
-							pos1 = pos3 - e.clientX;
-							pos2 = pos4 - e.clientY;
-							pos3 = e.clientX;
-							pos4 = e.clientY;
-							painel.style.top = (painel.offsetTop - pos2) + "px";
-							painel.style.left = (painel.offsetLeft - pos1) + "px";
-							painel.style.right = "auto";
-						}
+	<!-- Listagem de Fornecedores -->
+	<div class="coluna-tabela">
+	    <div class="box-custom">
+	        <h4>Fornecedores Cadastrados</h4>
+	        <div class="tabela-container-scroll">
+	            <table class="table-custom">
+	                <thead>
+	                    <tr>
+	                        <th>ID</th>
+	                        <th>Nome / Razão Social</th>
+	                        <th>CNPJ / CPF</th>
+	                        <th>Inscrição Estadual</th>
+	                        <th>Telefone</th> <!-- Corrigido aqui -->
+	                        <th>E-mail</th>
+	                        <th>CEP</th>
+	                        <th>UF</th>
+	                        <th>Logradouro</th>
+	                        <th>Número</th>
+	                        <th>Bairro</th>
+	                        <th>Cidade</th>
+	                    </tr>
+	                </thead>
+	                <tbody id="tabelaFornecedores">
+	                    <!-- Preenchido via JS (appFornecedor.js) -->
+	                </tbody>
+	            </table>
+	        </div>
+	    </div>
+	</div>
 
-						function pararArrasto() {
-							document.onmouseup = null;
-							document.onmousemove = null;
-						}
-	
-	
-	</script>
+		</div>
+	</div>
 
-	<script src="/Fonecedores/appFornecedor.js"></script>
+	<!-- 👑 QUADRO VERTICAL FLUTUANTE ARRASTÁVEL -->
+	<div id="meuPainelFlutuante" class="painel-flutuante">
+		<div id="meuPainelHeader" class="painel-header">::: MENU :::</div>
+		<div class="painel-corpo">
+			<button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()"><u>I</u>ncluir</button>
+			<button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()"><u>A</u>lterar</button>
+			<button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()"><u>E</u>xcluir</button>
+			<!-- Código Corrigido: Adicionada a / antes de menu.html -->
+			<button class="btn-menu-vertical btn-voltar"
+				onclick="window.location.href='/menu.html'"><u>V</u>oltar</button>
+		</div>
+
+		<!-- ************ script **************-->
+		<script>
+
+			// Lógica física de arrastar o painel flutuante
+			const painel = document.getElementById("meuPainelFlutuante");
+			const header = document.getElementById("meuPainelHeader");
+			let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+			if (header) {header.onmousedown = iniciarArrasto;}
+
+			function iniciarArrasto(e) {
+				e = e || window.event;
+				e.preventDefault();
+				pos3 = e.clientX;
+				pos4 = e.clientY;
+				document.onmouseup = pararArrasto;
+				document.onmousemove = arrastandoPainel;
+			}
+
+			function arrastandoPainel(e) {
+				e = e || window.event;
+				e.preventDefault();
+				pos1 = pos3 - e.clientX;
+				pos2 = pos4 - e.clientY;
+				pos3 = e.clientX;
+				pos4 = e.clientY;
+				painel.style.top = (painel.offsetTop - pos2) + "px";
+				painel.style.left = (painel.offsetLeft - pos1) + "px";
+				painel.style.right = "auto";
+			}
+
+			function pararArrasto() {
+				document.onmouseup = null;
+				document.onmousemove = null;
+			}
+
+
+		</script>
+
+		<!-- 📦 Sempre os scripts globais primeiro, depois o seu app customizado -->
+		<script src="/componentes-js/utils.js"></script>
+		<script src="/Fonecedores/appFornecedor.js"></script> <!-- ⚡ Verifique se a pasta com 'F' maiúsculo bate com a sua estrutura -->
 	
 </body>
 

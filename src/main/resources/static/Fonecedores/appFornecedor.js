@@ -1,6 +1,6 @@
 const API_URL =
     window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
+        window.location.hostname === "127.0.0.1"
         ? "http://localhost:8080"
         : window.location.origin;
 // Helper para pegar o token limpo do LocalStorage em qualquer função
@@ -39,7 +39,7 @@ function bloquearFormulario(status) {
     const enderecoInput = document.getElementById("endereco");
     const btnSalvar = document.getElementById("btnSalvar");
     const formContainer = document.getElementById("formFornecedor");
-    
+
     if (nomeInput) nomeInput.disabled = status;
     if (enderecoInput) enderecoInput.disabled = status;
     if (btnSalvar) btnSalvar.disabled = status;
@@ -75,7 +75,7 @@ async function carregarFornecedores() {
 
         if (response.status === 401 || response.status === 403) {
             alert("Sessão expirada. Por favor, faça login novamente, piá!");
-            window.location.href = "login.html";
+            window.location.href = "/login.html"; // ⚡ Corrigido com barra
             return;
         }
 
@@ -84,16 +84,14 @@ async function carregarFornecedores() {
         }
 
         const fornecedores = await response.json();
-        renderizarTabelaFornecedores(fornecedores); // 🌟 Agora ela existe!
-        
+        renderizarTabelaFornecedores(fornecedores);
+
     } catch (error) {
         console.error("Erro no processamento:", error);
     }
 }
-
-// 🌟 NOVA FUNÇÃO: Desenha as linhas no HTML e ativa a seleção do clique
+// 🌟 FUNÇÃO CORRIGIDA: Alinhada estritamente com as 4 colunas visíveis da sua tela
 function renderizarTabelaFornecedores(fornecedores) {
-
     const tbody = document.getElementById("tabelaFornecedores");
     if (!tbody) return;
 
@@ -102,7 +100,7 @@ function renderizarTabelaFornecedores(fornecedores) {
     if (fornecedores.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="11" style="text-align:center;">
+                <td colspan="4" style="text-align:center;">
                     Nenhum fornecedor cadastrado.
                 </td>
             </tr>
@@ -110,14 +108,15 @@ function renderizarTabelaFornecedores(fornecedores) {
         return;
     }
 
+    // ⚡ Atualize o trecho de renderização para bater com as 12 colunas do HTML
     fornecedores.forEach(forn => {
-
         const tr = document.createElement("tr");
 
-        // Guarda os dados para Alterar
+        // Mantém o dataset completo para a função Alterar funcionar perfeitamente
         tr.dataset.id = forn.id;
         tr.dataset.nome = forn.nome;
         tr.dataset.cnpj = forn.cnpj || "";
+        tr.dataset.inscricaoEstadual = forn.inscricaoEstadual || "";
         tr.dataset.telefone = forn.telefone || "";
         tr.dataset.email = forn.email || "";
         tr.dataset.cep = forn.cep || "";
@@ -126,61 +125,69 @@ function renderizarTabelaFornecedores(fornecedores) {
         tr.dataset.numero = forn.numero || "";
         tr.dataset.bairro = forn.bairro || "";
         tr.dataset.cidade = forn.cidade || "";
+        tr.dataset.complemento = forn.complemento || "";
 
+        // 🌟 A MÁGICA DO ALINHAMENTO: 12 tags <td> na ordem exata do seu <th>
         tr.innerHTML = `
-            <td>${forn.id}</td>
-            <td>${forn.nome || ""}</td>
-            <td>${forn.cnpj || "Não informado"}</td>
-            <td>${forn.telefone || "Não informado"}</td>
-            <td>${forn.email || "Não informado"}</td>
-            <td>${forn.cep || ""}</td>
-            <td>${forn.uf || ""}</td>
-            <td>${forn.logradouro || ""}</td>
-            <td>${forn.numero || ""}</td>
-            <td>${forn.bairro || ""}</td>
-            <td>${forn.cidade || ""}</td>
-        `;
+	        <td>${forn.id}</td>
+	        <td>${forn.nome || ""}</td>
+	        <td>${forn.cnpj || "Não informado"}</td>
+	        <td>${forn.inscricaoEstadual || "ISENTO"}</td>
+	        <td>${forn.telefone || "Não informado"}</td>
+	        <td>${forn.email || "Não informado"}</td>
+	        <td>${forn.cep || ""}</td>
+	        <td>${forn.uf || ""}</td>
+	        <td>${forn.logradouro || ""}</td>
+	        <td>${forn.numero || ""}</td>
+	        <td>${forn.bairro || ""}</td>
+	        <td>${forn.cidade || ""}</td>
+	    `;
 
         tr.addEventListener("click", () => {
-
-            document
-                .querySelectorAll("#tabelaFornecedores tr")
-                .forEach(r => r.classList.remove("selecionado"));
-
+            document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
             tr.classList.add("selecionado");
-
             fornecedorSelecionadoId = forn.id;
         });
 
         tbody.appendChild(tr);
     });
 }
-async function cadastrarFornecedor(event) { 
-    if (event) event.preventDefault(); 
-    
-    const tokenPuro = obterTokenPuro(); 
-    if (!tokenPuro) return; 
+async function cadastrarFornecedor(event) {
+    if (event) event.preventDefault();
+
+    const tokenPuro = obterTokenPuro();
+    if (!tokenPuro) return;
 
     // Captura dos valores do HTML
-    const nomeForn = document.getElementById("nome").value; 
-    const cnpjForn = document.getElementById("cnpj").value; 
-    const emailForn = document.getElementById("email").value; 
-    const telefoneForn = document.getElementById("telefone").value; 
-    const cepForn = document.getElementById("cep").value; 
-    const logradouroForn = document.getElementById("logradouro").value; 
-    const numeroForn = document.getElementById("numero").value; 
-    const complementoForn = document.getElementById("complemento").value; 
-    const bairroForn = document.getElementById("bairro").value; 
-    const cidadeForn = document.getElementById("cidade").value; 
-    const ufForn = document.getElementById("uf").value; 
+    const nomeForn = document.getElementById("nome").value;
+    const documentoMascarado = document.getElementById("documento").value;
+    const documentoLimpo = documentoMascarado.replace(/\D/g, ""); // 🧼 Dado limpo para o Java
 
-    // ✨ CORREÇÃO: Criação do objeto com todos os dados capturados
-    const SamplefornecedorDados = {
+    // ⚡ INCLUSÃO: Captura a Inscrição Estadual (Pode levar o número com traço ou a palavra "ISENTO")
+    const inscricaoEstadualForn = document.getElementById("inscricaoEstadual").value;
+
+    const emailForn = document.getElementById("email").value;
+    const telefoneForn = document.getElementById("telefone").value;
+
+    // 🧼 REGRA DE OURO: Limpa o ponto e traço do CEP para enviar estritamente os 8 números puros exigidos pelo Java!
+    const cepMascarado = document.getElementById("cep").value;
+    const cepLimpo = cepMascarado.replace(/\D/g, "");
+
+    const logradouroForn = document.getElementById("logradouro").value;
+    const numeroForn = document.getElementById("numero").value;
+    const complementoForn = document.getElementById("complemento").value;
+    const bairroForn = document.getElementById("bairro").value;
+    const cidadeForn = document.getElementById("cidade").value;
+    const ufForn = document.getElementById("uf").value;
+
+    // 📦 Criação do objeto perfeitamente alinhado com o Fornecedor.java de 13 colunas
+    const fornecedorDados = {
         nome: nomeForn,
-        cnpj: cnpjForn,
+        cnpj: documentoLimpo, // Envia 11 ou 14 dígitos puros
+        inscricaoEstadual: inscricaoEstadualForn, // ⚡ Enviando o novo campo mapeado!
         email: emailForn,
         telefone: telefoneForn,
-        cep: cepForn,
+        cep: cepLimpo, // Envia exatamente 8 números puros
         logradouro: logradouroForn,
         numero: numeroForn,
         complemento: complementoForn,
@@ -189,112 +196,266 @@ async function cadastrarFornecedor(event) {
         uf: ufForn
     };
 
-    const url = fornecedorSelecionadoId ? `${API_URL}/fornecedores/${fornecedorSelecionadoId}` : `${API_URL}/fornecedores`; 
-    const metodo = fornecedorSelecionadoId ? "PUT" : "POST"; 
+    // ⚡ Ajuste de rota com barra absoluta para estabilidade local e nuvem
+    const url = fornecedorSelecionadoId ? `/fornecedores/${fornecedorSelecionadoId}` : `/fornecedores`;
+    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
 
-    try { 
-        const response = await fetch(url, { 
-            method: metodo, 
-            headers: { 
-                "Content-Type": "application/json", 
-                "Authorization": `Bearer ${tokenPuro}` 
-            }, 
-            body: JSON.stringify(SamplefornecedorDados) // ✨ Enviando o objeto correto
-        }); 
+    try {
+        const response = await fetch(url, {
+            method: metodo,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${tokenPuro}`
+            },
+            body: JSON.stringify(fornecedorDados)
+        });
 
-        if (response.ok) { 
-            alert(fornecedorSelecionadoId ? "Fornecedor alterado com sucesso!" : "Fornecedor cadastrado com sucesso!"); 
-            acionarIncluir(); 
-            carregarFornecedores(); 
-        } else { 
-            alert("Erro ao salvar fornecedor."); 
-        } 
-    } catch (e) { 
-        console.error("Erro na requisição:", e); 
-    } 
+        if (response.ok) {
+            alert(fornecedorSelecionadoId ? "✅ Fornecedor alterado com sucesso!" : "✅ Fornecedor cadastrado com sucesso!");
+            acionarIncluir();
+            carregarFornecedores();
+        } else {
+            const textoErro = await response.text();
+            alert("❌ Erro ao salvar fornecedor:\n" + textoErro);
+        }
+    } catch (e) {
+        console.error("Erro na requisição:", e);
+        alert("❌ Erro de rede ao tentar se conectar ao servidor.");
+    }
 }
+
 function acionarAlterar() {
     if (!fornecedorSelecionadoId) {
-        alert("Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
+        alert("⚠️ Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
         return;
     }
     const linhaSelecionada = document.querySelector("#tabelaFornecedores tr.selecionado");
-	if (linhaSelecionada) {
+    if (linhaSelecionada) {
+        bloquearFormulario(false);
 
-	    bloquearFormulario(false);
+        document.getElementById("id").value = linhaSelecionada.dataset.id || "";
+        document.getElementById("nome").value = linhaSelecionada.dataset.nome || "";
+        document.getElementById("email").value = linhaSelecionada.dataset.email || "";
+        document.getElementById("telefone").value = linhaSelecionada.dataset.telefone || "";
+        document.getElementById("cep").value = linhaSelecionada.dataset.cep || "";
+        document.getElementById("uf").value = linhaSelecionada.dataset.uf || "";
+        document.getElementById("logradouro").value = linhaSelecionada.dataset.logradouro || "";
+        document.getElementById("numero").value = linhaSelecionada.dataset.numero || "";
+        document.getElementById("complemento").value = linhaSelecionada.dataset.complemento || "";
+        document.getElementById("bairro").value = linhaSelecionada.dataset.bairro || "";
+        document.getElementById("cidade").value = linhaSelecionada.dataset.cidade || "";
 
-	    document.getElementById("id").value =
-	        linhaSelecionada.dataset.id || "";
+        // 📇 Captura o documento puro do dataset
+       
+		// 📇 CPF/CNPJ - somente exibição para conferência no ALTERAR
+		const docPuro = linhaSelecionada.dataset.cnpj || "";
 
-	    document.getElementById("nome").value =
-	        linhaSelecionada.dataset.nome || "";
+		const inputDoc = document.getElementById("documento");
 
-	    document.getElementById("cnpj").value =
-	        linhaSelecionada.dataset.cnpj || "";
+		// Exibe o CPF/CNPJ selecionado
+		inputDoc.value = docPuro;
 
-	    document.getElementById("email").value =
-	        linhaSelecionada.dataset.email || "";
+		// Aplica a máscara para aparecer bonito
+		aplicarMascaraDocumento(inputDoc);
 
-	    document.getElementById("telefone").value =
-	        linhaSelecionada.dataset.telefone || "";
+		// Bloqueia: pode conferir, mas não alterar
+		inputDoc.disabled = true;
+		
+		
+		
+		// const docPuro = linhaSelecionada.dataset.cnpj || "";
+       // const inputDoc = document.getElementById("documento");
+       // inputDoc.value = docPuro;
 
-	    document.getElementById("cep").value =
-	        linhaSelecionada.dataset.cep || "";
+        // 🌟 AUTOMACÃO IH: Identifica se é CPF ou CNPJ pelo tamanho e marca o rádio certo
+       // if (docPuro.length <= 11) {
+       //     document.querySelector('input[name="tipoPessoa"][value="CPF"]').checked = true;
+      //  } else {
+       //     document.querySelector('input[name="tipoPessoa"][value="CNPJ"]').checked = true;
+      //  }
+	  if (docPuro.length <= 11) {
 
-	    document.getElementById("uf").value =
-	        linhaSelecionada.dataset.uf || "";
+	      document.querySelector(
+	          'input[name="tipoPessoa"][value="CPF"]'
+	      ).checked = true;
 
-	    document.getElementById("logradouro").value =
-	        linhaSelecionada.dataset.logradouro || "";
+	  } else {
 
-	    document.getElementById("numero").value =
-	        linhaSelecionada.dataset.numero || "";
+	      document.querySelector(
+	          'input[name="tipoPessoa"][value="CNPJ"]'
+	      ).checked = true;
+	  }
+	  
+	  
+	  
+	  
+	  
 
-	    document.getElementById("complemento").value =
-	        linhaSelecionada.dataset.complemento || "";
+        // Executa as regras de rótulo e comportamento de tela (ativa/inativa IE)
+        ajustarTipoFormulario();
+		// DEPOIS coloca o documento
+		inputDoc.value = docPuro;
 
-	    document.getElementById("bairro").value =
-	        linhaSelecionada.dataset.bairro || "";
+		// DEPOIS aplica máscara
+		aplicarMascaraDocumento(inputDoc);
 
-	    document.getElementById("cidade").value =
-	        linhaSelecionada.dataset.cidade || "";
+		// FINALMENTE bloqueia
+		inputDoc.disabled = true;
+		
+		
+		
+		
+		
+		
+		
+		
+		
 
-	    document.getElementById("tituloFormulario").textContent =
-	        "Alterar Fornecedor";
+        // 🏢 Carrega a Inscrição Estadual pós-ajuste de tela
+        const inputIE = document.getElementById("inscricaoEstadual");
+        if (inputIE) {
+            inputIE.value = linhaSelecionada.dataset.inscricaoEstadual || "";
+            // Aplica a máscara se não for "ISENTO"
+            if (inputIE.value !== "ISENTO") aplicarMascaraIE(inputIE);
+        }
 
-	    document.getElementById("btnSalvar").textContent =
-	        "Atualizar Fornecedor";
+        // ⚡ MÁGICA VISUAL: Força a formatação imediata das máscaras na tela
+        aplicarMascaraDocumento(inputDoc);
+        aplicarMascaraCEP(document.getElementById("cep"));
+        aplicarMascaraTelefone(document.getElementById("telefone"));
+		
+		// 🔒 CPF/CNPJ é chave: no ALTERAR apenas exibe
+		inputDoc.disabled = true;
 
-	    document.getElementById("nome").focus();
-	}
+		// 🔒 Também não permite trocar Física ↔ Jurídica
+		document.querySelectorAll('input[name="tipoPessoa"]').forEach(radio => {
+		    radio.disabled = true;
+		});
+		
+
+        document.getElementById("tituloFormulario").textContent = "Alterar Fornecedor";
+       
+		 document.getElementById("btnSalvar").textContent = "Atualizar Fornecedor";
+        document.getElementById("nome").focus();
+    }
 }
+
 async function acionarExcluir() {
     const tokenPuro = obterTokenPuro();
     if (!tokenPuro) return;
 
     if (!fornecedorSelecionadoId) {
-        alert("Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
+        alert("⚠️ Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
         return;
     }
-    if (confirm("Tem certeza que deseja excluir o fornecedor selecionado?")) {
+    if (confirm("❓ Tem certeza que deseja excluir o fornecedor selecionado?")) {
         try {
-            const response = await fetch(`${API_URL}/fornecedores/${fornecedorSelecionadoId}`, {
+            // ⚡ Ajustado para rota absoluta estável
+            const response = await fetch(`/fornecedores/${fornecedorSelecionadoId}`, {
                 method: "DELETE",
                 headers: {
-                    "Authorization": `Bearer ${tokenPuro}` // 🌟 Corrigido com tokenPuro
+                    "Authorization": `Bearer ${tokenPuro}`
                 }
             });
             if (response.ok) {
-                alert("Fornecedor excluído com sucesso!");
-                acionarIncluir(); 
+                alert("✅ Fornecedor excluído com sucesso!");
+                acionarIncluir();
                 carregarFornecedores();
             } else {
-                alert("Erro ao excluir fornecedor.");
+                alert("❌ Erro ao excluir fornecedor.");
             }
         } catch (e) {
             console.error(e);
         }
     }
+}
+
+// ⚡ 5. MÁSCARA DE TELEFONE AVANÇADA (055-41-99895-9399)
+function aplicarMascaraTelefone(input) {
+    if (!input) return;
+    let valor = input.value.replace(/\D/g, "");
+
+    if (valor.length > 3) valor = valor.replace(/^(\d{3})(\d)/, "$1-$2");
+    if (valor.length > 5) valor = valor.replace(/^(\d{3})-(\d{2})(\d)/, "$1-$2-$3");
+    if (valor.length > 10) valor = valor.replace(/^(\d{3})-(\d{2})-(\d{5})(\d)/, "$1-$2-$3-$4");
+
+    input.value = valor;
+}
+
+// ⚡ 6. MÁSCARA DE CEP AVANÇADA (80.820-080)
+function aplicarMascaraCEP(input) {
+    if (!input) return;
+    let valor = input.value.replace(/\D/g, "");
+
+    if (valor.length > 2) valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+    if (valor.length > 5) valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2-$3");
+
+    input.value = valor;
+}
+
+function ajustarTipoFormulario() {
+    const tipo = document.querySelector('input[name="tipoPessoa"]:checked').value;
+    const label = document.getElementById("label-documento");
+    const inputDoc = document.getElementById("documento");
+    const inputIE = document.getElementById("inscricaoEstadual");
+
+    inputDoc.value = "";
+
+    if (tipo === "CNPJ") {
+        label.innerText = "CNPJ (Apenas números)";
+        inputDoc.placeholder = "Ex: 12.345.678/0001-99";
+        inputDoc.maxLength = 18;
+
+        inputIE.value = "";
+        inputIE.disabled = false;
+        inputIE.placeholder = "Ex: 99999999-99";
+        inputIE.maxLength = 11; // ⚡ Força o tamanho correto com o traço
+    } else {
+        label.innerText = "CPF (Apenas números)";
+        inputDoc.placeholder = "Ex: 123.456.789-00";
+        inputDoc.maxLength = 14;
+
+        // Crava ISENTO automático e bloqueia o campo para Pessoa Física
+        inputIE.value = "ISENTO";
+        inputIE.disabled = true;
+    }
+}
+
+// ⚡ 1. Máscara dinâmica para Documento (CPF ou CNPJ)
+function aplicarMascaraDocumento(input) {
+    let valor = input.value.replace(/\D/g, "");
+    const tipo = document.querySelector('input[name="tipoPessoa"]:checked').value;
+
+    if (tipo === "CNPJ") {
+        if (valor.length > 2) valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+        if (valor.length > 5) valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+        if (valor.length > 8) valor = valor.replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4");
+        if (valor.length > 12) valor = valor.replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3\/$4-$5");
+    } else {
+        if (valor.length > 3) valor = valor.replace(/^(\d{3})(\d)/, "$1.$2");
+        if (valor.length > 6) valor = valor.replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3");
+        if (valor.length > 9) valor = valor.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+    }
+    input.value = valor;
+}
+
+// ⚡ 2. Máscara de Inscrição Estadual (99999999-99)
+function aplicarMascaraIE(input) {
+    let valor = input.value.replace(/\D/g, "");
+    if (valor.length > 8) {
+        valor = valor.replace(/^(\d{8})(\d)/, "$1-$2");
+    }
+    input.value = valor;
+}
+
+// ⚡ 3. Máscara de CEP (80.820-080) - LIBERTADA E ISOLADA GLOBALMENTE!
+function aplicarMascaraCEP(input) {
+    let valor = input.value.replace(/\D/g, "");
+
+    if (valor.length > 2) valor = valor.replace(/^(\d{2})(\d)/, "$1.$2");
+    if (valor.length > 5) valor = valor.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2-$3");
+
+    input.value = valor;
 }
 
 // ⌨️ MOTOR DE ATALHOS DE TECLADO INTERATIVO (ALT + LETRA)
@@ -303,7 +464,7 @@ document.addEventListener("keydown", (event) => {
         const tecla = event.key.toLowerCase();
         if (tecla === 'i') {
             event.preventDefault();
-            acionarIncluir(); 
+            acionarIncluir();
         } else if (tecla === 'a') {
             event.preventDefault();
             acionarAlterar();
@@ -312,7 +473,13 @@ document.addEventListener("keydown", (event) => {
             acionarExcluir();
         } else if (tecla === 'v') {
             event.preventDefault();
-            window.location.href = 'menu.html';
+            window.location.href = '/menu.html'; // ⚡ Corrigido com barra absoluta!
         }
     }
 });
+
+
+
+
+
+

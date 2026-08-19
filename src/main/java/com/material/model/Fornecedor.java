@@ -1,9 +1,7 @@
 package com.material.model;
 
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,11 +28,16 @@ public class Fornecedor {
     @Column(nullable = false, length = 150)
     private String nome;
    
-    @NotBlank(message = "O CNPJ é obrigatório")
-    @Pattern(regexp = "\\d{14}", message = "O CNPJ deve conter exatamente 14 dígitos numéricos")
+    @NotBlank(message = "O documento é obrigatório")
+    // ⚡ AJUSTADO: A expressão aceita 11 dígitos (CPF) OU 14 dígitos (CNPJ) sem travar!
+    @Pattern(regexp = "\\d{11}|\\d{14}", message = "O documento deve conter 11 dígitos (CPF) ou 14 dígitos (CNPJ)")
     @Column(nullable = false, unique = true, length = 14)
-  
     private String cnpj;
+
+    // ⚡ INCLUSÃO: Mapeamento da nova coluna de Inscrição Estadual
+    @Column(name = "inscricao_estadual", length = 15)
+    private String inscricaoEstadual;
+
     @Email(message = "E-mail inválido")
     @Column(length = 100)
     private String email;
@@ -71,16 +74,6 @@ public class Fornecedor {
     @Column(nullable = false, length = 2)
     private String uf;
     
-   // @OneToMany(
-   //         mappedBy = "fornecedor",
-   //         cascade = CascadeType.ALL
-   //     )
-        //@JsonIgnore
-        //private List<Produto> produtos;
-    
-    
-    
-   
     @OneToMany(
         mappedBy = "fornecedor",
         cascade = CascadeType.ALL
@@ -88,123 +81,49 @@ public class Fornecedor {
     @JsonIgnore
     private List<Produto> produtos;
 
-    public Long getId() {
-        return id;
-    }
+    // --- GETTERS E SETTERS ---
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public String getNome() {
-        return nome;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getCnpj() { return cnpj; }
+    public void setCnpj(String cnpj) { this.cnpj = cnpj; }
 
-   
+    // ⚡ INCLUSÃO: Getters e Setters para a Inscrição Estadual ler o JSON do front
+    public String getInscricaoEstadual() { return inscricaoEstadual; }
+    public void setInscricaoEstadual(String inscricaoEstadual) { this.inscricaoEstadual = inscricaoEstadual; }
 
-    public List<Produto> getProdutos() {
-        return produtos;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setProdutos(List<Produto> produtos) {
-        this.produtos = produtos;
-    }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
 
-	public String getCnpj() {
-		return cnpj;
-	}
+    public String getCep() { return cep; }
+    public void setCell(String cep) { this.cep = cep; } // Mantido seu padrão anterior
+    public void setCep(String cep) { this.cep = cep; }
 
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
-	}
+    public String getLogradouro() { return logradouro; }
+    public void setLogradouro(String logradouro) { this.logradouro = logradouro; }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public String getComplemento() { return complemento; }
+    public void setComplemento(String complemento) { this.complemento = complemento; }
 
-	public String getTelefone() {
-		return telefone;
-	}
+    public String getBairro() { return bairro; }
+    public void setBairro(String bairro) { this.bairro = bairro; }
 
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
+    public String getCidade() { return cidade; }
+    public void setCidade(String cidade) { this.cidade = cidade; }
 
-	public String getCep() {
-		return cep;
-	}
+    public String getUf() { return uf; }
+    public void setUf(String uf) { this.uf = uf; }
 
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
-
-	public String getLogradouro() {
-		return logradouro;
-	}
-
-	public void setLogradouro(String logradouro) {
-		this.logradouro = logradouro;
-	}
-
-	public String getNumero() {
-		return numero;
-	}
-
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
-
-	public String getComplemento() {
-		return complemento;
-	}
-
-	public void setComplemento(String complemento) {
-		this.complemento = complemento;
-	}
-
-	public String getBairro() {
-		return bairro;
-	}
-
-	public void setBairro(String bairro) {
-		this.bairro = bairro;
-	}
-
-	public String getCidade() {
-		return cidade;
-	}
-
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
-	}
-
-	public String getUf() {
-		return uf;
-	}
-
-	public void setUf(String uf) {
-		this.uf = uf;
-	}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    public List<Produto> getProdutos() { return produtos; }
+    public void setProdutos(List<Produto> produtos) { this.produtos = produtos; }
 }
