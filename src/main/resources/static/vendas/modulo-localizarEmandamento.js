@@ -1,5 +1,5 @@
 // =========================================================================
-// 🌳 MOTOR GENEALÓGICO DE BALCÃO: PRODUTO RAIZ ➡️ FORNECEDOR SUB-RAIZ
+// 🌳 MOTOR GENEALÓGICO DE BALCÃO: PRODUTO RAIZ ➡️ Cliente SUB-RAIZ
 // =========================================================================
 
 // 📦 BUSCA PRODUTOS DO BANCO DE DADOS
@@ -58,9 +58,9 @@ function montarArvoreVendasCentro() {
             divSubRaizContainer.style.display = divSubRaizContainer.style.display === "none" ? "block" : "none";
         });
 
-        // Varre os fornecedores daquele produto
+        // Varre os Clientes daquele produto
         hierarquia[produtoRaiz].forEach(prod => {
-            const fornecedorNome = prod.fornecedor ? prod.fornecedor.nome : "Sem Marca";
+            const ClienteNome = prod.Cliente ? prod.Cliente.nome : "Sem Marca";
             const tipoLabel = prod.aGranel ? "[Granel]" : "[Unid]";
             const precoVenda = prod.precoVenda || 0;
             const precoCusto = prod.precoCusto || 0;
@@ -74,7 +74,7 @@ function montarArvoreVendasCentro() {
             // Texto da linha
             const divTextoLinha = document.createElement("div");
             divTextoLinha.style.cssText = "cursor: pointer; display: inline-block;";
-            divTextoLinha.innerHTML = `🔹 <strong>${fornecedorNome}</strong> <small style="color: #ff9800;">${tipoLabel}</small> - <span style="color: #5eff5e; font-weight: bold;">R$ ${precoVenda.toFixed(2)}</span> <small style="color: #bdc3c7; font-size: 11px;">(Margem: ${margem}%)</small>`;
+            divTextoLinha.innerHTML = `🔹 <strong>${ClienteNome}</strong> <small style="color: #ff9800;">${tipoLabel}</small> - <span style="color: #5eff5e; font-weight: bold;">R$ ${precoVenda.toFixed(2)}</span> <small style="color: #bdc3c7; font-size: 11px;">(Margem: ${margem}%)</small>`;
 
             // 🎯 O MODELO DO PRINT: Menu de botões contextuais que nasce escondido logo abaixo do nome
             const divMenuBotoes = document.createElement("div");
@@ -85,7 +85,7 @@ function montarArvoreVendasCentro() {
                 <button class="btn" style="background: #7f8c8d; color: white; font-size: 11px; padding: 2px 8px; border: none; border-radius: 3px; font-weight: bold; text-transform: uppercase;" disabled>Incluir</button>
             `;
 
-            // Clique no texto do fornecedor faz o menu de botões brotar logo abaixo dele (Igual ao print!)
+            // Clique no texto do Cliente faz o menu de botões brotar logo abaixo dele (Igual ao print!)
             divTextoLinha.addEventListener("click", (evento) => {
                 evento.stopPropagation(); // Impede o clique de fechar o pai
                 document.querySelectorAll(".produtos-lista div[style*='display: flex']").forEach(m => m.style.display = "none");
@@ -115,7 +115,7 @@ function montarArvoreVendasCentro() {
 			              if (typeof adicionarProdutoAoCupom === "function") { 
 			                  adicionarProdutoAoCupom( 
 			                      prod.id, 
-			                      `${produtoRaiz} (${fornecedorNome})`, 
+			                      `${produtoRaiz} (${ClienteNome})`, 
 			                      quantidadeInput, 
 			                      precoVenda, 
 			                      precoCusto 

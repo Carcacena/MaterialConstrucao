@@ -59,9 +59,9 @@ function montarArvoreVendasCentro() {
             divSubRaizContainer.style.display = divSubRaizContainer.style.display === "none" ? "block" : "none"; 
         }); 
 
-        // Varre fornecedores daquele produto 
+        // Varre Clientes daquele produto 
         hierarquia[produtoRaiz].forEach(prod => { 
-            const fornecedorNome = prod.fornecedor ? prod.fornecedor.nome : "Sem Marca"; 
+            const ClienteNome = prod.Cliente ? prod.Cliente.nome : "Sem Marca"; 
             const tipoLabel = prod.aGranel ? "[Granel]" : "[Unid]"; 
             const precoVenda = Number(prod.precoVenda || 0); 
             const precoCusto = Number(prod.precoCusto || 0); 
@@ -85,7 +85,7 @@ function montarArvoreVendasCentro() {
             // Texto da linha 
             const divTextoLinha = document.createElement("div"); 
             divTextoLinha.style.cssText = "cursor: pointer; display: inline-block;"; 
-            divTextoLinha.innerHTML = `🔹 <strong>${fornecedorNome}</strong> <small style="color: #ff9800;"> ${tipoLabel} </small> - <span style="color: #5eff5e; font-weight: bold;"> R$ ${precoVenda.toFixed(2)} </span> <small style="color: #bdc3c7; font-size: 11px;"> (Margem: ${margem}%) </small> <small style="color: #ffd54f; font-size: 11px; font-weight: bold;"> | Estoque: ${estoqueFormatado} | Est. Atual: <span class="txt-dinamico-estoque" style="color: #5eff5e;">${saldoFormatadoInicial}</span> </small>`; 
+            divTextoLinha.innerHTML = `🔹 <strong>${ClienteNome}</strong> <small style="color: #ff9800;"> ${tipoLabel} </small> - <span style="color: #5eff5e; font-weight: bold;"> R$ ${precoVenda.toFixed(2)} </span> <small style="color: #bdc3c7; font-size: 11px;"> (Margem: ${margem}%) </small> <small style="color: #ffd54f; font-size: 11px; font-weight: bold;"> | Estoque: ${estoqueFormatado} | Est. Atual: <span class="txt-dinamico-estoque" style="color: #5eff5e;">${saldoFormatadoInicial}</span> </small>`; 
 
             // Menu contextual 
             const divMenuBotoes = document.createElement("div"); 
@@ -93,7 +93,7 @@ function montarArvoreVendasCentro() {
             divMenuBotoes.style.cssText = "display: none; gap: 6px; padding-left: 15px; margin-top: 2px; margin-bottom: 4px;"; 
             divMenuBotoes.innerHTML = ` <button class="btn" style="background: #27ae60; color: white; font-size: 11px; padding: 2px 8px; border: none; border-radius: 3px; font-weight: bold; text-transform: uppercase;"> Mover </button> <button class="btn" style="background: #7f8c8d; color: white; font-size: 11px; padding: 2px 8px; border: none; border-radius: 3px; font-weight: bold; text-transform: uppercase;" disabled> Alterar </button> <button class="btn" style="background: #7f8c8d; color: white; font-size: 11px; padding: 2px 8px; border: none; border-radius: 3px; font-weight: bold; text-transform: uppercase;" disabled> Incluir </button> `; 
 
-            // Clique no fornecedor abre menu e fecha os outros 
+            // Clique no Cliente abre menu e fecha os outros 
             divTextoLinha.addEventListener("click", evento => { 
                 evento.stopPropagation(); 
                 container.querySelectorAll(".menu-botoes-pdv").forEach(menu => { 
@@ -138,7 +138,7 @@ function montarArvoreVendasCentro() {
                 if (typeof adicionarProdutoAoCupom === "function") { 
                     adicionarProdutoAoCupom( 
                         prod.id, 
-                        `${produtoRaiz} (${fornecedorNome})`, 
+                        `${produtoRaiz} (${ClienteNome})`, 
                         quantidadeInput, 
                         precoVenda, 
                         precoCusto 

@@ -8,8 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/api/clientes") // ⚡ ADICIONADO O /api AQUI!
 public class ClienteController {
 
     @Autowired

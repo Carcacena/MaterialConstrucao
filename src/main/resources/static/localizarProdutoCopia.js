@@ -36,7 +36,7 @@ async function inicializarComponenteArvore(apiUrl, tokenJWT) {
 
                 // O Pai (A Categoria)
                 const btnPai = document.createElement("button");
-                btnPai.className = "fornecedor-header";
+                btnPai.className = "Cliente-header";
                 btnPai.innerHTML = `📁 <strong>${nomeProduto}</strong> (${agrupado[nomeProduto].length})`;
 
                 // O bloco dos Filhos (As Marcas) - Começa colapsado/fechado
@@ -54,7 +54,7 @@ async function inicializarComponenteArvore(apiUrl, tokenJWT) {
                     const itemFilho = document.createElement("div");
                     itemFilho.className = "produto-item";
 
-                    const marca = prod.fornecedor ? prod.fornecedor.nome : "Sem Marca";
+                    const marca = prod.Cliente ? prod.Cliente.nome : "Sem Marca";
                     const precoVendaShow = prod.precoVenda || 0;
                     const precoCustoShow = prod.precoCusto || 0;
                     const margem = precoCustoShow > 0 ? (((precoVendaShow - precoCustoShow) / precoCustoShow) * 100).toFixed(0) : "0";

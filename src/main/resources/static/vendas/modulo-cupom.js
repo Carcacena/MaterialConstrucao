@@ -203,12 +203,12 @@ async function carregarCarrinhoDoBanco(numeroPedido) {
 
                     // Mapeamento seguro das chaves relacionais da Entity do Java
                     const nomeProduto = item.produto && item.produto.nome ? item.produto.nome : (item.nome || 'Produto');
-                    const nomeFornecedor = item.produto && item.produto.fornecedor && item.produto.fornecedor.nome ? item.produto.fornecedor.nome : 'S/M';
+                    const nomeCliente = item.produto && item.produto.Cliente && item.produto.Cliente.nome ? item.produto.Cliente.nome : 'S/M';
 
                     const tr = document.createElement("tr");
                     tr.className = "item-linha";
                     tr.innerHTML = `
-                        <td><strong>${index + 1}</strong> - ${nomeProduto} (${nomeFornecedor})</td>
+                        <td><strong>${index + 1}</strong> - ${nomeProduto} (${nomeCliente})</td>
                         <td class="text-center">${item.quantidade}</td>
                         <td class="text-end text-success fw-bold">R$ ${subtotal.toFixed(2)}</td>
                     `;

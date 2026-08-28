@@ -1,5 +1,5 @@
 const API_URL = "http://localhost:8080";
-let fornecedorSelecionadoId = null;
+let ClienteSelecionadoId = null;
 
 // Helper para pegar o token limpo do LocalStorage em qualquer função
 function obterTokenPuro() {
@@ -24,10 +24,10 @@ if (!localStorage.getItem("token")) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    carregarFornecedores();
-    const form = document.getElementById("formFornecedor");
+    carregarClientes();
+    const form = document.getElementById("formCliente");
     if (form) {
-        form.addEventListener("submit", cadastrarFornecedor);
+        form.addEventListener("submit", cadastrarCliente);
     }
     bloquearFormulario(true);
 });
@@ -36,7 +36,7 @@ function bloquearFormulario(status) {
     const nomeInput = document.getElementById("nome");
     const enderecoInput = document.getElementById("endereco");
     const btnSalvar = document.getElementById("btnSalvar");
-    const formContainer = document.getElementById("formFornecedor");
+    const formContainer = document.getElementById("formCliente");
     
     if (nomeInput) nomeInput.disabled = status;
     if (enderecoInput) enderecoInput.disabled = status;
@@ -47,23 +47,23 @@ function bloquearFormulario(status) {
 }
 
 function acionarIncluir() {
-    fornecedorSelecionadoId = null;
-    const form = document.getElementById("formFornecedor");
+    ClienteSelecionadoId = null;
+    const form = document.getElementById("formCliente");
     if (form) form.reset();
-    document.getElementById("tituloFormulario").textContent = "Cadastrar Fornecedor";
-    document.getElementById("btnSalvar").textContent = "Salvar Fornecedor";
-    document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
+    document.getElementById("tituloFormulario").textContent = "Cadastrar Cliente";
+    document.getElementById("btnSalvar").textContent = "Salvar Cliente";
+    document.querySelectorAll("#tabelaClientes tr").forEach(r => r.classList.remove("selecionado"));
     bloquearFormulario(false);
     const nomeInput = document.getElementById("nome");
     if (nomeInput) nomeInput.focus();
 }
 
-async function carregarFornecedores() {
+async function carregarClientes() {
     const tokenPuro = obterTokenPuro();
     if (!tokenPuro) return;
 
     try {
-        const response = await fetch("/fornecedores", {
+        const response = await fetch("/Clientes", {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${tokenPuro}`,
@@ -78,11 +78,11 @@ async function carregarFornecedores() {
         }
 
         if (!response.ok) {
-            throw new Error("Erro ao buscar fornecedores");
+            throw new Error("Erro ao buscar Clientes");
         }
 
-        const fornecedores = await response.json();
-        renderizarTabelaFornecedores(fornecedores); // 🌟 Agora ela existe!
+        const Clientes = await response.json();
+        renderizarTabelaClientes(Clientes); // 🌟 Agora ela existe!
         
     } catch (error) {
         console.error("Erro no processamento:", error);
@@ -90,18 +90,18 @@ async function carregarFornecedores() {
 }
 
 // 🌟 NOVA FUNÇÃO: Desenha as linhas no HTML e ativa a seleção do clique
-function renderizarTabelaFornecedores(fornecedores) {
-    const tbody = document.getElementById("tabelaFornecedores");
+function renderizarTabelaClientes(Clientes) {
+    const tbody = document.getElementById("tabelaClientes");
     if (!tbody) return;
     
     tbody.innerHTML = ""; // Limpa a tabela
 
-    if (fornecedores.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Nenhum fornecedor cadastrado.</td></tr>`;
+    if (Clientes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Nenhum Cliente cadastrado.</td></tr>`;
         return;
     }
 
-    fornecedores.forEach(forn => {
+    Clientes.forEach(forn => {
         const tr = document.createElement("tr");
         
         // Guarda os dados na linha para a função Alterar ler depois
@@ -117,16 +117,16 @@ function renderizarTabelaFornecedores(fornecedores) {
 
         // 🔥 MOTOR DE SELEÇÃO: Ao clicar na linha, marca ela e guarda o ID
         tr.addEventListener("click", () => {
-            document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
+            document.querySelectorAll("#tabelaClientes tr").forEach(r => r.classList.remove("selecionado"));
             tr.classList.add("selecionado");
-            fornecedorSelecionadoId = forn.id;
+            ClienteSelecionadoId = forn.id;
         });
 
         tbody.appendChild(tr);
     });
 }
 
-async function cadastrarFornecedor(event) {
+async function cadastrarCliente(event) {
     if (event) event.preventDefault();
     
     const tokenPuro = obterTokenPuro();
@@ -134,10 +134,10 @@ async function cadastrarFornecedor(event) {
 
     const nomeForn = document.getElementById("nome").value;
     const enderecoForn = document.getElementById("endereco").value;
-    const fornecedorDados = { nome: nomeForn, endereco: enderecoForn };
+    const ClienteDados = { nome: nomeForn, endereco: enderecoForn };
 
-    const url = fornecedorSelecionadoId ? `${API_URL}/fornecedores/${fornecedorSelecionadoId}` : `${API_URL}/fornecedores`;
-    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
+    const url = ClienteSelecionadoId ? `${API_URL}/Clientes/${ClienteSelecionadoId}` : `${API_URL}/Clientes`;
+    const metodo = ClienteSelecionadoId ? "PUT" : "POST";
 
     try {
         const response = await fetch(url, {
@@ -146,15 +146,15 @@ async function cadastrarFornecedor(event) {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${tokenPuro}` // 🌟 Corrigido com tokenPuro
             },
-            body: JSON.stringify(fornecedorDados)
+            body: JSON.stringify(ClienteDados)
         });
 
         if (response.ok) {
-            alert(fornecedorSelecionadoId ? "Fornecedor alterado com sucesso!" : "Fornecedor cadastrado com sucesso!");
+            alert(ClienteSelecionadoId ? "Cliente alterado com sucesso!" : "Cliente cadastrado com sucesso!");
             acionarIncluir(); 
-            carregarFornecedores();
+            carregarClientes();
         } else {
-            alert("Erro ao salvar fornecedor.");
+            alert("Erro ao salvar Cliente.");
         }
     } catch (e) {
         console.error(e);
@@ -162,17 +162,17 @@ async function cadastrarFornecedor(event) {
 }
 
 function acionarAlterar() {
-    if (!fornecedorSelecionadoId) {
-        alert("Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
+    if (!ClienteSelecionadoId) {
+        alert("Por favor, clique em um Cliente na tabela primeiro para selecioná-lo!");
         return;
     }
-    const linhaSelecionada = document.querySelector("#tabelaFornecedores tr.selecionado");
+    const linhaSelecionada = document.querySelector("#tabelaClientes tr.selecionado");
     if (linhaSelecionada) {
         bloquearFormulario(false);
         document.getElementById("nome").value = linhaSelecionada.dataset.nome;
         document.getElementById("endereco").value = linhaSelecionada.dataset.endereco;
-        document.getElementById("tituloFormulario").textContent = "Alterar Fornecedor";
-        document.getElementById("btnSalvar").textContent = "Atualizar Fornecedor";
+        document.getElementById("tituloFormulario").textContent = "Alterar Cliente";
+        document.getElementById("btnSalvar").textContent = "Atualizar Cliente";
         document.getElementById("nome").focus();
     }
 }
@@ -181,24 +181,24 @@ async function acionarExcluir() {
     const tokenPuro = obterTokenPuro();
     if (!tokenPuro) return;
 
-    if (!fornecedorSelecionadoId) {
-        alert("Por favor, clique em um fornecedor na tabela primeiro para selecioná-lo!");
+    if (!ClienteSelecionadoId) {
+        alert("Por favor, clique em um Cliente na tabela primeiro para selecioná-lo!");
         return;
     }
-    if (confirm("Tem certeza que deseja excluir o fornecedor selecionado?")) {
+    if (confirm("Tem certeza que deseja excluir o Cliente selecionado?")) {
         try {
-            const response = await fetch(`${API_URL}/fornecedores/${fornecedorSelecionadoId}`, {
+            const response = await fetch(`${API_URL}/Clientes/${ClienteSelecionadoId}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${tokenPuro}` // 🌟 Corrigido com tokenPuro
                 }
             });
             if (response.ok) {
-                alert("Fornecedor excluído com sucesso!");
+                alert("Cliente excluído com sucesso!");
                 acionarIncluir(); 
-                carregarFornecedores();
+                carregarClientes();
             } else {
-                alert("Erro ao excluir fornecedor.");
+                alert("Erro ao excluir Cliente.");
             }
         } catch (e) {
             console.error(e);

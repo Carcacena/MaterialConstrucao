@@ -113,6 +113,7 @@ async function buscarCepAutomatico() {
     }
 }
 
+
 async function carregarClientes() {
     const tokenPuro = obterTokenPuro();
     if (!tokenPuro) return;
@@ -210,7 +211,9 @@ async function cadastrarCliente(event) {
         uf: document.getElementById("uf").value
     };
 
-    const url = clienteSelecionadoId ? `${API_URL}/api/clientes/${clienteSelecionadoId}` : `${API_URL}/api/clientes`;
+	const url = fornecedorSelecionadoId ? `${API_URL}/api/fornecedores/${fornecedorSelecionadoId}` : `${API_URL}/api/fornecedores`;
+	
+   // const url = clienteSelecionadoId ? `${API_URL}/api/clientes/${clienteSelecionadoId}` : `${API_URL}/api/clientes`;
     const metodo = clienteSelecionadoId ? "PUT" : "POST";
 
     try {
@@ -343,16 +346,6 @@ function aplicarMascaraCEP(el) {
     v = v.replace(/(\d{3})(\d{1,3})$/, "$1-$2");
     el.value = v;
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

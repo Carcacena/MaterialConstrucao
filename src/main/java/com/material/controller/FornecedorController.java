@@ -10,7 +10,7 @@ import java.util.List;
 
 @CrossOrigin("*") // 👈 Adicionado para liberar o acesso do JavaScript local
 @RestController
-@RequestMapping("/fornecedores")
+@RequestMapping("/api/fornecedores")
 public class FornecedorController {
 
     @Autowired

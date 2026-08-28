@@ -26,6 +26,7 @@ public class FornecedorService {
         return repository.findById(id).map(fornecedor -> {
             fornecedor.setNome(atualizado.getNome());
             fornecedor.setCnpj(atualizado.getCnpj());
+            fornecedor.setInscricaoEstadual(atualizado.getInscricaoEstadual());
             fornecedor.setEmail(atualizado.getEmail());
             fornecedor.setTelefone(atualizado.getTelefone());
             fornecedor.setCep(atualizado.getCep());

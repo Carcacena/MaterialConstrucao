@@ -1,44 +1,44 @@
-// 🌟 Carrega os fornecedores do banco assim que a página abre
-async function carregarFornecedores() {
-    const selectFornecedor = document.getElementById('fornecedorId');
-    selectFornecedor.innerHTML = '<option value="">Carregando fornecedores...</option>';
+// 🌟 Carrega os Clientes do banco assim que a página abre
+async function carregarClientes() {
+    const selectCliente = document.getElementById('ClienteId');
+    selectCliente.innerHTML = '<option value="">Carregando Clientes...</option>';
 
     try {
-        const response = await fetch('/fornecedores', {
+        const response = await fetch('/Clientes', {
             method: 'GET',
             headers: montarHeaders()
         });
 
         if (!response.ok) {
-            throw new Error('Erro ao buscar fornecedores: ' + response.status);
+            throw new Error('Erro ao buscar Clientes: ' + response.status);
         }
 
-        const fornecedores = await response.json();
+        const Clientes = await response.json();
 
-        selectFornecedor.innerHTML = '<option value="">Selecione o Fornecedor...</option>';
-        fornecedores.forEach(f => {
+        selectCliente.innerHTML = '<option value="">Selecione o Cliente...</option>';
+        Clientes.forEach(f => {
             const opt = document.createElement('option');
             opt.value = f.id;
             opt.textContent = `${f.nome} (ID: ${f.id})`;
-            selectFornecedor.appendChild(opt);
+            selectCliente.appendChild(opt);
         });
 
     } catch (erro) {
-        console.error('Erro ao carregar fornecedores:', erro);
-        selectFornecedor.innerHTML = '<option value="">Erro ao carregar fornecedores</option>';
+        console.error('Erro ao carregar Clientes:', erro);
+        selectCliente.innerHTML = '<option value="">Erro ao carregar Clientes</option>';
     }
 }
 
 // 🌟 Dispara assim que a página termina de carregar
-carregarFornecedores();
+carregarClientes();
 
 
-async function carregarProdutosPorFornecedor() {
-    const fornecedorId = document.getElementById('fornecedorId').value;
+async function carregarProdutosPorCliente() {
+    const ClienteId = document.getElementById('ClienteId').value;
     const selectProduto = document.getElementById('selectProduto');
 
-    if (!fornecedorId) {
-        selectProduto.innerHTML = '<option value="">Selecione o Fornecedor primeiro...</option>';
+    if (!ClienteId) {
+        selectProduto.innerHTML = '<option value="">Selecione o Cliente primeiro...</option>';
         return;
     }
 
@@ -57,11 +57,11 @@ async function carregarProdutosPorFornecedor() {
         const todosProdutos = await response.json();
 
         const produtosFiltrados = todosProdutos.filter(p =>
-            p.fornecedor && Number(p.fornecedor.id) === Number(fornecedorId)
+            p.Cliente && Number(p.Cliente.id) === Number(ClienteId)
         );
 
         if (produtosFiltrados.length === 0) {
-            selectProduto.innerHTML = '<option value="">Nenhum produto cadastrado para este fornecedor</option>';
+            selectProduto.innerHTML = '<option value="">Nenhum produto cadastrado para este Cliente</option>';
             return;
         }
 
@@ -84,7 +84,7 @@ async function salvarEntrada() {
     const elSerie = document.getElementById('serie');
     const elChave = document.getElementById('chaveAcesso');
     const elData = document.getElementById('dataRecebimento');
-    const elForn = document.getElementById('fornecedorId');
+    const elForn = document.getElementById('ClienteId');
 
     if (!elNota || !elSerie || !elChave || !elData || !elForn) {
         alert("❌ Erro interno: Elementos do formulário HTML não foram encontrados.");
@@ -95,9 +95,9 @@ async function salvarEntrada() {
     const serie = elSerie.value;
     const chaveAcesso = elChave.value;
     const dataRecebimento = elData.value;
-    const fornecedorId = elForn.value;
+    const ClienteId = elForn.value;
 
-    if (!numeroNota || !chaveAcesso || !dataRecebimento || !fornecedorId || itensNota.length === 0) {
+    if (!numeroNota || !chaveAcesso || !dataRecebimento || !ClienteId || itensNota.length === 0) {
         alert("⚠️ Erro de Validação:\nPor favor, preencha o cabeçalho da nota e insira pelo menos um item no grid.");
         return;
     }
@@ -107,7 +107,7 @@ async function salvarEntrada() {
         serie: serie,
         chaveAcesso: chaveAcesso,
         dataRecebimento: dataRecebimento,
-        fornecedorId: parseInt(fornecedorId),
+        ClienteId: parseInt(ClienteId),
         itens: itensNota
     };
 

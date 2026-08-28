@@ -34,7 +34,7 @@ if (!token) {
 
 // 🌐 DISPARA O CARREGAMENTO QUANDO A TELA ABRE
 document.addEventListener("DOMContentLoaded", () => {
-    carregarFornecedores();
+    carregarClientes();
     carregarProdutos();
     document.getElementById("formProduto").addEventListener("submit", cadastrarProduto);
     
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 🛠️ AUXILIAR DE CONTROLE DOS CAMPOS (Afinado com os novos campos)
 function bloquearFormulario(status) {
 	   document.getElementById("nomeProduto").disabled = status;
-	   document.getElementById("selecionaFornecedor").disabled = status;
+	   document.getElementById("selecionaCliente").disabled = status;
 	   document.getElementById("tipoProduto").disabled = status;
 	   document.getElementById("dataValidade").disabled = status;
 	   document.getElementById("precoCusto").disabled = status;
@@ -94,7 +94,7 @@ async function cadastrarProduto(event) {
     
     const produtoDados = {
         nome: document.getElementById("nomeProduto").value,
-        fornecedorId: parseInt(document.getElementById("selecionaFornecedor").value),
+        ClienteId: parseInt(document.getElementById("selecionaCliente").value),
         aGranel: document.getElementById("tipoProduto").value === "true",
         precoCusto: parseFloat(document.getElementById("precoCusto").value),
         precoVenda: parseFloat(document.getElementById("precoVenda").value),
@@ -155,35 +155,35 @@ async function carregarProdutos() {
         const produtos = await response.json();
         console.log("Produtos carregados:", produtos);
         
-        const container = document.getElementById("containerFornecedoresProdutos");
+        const container = document.getElementById("containerClientesProdutos");
         if (!container) {
-            console.error("Container containerFornecedoresProdutos não encontrado.");
+            console.error("Container containerClientesProdutos não encontrado.");
             return;
         }
         container.innerHTML = "";
         
-        // 🌳 FORNECEDOR = PAI / PRODUTOS = FILHOS
-        const agrupadoPorFornecedor = {};
+        // 🌳 Cliente = PAI / PRODUTOS = FILHOS
+        const agrupadoPorCliente = {};
         produtos.forEach(prod => {
-            const fornecedorNome = prod.fornecedor ? prod.fornecedor.nome : "Sem Fornecedor";
-            if (!agrupadoPorFornecedor[fornecedorNome]) {
-                agrupadoPorFornecedor[fornecedorNome] = [];
+            const ClienteNome = prod.Cliente ? prod.Cliente.nome : "Sem Cliente";
+            if (!agrupadoPorCliente[ClienteNome]) {
+                agrupadoPorCliente[ClienteNome] = [];
             }
-            agrupadoPorFornecedor[fornecedorNome].push(prod);
+            agrupadoPorCliente[ClienteNome].push(prod);
         });
         
-        // Ordena os fornecedores alfabeticamente
-        const fornecedoresOrdenados = Object.keys(agrupadoPorFornecedor).sort((a, b) => a.localeCompare(b, "pt-BR"));
+        // Ordena os Clientes alfabeticamente
+        const ClientesOrdenados = Object.keys(agrupadoPorCliente).sort((a, b) => a.localeCompare(b, "pt-BR"));
         
-        fornecedoresOrdenados.forEach(fornecedorNome => {
-            const produtosFornecedor = agrupadoPorFornecedor[fornecedorNome];
+        ClientesOrdenados.forEach(ClienteNome => {
+            const produtosCliente = agrupadoPorCliente[ClienteNome];
             const divGrupo = document.createElement("div");
             divGrupo.style.marginBottom = "10px";
             
-            // 📁 Cabeçalho do fornecedor
+            // 📁 Cabeçalho do Cliente
             const btnHeader = document.createElement("button");
-            btnHeader.className = "fornecedor-header";
-            btnHeader.innerHTML = `📁 <strong>${fornecedorNome}</strong> (${produtosFornecedor.length})`;
+            btnHeader.className = "Cliente-header";
+            btnHeader.innerHTML = `📁 <strong>${ClienteNome}</strong> (${produtosCliente.length})`;
             
             // Área dos produtos começa fechada
             const divProdutosList = document.createElement("div");
@@ -195,8 +195,8 @@ async function carregarProdutos() {
                 divProdutosList.style.display = estaFechado ? "block" : "none";
             });
             
-            // Ordena os produtos do fornecedor
-            produtosFornecedor
+            // Ordena os produtos do Cliente
+            produtosCliente
                 .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"))
                 .forEach(prod => {
                     const item = document.createElement("div");
@@ -238,7 +238,7 @@ async function carregarProdutos() {
                     // Dados usados pelos botões Alterar e Excluir
                     item.dataset.id = prod.id;
                     item.dataset.nome = prod.nome;
-                    item.dataset.fornecedorid = prod.fornecedor ? prod.fornecedor.id : "";
+                    item.dataset.Clienteid = prod.Cliente ? prod.Cliente.id : "";
                     item.dataset.agranel = prod.aGranel;
                     item.dataset.precocusto = custo;
                     item.dataset.precovenda = venda;
@@ -267,20 +267,20 @@ async function carregarProdutos() {
     }
 }
 
-async function carregarFornecedores() {
+async function carregarClientes() {
     try {
-        const response = await fetch(`${API_URL}/fornecedores`, {
+        const response = await fetch(`${API_URL}/Clientes`, {
             method: "GET",
             headers: { "Authorization": `Bearer ${token}` }
         });
-        console.log("GET /fornecedores status:", response.status);
+        console.log("GET /Clientes status:", response.status);
         if (response.ok) {
-            const fornecedores = await response.json();
-            console.log("Fornecedores carregados:", fornecedores);
-            const select = document.getElementById("selecionaFornecedor");
+            const Clientes = await response.json();
+            console.log("Clientes carregados:", Clientes);
+            const select = document.getElementById("selecionaCliente");
             if (select) {
                 select.innerHTML = '<option value="">Selecione...</option>';
-                fornecedores.forEach(f => {
+                Clientes.forEach(f => {
                     const opt = document.createElement("option");
                     opt.value = f.id;
                     opt.textContent = f.nome;
@@ -288,24 +288,24 @@ async function carregarFornecedores() {
                 });
             }
         } else {
-            console.error("Erro na resposta de fornecedores:", response.status);
+            console.error("Erro na resposta de Clientes:", response.status);
         }
     } catch (e) {
-        console.error("Falha ao carregar fornecedores:", e);
+        console.error("Falha ao carregar Clientes:", e);
     }
 }
 
 // 🔵 BOTÃO ALTERAR (PUXA OS DADOS DA ÁRVORE PARA OS INPUTS)
 function acionarAlterar() {
     if (!produtoSelecionadoId) {
-        alert("Clique em um produto dentro de um fornecedor para selecioná-lo!");
+        alert("Clique em um produto dentro de um Cliente para selecioná-lo!");
         return;
     }
     const item = document.querySelector(".produto-item.selecionado");
     if (item) {
         bloquearFormulario(false);
         document.getElementById("nomeProduto").value = item.dataset.nome;
-        document.getElementById("selecionaFornecedor").value = item.dataset.fornecedorid;
+        document.getElementById("selecionaCliente").value = item.dataset.Clienteid;
         document.getElementById("tipoProduto").value = item.dataset.agranel;
         document.getElementById("precoCusto").value = item.dataset.precocusto;
         document.getElementById("precoVenda").value = item.dataset.precovenda;
