@@ -6,7 +6,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Gerenciamento de Clientes Profissional</title>
+	<title>Gerenciamento de Fornecedores Profissional</title>
 	<style>
 		body {
 			font-family: Arial, sans-serif;
@@ -233,7 +233,7 @@
 <body>
 	<div class="container-sistema">
 		<div class="titulo-pagina">
-			<h2 style="margin: 0;">👥 Gerenciamento de Clientes</h2>
+			<h2 style="margin: 0;">👥 Gerenciamento de Fornecedor<h2>
 		</div>
 		<!-- ==========================================
 		     PARTE 2: FORMULÁRIO E DROPDOWN DE UFs
@@ -241,8 +241,8 @@
 		<!-- Formulário de Entrada -->
 		<div class="coluna-formulario">
 			<div class="box-custom">
-				<h4 id="tituloFormulario">Cadastrar Cliente</h4>
-				<form id="formCliente">
+				<h4 id="tituloFormulario">Cadastrar Fornecedor</h4>
+				<form id="formFornecedor">
 					<!-- Campo Oculto para ID -->
 					<input type="hidden" id="id">
 
@@ -254,7 +254,7 @@
 
 					<!-- Seleção do Tipo de Pessoa (Física ou Jurídica) -->
 					<div class="campo-grupo">
-						<label class="form-label">Tipo de Cliente:</label>
+						<label class="form-label">Tipo de Fornecedor:</label>
 						<div style="display: flex; gap: 15px; margin-bottom: 10px;">
 							<label>
 								<input type="radio" name="tipoPessoa" value="CPF" checked
@@ -279,7 +279,7 @@
 						<div class="campo-grupo">
 							<label for="email" class="form-label">E-mail</label>
 							<input type="email" class="form-control" id="email" maxlength="100"
-								placeholder="Ex: cliente@email.com">
+								placeholder="Ex: fornecedor@email.com">
 						</div>
 						<div class="campo-grupo">
 							<label for="telefone" class="form-label">Telefone</label>
@@ -365,15 +365,16 @@
 						</div>
 					</div>
 
-					<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Cliente</button>
+					<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Fornecedor</button>
 				</form>
 			</div>
 		</div>
 
-		<!-- Listagem de Clientes -->
+		
+		<!-- Listagem de Fornecedores -->
 		<div class="coluna-tabela">
 			<div class="box-custom">
-				<h4>Clientes Cadastrados</h4>
+				<h4>FornecedoresCadastrados</h4>
 				<div class="tabela-container-scroll">
 					<table class="table-custom">
 						<thead>
@@ -391,8 +392,8 @@
 								<th>Cidade</th>
 							</tr>
 						</thead>
-						<tbody id="tabelaClientes">
-							<!-- Preenchido dinamicamente via appCliente.js -->
+						<tbody id="tabelaFornecedores">
+							<!-- Preenchido dinamicamente via appFornecedor.js -->
 						</tbody>
 					</table>
 				</div>
@@ -404,11 +405,13 @@
 	<div id="meuPainelFlutuante" class="painel-flutuante">
 		<div id="meuPainelHeader" class="painel-header">::: MENU :::</div>
 		<div class="painel-corpo">
-			<button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()"><u>I</u>ncluir</button>
+			<button class="btn-menu-vertical btn-incluir"
+				 onclick="acionarIncluir()"><u>I</u>ncluir</button>
+				 
 			<button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()"><u>A</u>lterar</button>
 			<button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()"><u>E</u>xcluir</button>
 			<button class="btn-menu-vertical btn-voltar"
-				onclick="window.location.href='/menu.html'"><u>V</u>oltar</button>
+				onclick="window.location.href='/menu/menu.html'"><u>V</u>oltar</button>
 		</div>
 	</div>
 
@@ -449,11 +452,11 @@
 
 	
 	<!-- Injeção dos scripts da casa -->
-	<script src="/componentes-js/utils.js"></script>
-	<script src="/Fonecedores/appFornecedor.js"></script> <!-- ⚡ Corrigido: Tirou o 'r' de Fornecedores -->
+	<!-- 🚀 Bastidores 100% afinados, limpos e corrigidos -->
 	
-	
-	
+	<!-- 🚀 Bastidores 100% afinados, limpos e corrigidos -->
+		<script src="/componentes-js/utils.js"></script>
+		<script src="/Fornecedores/appFornecedor.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
 	
 	
 </body>

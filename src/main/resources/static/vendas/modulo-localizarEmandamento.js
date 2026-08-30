@@ -65,12 +65,12 @@ function montarArvoreVendasCentro() {
             const precoVenda = prod.precoVenda || 0;
             const precoCusto = prod.precoCusto || 0;
             const margem = precoCusto > 0 ? (((precoVenda - precoCusto) / precoCusto) * 100).toFixed(0) : "0";
-			const estoqueFormatado = prod.aGranel ? estoqueAtual.toFixed(3) : estoqueAtual.toFixed(0); 
+            const estoqueFormatado = prod.aGranel ? estoqueAtual.toFixed(3) : estoqueAtual.toFixed(0);
 
             // LINHA SUB-RAIZ (Filho com dados comerciais em linha limpa)
             const divItemFilho = document.createElement("div");
             divItemFilho.style.cssText = "padding: 6px 0; font-size: 13px; color: #ecf0f1; display: flex; flex-direction: column; gap: 4px;";
-            
+
             // Texto da linha
             const divTextoLinha = document.createElement("div");
             divTextoLinha.style.cssText = "cursor: pointer; display: inline-block;";
@@ -94,41 +94,41 @@ function montarArvoreVendasCentro() {
             });
 
             // Ação do Botão Mover Contextual da linha
-			const btnMoverLinha = divMenuBotoes.querySelector("button:nth-child(1)"); 
-			          btnMoverLinha.addEventListener("click", evento => { 
-			              evento.stopPropagation(); 
-			              const inputQtd = document.getElementById("inputQuantidade"); 
-			              if (!inputQtd) return; 
-			              const quantidadeInput = prod.aGranel ? parseFloat(inputQtd.value) : parseInt(inputQtd.value, 10); 
+            const btnMoverLinha = divMenuBotoes.querySelector("button:nth-child(1)");
+            btnMoverLinha.addEventListener("click", evento => {
+                evento.stopPropagation();
+                const inputQtd = document.getElementById("inputQuantidade");
+                if (!inputQtd) return;
+                const quantidadeInput = prod.aGranel ? parseFloat(inputQtd.value) : parseInt(inputQtd.value, 10);
 
-			              // Validações de Quantidade e Estoque antes de mover 
-			              if (isNaN(quantidadeInput) || quantidadeInput <= 0) { 
-			                  alert("Atenção, piá! Informe uma quantidade válida maior que zero."); 
-			                  return; 
-			              } 
-			              if (quantidadeInput > estoqueAtual) { 
-			                  alert(`Estoque insuficiente.\nDisponível: ${estoqueFormatado}`); 
-			                  return; 
-			              } 
+                // Validações de Quantidade e Estoque antes de mover 
+                if (isNaN(quantidadeInput) || quantidadeInput <= 0) {
+                    alert("Atenção, piá! Informe uma quantidade válida maior que zero.");
+                    return;
+                }
+                if (quantidadeInput > estoqueAtual) {
+                    alert(`Estoque insuficiente.\nDisponível: ${estoqueFormatado}`);
+                    return;
+                }
 
-			              // Envia para o cupom 
-			              if (typeof adicionarProdutoAoCupom === "function") { 
-			                  adicionarProdutoAoCupom( 
-			                      prod.id, 
-			                      `${produtoRaiz} (${ClienteNome})`, 
-			                      quantidadeInput, 
-			                      precoVenda, 
-			                      precoCusto 
-			                  ); 
-			                  inputQtd.value = "1"; 
-			                  divMenuBotoes.style.display = "none"; 
-			              } 
-			          }); 
+                // Envia para o cupom 
+                if (typeof adicionarProdutoAoCupom === "function") {
+                    adicionarProdutoAoCupom(
+                        prod.id,
+                        `${produtoRaiz} (${ClienteNome})`,
+                        quantidadeInput,
+                        precoVenda,
+                        precoCusto
+                    );
+                    inputQtd.value = "1";
+                    divMenuBotoes.style.display = "none";
+                }
+            });
 
-			          divItemFilho.appendChild(divTextoLinha); 
-			          divItemFilho.appendChild(divMenuBotoes); 
-			          divSubRaizContainer.appendChild(divItemFilho); 
-			      }); 
+            divItemFilho.appendChild(divTextoLinha);
+            divItemFilho.appendChild(divMenuBotoes);
+            divSubRaizContainer.appendChild(divItemFilho);
+        });
 
         divGrupo.appendChild(divRaizRow);
         divGrupo.appendChild(divSubRaizContainer);

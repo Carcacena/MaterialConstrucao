@@ -73,19 +73,17 @@
 	<div class="box">
 		<h2>🌳 Sistema Material Construção</h2>
 
-		<!-- ⚡ Código Corrigido: Aponta direto para a nova pasta física /vendas -->
-		<button class="btn-pdv" onclick="location.href='/vendas/vendas.html'">⚡ Lançar Venda (PDV)</button>
+		<button class="btn-pdv" onclick="irVendas()">⚡ Lançar Venda (PDV)</button>
 		<hr>
-	<button onclick="location.href='/Fonecedores/crudFornecedor.html'">🌲 Fornecedores</button>
 		
-	<button class="btn-laranja" onclick="location.href='/Produtos/crudProduto.html'">
-			    📦 Cadastro de Produto
-			</button>
-			<hr>
+		<button onclick="irExpandida()">🌲 Fornecedores</button>
+		
+		<button class="btn-laranja" onclick="irProdutos()">📦 Cadastro de Produto</button>
+		<hr>
 	
-		<button onclick="location.href='/Clientes/crudCliente.html'">🌲 Clientes<button>
+		<button onclick="irClientes()">🌲 Clientes</button>
 		
-			<button class="btn-laranja" onclick="location.href='/Entradas/entradaProduto.html'">
+		<button class="btn-laranja" onclick="location.href='/Entradas/entradaProduto.html'">
 		    📦 Entrada de Produto (Nota Fiscal)
 		</button>
 		<hr>
@@ -94,38 +92,24 @@
 		<div class="info">Usuário autenticado com JWT 🔑</div>
 	</div>
 
+	<!-- 💡 SÓ AS FUNÇÕES SOLTAS AQUI DENTRO DO MENU.HTML, SEM O MENU.JS! -->
 	<script>
 		// 🔑 PROTEÇÃO DE ACESSO
 		const token = localStorage.getItem("token");
 		if (!token) {
-			window.location.href = "login.html";
+			window.location.href = "/login.html";
 		}
 
-		// 🚀 NAVEGAÇÃO DO SISTEMA
-		function irVendas() {
-			window.location.href = "vendas.html"; // 🎯 Direciona direto para o balcão de vendas
-		}
-
-		function irUsuario() {
-			window.location.href = "crudUsuario.html";
-		}
-
-		function irExpandida() {
-			window.location.href = "crudFornecedor.html";
-		}
-
-		function irProdutos() {
-			window.location.href = "crudProduto.html";
-		}
-
-		function irClientes() {
-			window.location.href = "crudCliente.html";
-		}
+		// 🚀 NAVEGAÇÃO
+		function irVendas() { window.location.href = "/vendas/vendas.html"; }
+		function irExpandida() { window.location.href = "/Fornecedores/crudFornecedor.html"; }
+		function irProdutos() { window.location.href = "/Produtos/crudProduto.html"; }
+		function irClientes() { window.location.href = "/Clientes/crudCliente.html"; }
 
 		// 🚪 LOGOUT
 		function sair() {
 			localStorage.removeItem("token");
-			window.location.href = "login.html";
+			window.location.href = "/login.html";
 		}
 	</script>
 </body>

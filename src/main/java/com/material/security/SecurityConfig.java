@@ -95,20 +95,27 @@ public class SecurityConfig {
                
             // 🌟 1. PRIMEIRO: Abre as exceções públicas (Tudo que NÃO precisa de login fica no topo)
                .requestMatchers("/carrinho/public/pedido/**").permitAll() // Exceção do PDF
-               .requestMatchers("/Entradas/**", "/Fonecedores/**", "/Clientes/**", "/Produtos/**", "/vendas/**", "/css/**", "/js/**")
-               .permitAll() // Arquivos estáticos liberados totalmente corrigidos!
-               		
+             	   .requestMatchers(
+            				    "/menu/**", // 👈 Liberando a nova pasta com o HTML e o JS do menu juntos!
+            				    "/Entradas/**", "/Fornecedores/**", "/Clientes/**", "/Produtos/**", "/vendas/**", "/css/**", "/js/**",
+            				    "/api/**"
+            				).permitAll()   
+            		   
+            		   
+            		   
+            		   
+            		   
+            //		   "/menu/**","/Entradas/**", "/Fonecedores/**", "/Clientes/**", "/Produtos/**", "/vendas/**", "/css/**", "/js/**",
+            //       "/api/fornecedores/**", "/api/entradas/**", "/api/produtos/**" // 👈 🚀 ADICIONE AS ROTAS DA API AQUI!
+            //   ).permitAll() 
+
                // 🔒 2. DEPOIS: Bloqueia as rotas específicas do sistema (Exige autenticação)
                .requestMatchers("/admin/**", "/usuario/**").authenticated() 
-              // .requestMatchers("/produtos", "/produtos/**").authenticated() 
-               
                .requestMatchers("/imprimeCarrinho/imprimeCarrinho/**").authenticated() 
-               // .requestMatchers("/fornecedores", "/fornecedores/**").authenticated() // Se reativar, fica aqui
 
                // 🔒 3. POR ÚLTIMO: Bloqueia as rotas gerais e o que sobrou do carrinho
                .requestMatchers("/carrinho", "/carrinho/**").authenticated() 
-               .anyRequest().authenticated()   
-         
+               .anyRequest().authenticated()
           
            		   
         		   ) 

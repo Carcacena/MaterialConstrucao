@@ -1,153 +1,153 @@
-	
-	async function abrirPainelFechamento() {
-	    if (!window.itensCupomMemoria ||
-	        window.itensCupomMemoria.length === 0) {
 
-	        alert("O carrinho está vazio!");
-	        return;
-	    }
-		
-		await carregarClientesPDV();
+async function abrirPainelFechamento() {
+    if (!window.itensCupomMemoria ||
+        window.itensCupomMemoria.length === 0) {
 
-		const total = window.itensCupomMemoria.reduce(
-		    (soma, item) => {
-		        const quantidade = Number(item.quantidade || 0);
-		        const preco = Number(item.precoPraticado || 0);
+        alert("O carrinho está vazio!");
+        return;
+    }
 
-		        return soma + (quantidade * preco);
-		    },
-		    0
-		);
+    await carregarClientesPDV();
 
-	    const totalModal =
-	        document.getElementById("totalModalDisplay");
+    const total = window.itensCupomMemoria.reduce(
+        (soma, item) => {
+            const quantidade = Number(item.quantidade || 0);
+            const preco = Number(item.precoPraticado || 0);
 
-	    if (totalModal) {
-	        totalModal.textContent =
-	            `R$ ${total.toFixed(2).replace(".", ",")}`;
-	    }
+            return soma + (quantidade * preco);
+        },
+        0
+    );
 
-	    const modalElemento =
-	        document.getElementById("modalFecharPedido");
+    const totalModal =
+        document.getElementById("totalModalDisplay");
 
-	    if (!modalElemento) {
-	        console.error(
-	            'Modal "modalFecharPedido" não encontrado.'
-	        );
-	        return;
-	    }
+    if (totalModal) {
+        totalModal.textContent =
+            `R$ ${total.toFixed(2).replace(".", ",")}`;
+    }
 
-	    const modal =
-	        bootstrap.Modal.getOrCreateInstance(modalElemento);
+    const modalElemento =
+        document.getElementById("modalFecharPedido");
 
-	    modal.show();
-	}
-	async function confirmarFaturamentoDefinitivo() {
-	    if (
-	        !window.itensCupomMemoria ||
-	        window.itensCupomMemoria.length === 0
-	    ) {
-	        alert("O carrinho está vazio.");
-	        return;
-	    }
+    if (!modalElemento) {
+        console.error(
+            'Modal "modalFecharPedido" não encontrado.'
+        );
+        return;
+    }
 
-	    const selectCliente =
-	        document.getElementById("selectClienteModal");
+    const modal =
+        bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-	    const selectPagamento =
-	        document.getElementById("selectPagamentoModal");
+    modal.show();
+}
+async function confirmarFaturamentoDefinitivo() {
+    if (
+        !window.itensCupomMemoria ||
+        window.itensCupomMemoria.length === 0
+    ) {
+        alert("O carrinho está vazio.");
+        return;
+    }
 
-	    const clienteId = Number(selectCliente?.value || 0);
-	    const formaPagamento = selectPagamento?.value || "";
+    const selectCliente =
+        document.getElementById("selectClienteModal");
 
-	    if (!clienteId) {
-	        alert("Selecione o cliente.");
-	        return;
-	    }
+    const selectPagamento =
+        document.getElementById("selectPagamentoModal");
 
-	    if (!formaPagamento) {
-	        alert("Selecione a forma de pagamento.");
-	        return;
-	    }
+    const clienteId = Number(selectCliente?.value || 0);
+    const formaPagamento = selectPagamento?.value || "";
 
-		const numeroPedido = window.numeroPedidoAtual;
+    if (!clienteId) {
+        alert("Selecione o cliente.");
+        return;
+    }
 
-		if (!numeroPedido) {
-		    alert("Número do pedido não foi gerado.");
-		    return;
-		}
+    if (!formaPagamento) {
+        alert("Selecione a forma de pagamento.");
+        return;
+    }
 
-		try {
-		    const response = await fetch(
-		        `${API_URL}/carrinho/faturar/pedido/${encodeURIComponent(numeroPedido)}/cliente/${clienteId}`,
-		        {
-		            method: "POST",
-		            headers: {
-		                "Authorization": `Bearer ${token}`
-		            }
-		        }
-		    );
+    const numeroPedido = window.numeroPedidoAtual;
 
-		    if (!response.ok) {
-		        const mensagemErro = await response.text();
+    if (!numeroPedido) {
+        alert("Número do pedido não foi gerado.");
+        return;
+    }
 
-		        console.error(
-		            "Erro ao faturar pedido:",
-		            response.status,
-		            mensagemErro
-		        );
+    try {
+        const response = await fetch(
+            `${API_URL}/carrinho/faturar/pedido/${encodeURIComponent(numeroPedido)}/cliente/${clienteId}`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
 
-		        alert(
-		            `Não foi possível faturar o pedido.\n\n` +
-		            `${mensagemErro || `Status: ${response.status}`}`
-		        );
+        if (!response.ok) {
+            const mensagemErro = await response.text();
 
-		        return;
-		    }
+            console.error(
+                "Erro ao faturar pedido:",
+                response.status,
+                mensagemErro
+            );
 
-		    const mensagemSucesso = await response.text();
+            alert(
+                `Não foi possível faturar o pedido.\n\n` +
+                `${mensagemErro || `Status: ${response.status}`}`
+            );
 
-		    alert(mensagemSucesso || "Venda faturada com sucesso!");
+            return;
+        }
 
-		    window.itensCupomMemoria = [];
-		    window.numeroPedidoAtual = `PED-${Date.now()}`;
+        const mensagemSucesso = await response.text();
 
-		    if (typeof renderizarCupomDaMemoria === "function") {
-		        renderizarCupomDaMemoria();
-		    }
+        alert(mensagemSucesso || "Venda faturada com sucesso!");
 
-		    if (typeof carregarProdutosPDV === "function") {
-		        await carregarProdutosPDV();
-		    }
+        window.itensCupomMemoria = [];
+        window.numeroPedidoAtual = `PED-${Date.now()}`;
 
-		    const modalElemento =
-		        document.getElementById("modalFecharPedido");
+        if (typeof renderizarCupomDaMemoria === "function") {
+            renderizarCupomDaMemoria();
+        }
 
-		    const modal =
-		        bootstrap.Modal.getInstance(modalElemento);
+        if (typeof carregarProdutosPDV === "function") {
+            await carregarProdutosPDV();
+        }
 
-		    if (modal) {
-		        modal.hide();
-		    }
+        const modalElemento =
+            document.getElementById("modalFecharPedido");
 
-	    const labelStatus =
-		        document.getElementById("labelStatusCarrinho");
+        const modal =
+            bootstrap.Modal.getInstance(modalElemento);
 
-		    if (labelStatus) {
-		        labelStatus.textContent = "2 - Faturado";
-		        labelStatus.className =
-		            "status-badge bg-success text-white";
-		    }
+        if (modal) {
+            modal.hide();
+        }
 
-		} catch (erro) {
-		    console.error(
-		        "Falha de comunicação ao faturar:",
-		        erro
-		    );
+        const labelStatus =
+            document.getElementById("labelStatusCarrinho");
 
-		    alert("Falha de comunicação com o servidor.");
-		}
-		
-		
-		
+        if (labelStatus) {
+            labelStatus.textContent = "2 - Faturado";
+            labelStatus.className =
+                "status-badge bg-success text-white";
+        }
+
+    } catch (erro) {
+        console.error(
+            "Falha de comunicação ao faturar:",
+            erro
+        );
+
+        alert("Falha de comunicação com o servidor.");
+    }
+
+
+
 }

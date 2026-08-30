@@ -73,7 +73,7 @@ async function logar() {
 	        console.log("Login efetuado com sucesso! Redirecionando...");
 	        
 	        // ⚡ CORREÇÃO: Caminho absoluto com a barra inicial para encontrar o menu na raiz
-	        window.location.href = "/menu.html";
+	        window.location.href = "/menu/menu.html";
 
 	    } catch (error) {
 	        console.error("Erro na autenticação:", error);

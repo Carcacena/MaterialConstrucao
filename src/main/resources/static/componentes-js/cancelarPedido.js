@@ -95,7 +95,7 @@ async function cancelarOperacao() {
 	
 	async function carregarClientesPDV() {
 	    try {
-	        const response = await fetch(`${API_URL}/clientes`, {
+	        const response = await fetch(`${API_URL}/api/clientes`, {
 	            method: "GET",
 	            headers: {
 	                "Authorization": `Bearer ${token}`

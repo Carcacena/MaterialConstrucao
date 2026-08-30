@@ -149,10 +149,10 @@ async function carregarCarrinhoDoBanco(numeroPedido) {
     // 1. Pega a URL de contingência do navegador
     const urlServidor = window.API_URL || (typeof API_URL !== 'undefined' ? API_URL : "http://localhost:8080");
     const tokenSeguro = window.token || (typeof token !== 'undefined' ? token : "");
-    
+
     // 2. Garante o número estável da memória do payload enviado
     const pedidoAtivo = numeroPedido || window.numeroPedidoAtual;
-    
+
     if (!pedidoAtivo) {
         console.warn("Nenhum número de pedido ativo para listar.");
         return;
@@ -218,10 +218,10 @@ async function carregarCarrinhoDoBanco(numeroPedido) {
 
             // Alimenta a memória global do F10 e sincroniza os dois visores da interface
             window.totalAcumuladoCupom = totalAcumuladoCupom;
-            
+
             const lblTotalVenda = document.getElementById("labelTotalVenda");
             if (lblTotalVenda) lblTotalVenda.textContent = `R$ ${totalAcumuladoCupom.toFixed(2).replace('.', ',')}`;
-            
+
             const totalGeralCupom = document.getElementById("totalGeralCupom");
             if (totalGeralCupom) totalGeralCupom.textContent = totalAcumuladoCupom.toFixed(2);
         }
@@ -239,7 +239,7 @@ async function carregarCarrinhoDoBanco() {
 async function adicionarItemNaLista() {
     const clienteId = 1;
     const quantidade = parseFloat(document.getElementById("inputQuantidade").value) || 0;
-    
+
     if (!produtoSelecionadoId) {
         alert("Clique em uma variação de produto na árvore central primeiro!");
         return;
@@ -248,62 +248,49 @@ async function adicionarItemNaLista() {
         alert("Digite uma quantidade válida!");
         return;
     }
-	if (!window.numeroPedidoAtual) {
-	    window.numeroPedidoAtual = `PED-${Date.now()}`;
-	}
+    if (!window.numeroPedidoAtual) {
+        window.numeroPedidoAtual = `PED-${Date.now()}`;
+    }
 
-	const itemPayload = {
-	    cliente: { id: 1 },
-	    produto: { id: produtoSelecionadoId },
-	    quantidade: quantidade,
-	    precoPraticado: precoPraticadoVenda,
+    const itemPayload = {
+        cliente: { id: 1 },
+        produto: { id: produtoSelecionadoId },
+        quantidade: quantidade,
+        precoPraticado: precoPraticadoVenda,
 
-	    status: 1,
+        status: 1,
 
-	    numeroPedido: window.numeroPedidoAtual,
-	    numero_pedido: window.numeroPedidoAtual
-	};
+        numeroPedido: window.numeroPedidoAtual,
+        numero_pedido: window.numeroPedidoAtual
+    };
 
-	
-	
-    
-   
-    
     console.log("PAYLOAD ENVIADO AO CARRINHO:", itemPayload);
-    
-    try {
-       
-		console.log("PAYLOAD CARRINHO:", itemPayload);
 
-		const response = await fetch(`${API_URL}/carrinho`, {
-		    method: "POST",
-		    headers: {
-		        "Content-Type": "application/json",
-		        "Authorization": `Bearer ${token}`
-		    },
-		    body: JSON.stringify(itemPayload)
-		});
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		if (response.ok) { 
-		           // Limpa as seleções temporárias para deixar o caixa pronto para o próximo item
-		           produtoSelecionadoId = null; 
-		           document.getElementById("inputQuantidade").value = "1"; 
-		           document.querySelectorAll(".produto-item").forEach(item => item.classList.remove("selecionado")); 
-		           
-		           // 🔥 AQUI ESTÁ A CORREÇÃO: Passa o mesmo número que foi salvo no MySQL para a listagem puxar na hora!
-		           carregarCarrinhoDoBanco(window.numeroPedidoAtual); 
-		           
-		       } else {
-		
-		
+    try {
+
+        console.log("PAYLOAD CARRINHO:", itemPayload);
+
+        const response = await fetch(`${API_URL}/carrinho`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(itemPayload)
+        });
+
+        if (response.ok) {
+            // Limpa as seleções temporárias para deixar o caixa pronto para o próximo item
+            produtoSelecionadoId = null;
+            document.getElementById("inputQuantidade").value = "1";
+            document.querySelectorAll(".produto-item").forEach(item => item.classList.remove("selecionado"));
+
+            // 🔥 AQUI ESTÁ A CORREÇÃO: Passa o mesmo número que foi salvo no MySQL para a listagem puxar na hora!
+            carregarCarrinhoDoBanco(window.numeroPedidoAtual);
+
+        } else {
+
+
             const respostaErro = await response.text();
             console.error("STATUS HTTP:", response.status);
             console.error("RESPOSTA DO BACKEND:", respostaErro);
@@ -406,56 +393,56 @@ function atualisBadgeContadorCaixa() {
     }
 }
 async function deixarPedidoPendente() {
-	    if (
-	        !window.itensCupomMemoria ||
-	        window.itensCupomMemoria.length === 0
-	    ) {
-	        alert("Não existe pedido em andamento.");
-	        return;
-	    }
+    if (
+        !window.itensCupomMemoria ||
+        window.itensCupomMemoria.length === 0
+    ) {
+        alert("Não existe pedido em andamento.");
+        return;
+    }
 
-	    const numeroPedido = window.numeroPedidoAtual;
+    const numeroPedido = window.numeroPedidoAtual;
 
-	    if (!numeroPedido) {
-	        alert("Número do pedido não foi gerado.");
-	        return;
-	    }
+    if (!numeroPedido) {
+        alert("Número do pedido não foi gerado.");
+        return;
+    }
 
-	    if (!confirm(
-	        `Deseja deixar o pedido ${numeroPedido} pendente?`
-	    )) {
-	        return;
-	    }
+    if (!confirm(
+        `Deseja deixar o pedido ${numeroPedido} pendente?`
+    )) {
+        return;
+    }
 
-	    // O pedido já está gravado no MySQL com status 1.
-	    // Não baixa estoque e não grava novamente.
+    // O pedido já está gravado no MySQL com status 1.
+    // Não baixa estoque e não grava novamente.
 
-	    window.itensCupomMemoria = [];
+    window.itensCupomMemoria = [];
 
-	    if (typeof renderizarCupomDaMemoria === "function") {
-	        renderizarCupomDaMemoria();
-	    }
+    if (typeof renderizarCupomDaMemoria === "function") {
+        renderizarCupomDaMemoria();
+    }
 
-	    const inputQuantidade =
-	        document.getElementById("inputQuantidade");
+    const inputQuantidade =
+        document.getElementById("inputQuantidade");
 
-	    if (inputQuantidade) {
-	        inputQuantidade.value = "1";
-	    }
+    if (inputQuantidade) {
+        inputQuantidade.value = "1";
+    }
 
-	    const labelStatus =
-	        document.getElementById("labelStatusCarrinho");
+    const labelStatus =
+        document.getElementById("labelStatusCarrinho");
 
-	    if (labelStatus) {
-	        labelStatus.textContent = "1 - Pendente";
-	        labelStatus.className =
-	            "status-badge bg-warning text-dark";
-	    }
+    if (labelStatus) {
+        labelStatus.textContent = "1 - Pendente";
+        labelStatus.className =
+            "status-badge bg-warning text-dark";
+    }
 
-	    alert(`Pedido ${numeroPedido} mantido pendente no MySQL.`);
+    alert(`Pedido ${numeroPedido} mantido pendente no MySQL.`);
 
-	    window.numeroPedidoAtual = `PED-${Date.now()}`;
+    window.numeroPedidoAtual = `PED-${Date.now()}`;
 
-	
-	
+
+
 }
