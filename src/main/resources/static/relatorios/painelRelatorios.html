@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<title>Painel de Relatórios - Material de Construção</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background: linear-gradient(135deg, #2c3e50, #4caf50);
+			color: white;
+			text-align: center;
+			padding: 40px;
+			margin: 0;
+			height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.box {
+			background: rgba(0, 0, 0, 0.45);
+			padding: 35px;
+			border-radius: 12px;
+			min-width: 320px;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+		}
+
+		h2 { 
+			margin-bottom: 25px; 
+			color: #ff9800; 
+		}
+
+		h4 { 
+			margin-top: 20px; 
+			margin-bottom: 5px; 
+			text-align: left; 
+			color: #5eff5e; 
+			border-bottom: 1px solid rgba(255,255,255,0.2); 
+			padding-bottom: 5px;
+		}
+
+		button {
+			display: block; 
+			width: 100%; 
+			margin: 12px 0; 
+			padding: 12px; 
+			border: none;
+			background: #2e7d32; 
+			color: white; 
+			cursor: pointer; 
+			border-radius: 6px;
+			font-size: 14px; 
+			font-weight: bold; 
+			transition: 0.3s; 
+			text-align: left;
+		}
+
+		button:hover { 
+			background: #4CAF50; 
+			transform: scale(1.02); 
+		}
+
+		/* ⚡ Botão Voltar destacado em laranja */
+		button.btn-voltar { 
+			background: #ff9800; 
+			text-align: center; 
+			margin-top: 25px; 
+		}
+		
+		button.btn-voltar:hover { 
+			background: #e68a00; 
+		}
+	</style>
+</head>
+<body>
+	<div class="box">
+	    <h2>📊 Relatórios Gerenciais (PDF)</h2>
+
+	    <h4>🧾 Fiscal & Compras</h4>
+	    
+		<!-- 🎯 QUADRO ATUALIZADO: Painel Gerencial de Entradas -->
+
+		<div style="
+		    background: rgba(255, 255, 255, 0.95);
+		    color: #2c3e50;
+		    padding: 20px;
+		    border-radius: 8px;
+		    margin: 15px 0;
+		    text-align: left;
+		    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+		">
+
+		    <h3 style="
+		        margin-top: 0;
+		        color: #2e7d32;
+		        border-bottom: 2px solid #2e7d32;
+		        padding-bottom: 5px;
+		    ">
+		        📥 Painel Gerencial de Entradas (Notas Fiscais)
+		    </h3>
+
+			<!-- 🎯 Painel Gerencial de Entradas -->
+
+			<div style="
+			    background: rgba(255, 255, 255, 0.95);
+			    color: #2c3e50;
+			    padding: 20px;
+			    border-radius: 8px;
+			    margin: 15px 0;
+			    text-align: left;
+			    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+			">
+
+			    <h3 style="
+			        margin-top: 0;
+			        color: #2e7d32;
+			        border-bottom: 2px solid #2e7d32;
+			        padding-bottom: 5px;
+			    ">
+			        📥 Painel Gerencial de Entradas (Notas Fiscais)
+			    </h3>
+
+			    <!-- DATAS + FILTRO -->
+			    <div style="
+			        display: flex;
+			        gap: 15px;
+			        margin-bottom: 15px;
+			        align-items: flex-end;
+			    ">
+
+			        <div style="flex: 1;">
+			            <label style="font-size: 12px; font-weight: bold; color: #555;">
+			                Data Início:
+			            </label>
+
+			            <input
+			                type="date"
+			                id="entradaDataInicio"
+			                style="
+			                    width: 100%;
+			                    padding: 8px;
+			                    border: 1px solid #ccc;
+			                    border-radius: 4px;
+			                    box-sizing: border-box;
+			                "
+			            >
+			        </div>
+
+			        <div style="flex: 1;">
+			            <label style="font-size: 12px; font-weight: bold; color: #555;">
+			                Data Fim:
+			            </label>
+
+			            <input
+			                type="date"
+			                id="entradaDataFim"
+			                style="
+			                    width: 100%;
+			                    padding: 8px;
+			                    border: 1px solid #ccc;
+			                    border-radius: 4px;
+			                    box-sizing: border-box;
+			                "
+			            >
+			        </div>
+
+			        <div>
+			            <button
+			                type="button"
+			                onclick="filtrarEntradasPorPeriodo()"
+			                style="
+			                    background: #0288d1;
+			                    color: white;
+			                    border: none;
+			                    padding: 10px 20px;
+			                    border-radius: 4px;
+			                    font-weight: bold;
+			                    cursor: pointer;
+			                    margin: 0;
+			                "
+			            >
+			                🔍 Filtrar
+			            </button>
+			        </div>
+
+			    </div>
+
+			    <!-- NOTAS ENCONTRADAS -->
+			    <div style="margin-bottom: 10px;">
+
+			        <label style="font-size: 12px; font-weight: bold; color: #555;">
+			            Selecione a Nota Fiscal Cadastrada no Período:
+			        </label>
+
+			        <select
+			            id="selectEntradaDinamica"
+			            style="
+			                width: 100%;
+			                padding: 10px;
+			                border: 1px solid #ccc;
+			                border-radius: 4px;
+			                font-weight: bold;
+			                color: #2c3e50;
+			                margin-top: 5px;
+			                box-sizing: border-box;
+			            "
+			        >
+			            <option value="">
+			                -- SELECIONE UMA NOTA FISCAL --
+			            </option>
+			        </select>
+
+			    </div>
+
+			    <!-- DANFE PERTENCE À NOTA SELECIONADA -->
+			    <button
+			        type="button"
+			        onclick="imprimirDanfePeloPainel()"
+			        style="
+			            background: #2e7d32;
+			            color: white;
+			            border: none;
+			            width: 100%;
+			            padding: 12px;
+			            border-radius: 6px;
+			            font-weight: bold;
+			            cursor: pointer;
+			            text-align: center;
+			            font-size: 14px;
+			            margin-bottom: 20px;
+			        "
+			    >
+			        🖨️ Imprimir DANFE Consolidada (PDF)
+			    </button>
+
+			    <!-- RELATÓRIOS GERENCIAIS INDEPENDENTES -->
+			    <div style="
+			        display: flex;
+			        flex-direction: column;
+			        gap: 10px;
+			    ">
+
+			        <button
+			            type="button"
+			            onclick="window.baixarPdf(
+			                '/api/relatorios/mim',
+			                'Mapa_Inventario_Mercadorias'
+			            )"
+			            style="width: 100%;"
+			        >
+			            📋 MIM - Mapa de Inventário de Mercadorias
+			        </button>
+
+			        <button
+			            type="button"
+			            onclick="window.baixarPdf(
+			                '/api/relatorios/mgc',
+			                'Mapa_Gerencial_Compras'
+			            )"
+			            style="width: 100%;"
+			        >
+			            📈 MGC - Mapa Gerencial de Compras
+			        </button>
+
+			    </div>
+
+			</div>
+
+	<!-- 🌐 Conecta direto com a raiz do seu utils.js (Passaporte universal de PDFs) -->
+	<script src="/componentes-js/utils.js"></script>
+
+		<script>
+			function imprimirDanfeDinamica() {
+				const idNota = document.getElementById('entradaIdBusca').value;
+				
+				if (!idNota || idNota < 1) {
+					alert("⚠️ Por favor, informe um ID de Entrada válido!");
+					return;
+				}
+				
+				const endpoint = `/api/relatorios/danfe/${idNota}`;
+				window.baixarPdf(endpoint, `DANFE_Consolidada_Nota_${idNota}`);
+			}
+			// ⏳ Define as datas de hoje nos campos automaticamente ao carregar a página
+			document.addEventListener("DOMContentLoaded", () => {
+			    const hoje = new Date().toISOString().split('T')[0];
+			    if(document.getElementById('entradaDataInicio')) document.getElementById('entradaDataInicio').value = hoje;
+			    if(document.getElementById('entradaDataFim')) document.getElementById('entradaDataFim').value = hoje;
+			});
+
+			// 🔍 Função 1: Filtra as Notas de Entrada batendo no seu Java
+			async function filtrarEntradasPorPeriodo() {
+			    const dataInicio = document.getElementById('entradaDataInicio').value;
+			    const dataFim = document.getElementById('entradaDataFim').value;
+			    const select = document.getElementById('selectEntradaDinamica');
+			    
+			    if (!dataInicio || !dataFim) {
+			        alert("⚠️ Por favor, informe o período completo!");
+			        return;
+			    }
+			    
+			    select.innerHTML = '<option value="">Buscando notas no MySQL...</option>';
+			    
+			    try {
+			        // Envia as datas via parâmetro de URL (Query Params) para o seu Java filtrar
+			        const token = window.obterTokenSeguro();
+			        const response = await fetch(`/api/relatorios/entradas/periodo?inicio=${dataInicio}&fim=${dataFim}`, {
+			            method: "GET",
+			            headers: { "Authorization": `Bearer ${token}` }
+			        });
+			        
+			        if (!response.ok) throw new Error("Erro ao buscar notas.");
+			        
+			        const entradas = await response.json();
+			        
+			        if (entradas.length === 0) {
+			            select.innerHTML = '<option value="">-- NENHUMA NOTA ENCONTRADA NO PERÍODO --</option>';
+			            return;
+			        }
+			        
+			        select.innerHTML = '<option value="">-- SELECIONE UMA NOTA FISCAL --</option>';
+			        entradas.forEach(e => {
+			            const opt = document.createElement('option');
+			            opt.value = e.id; // Guarda o ID oculto para a busca
+			            // Monta o texto bonito: Fornecedor, Número da Nota, Data e o Valor Total vindo do banco!
+			            opt.textContent = `🏭 Forn: ${e.fornecedorNome} | Nota: ${e.numeroNota} | Dt: ${e.dataRecebimento} | 💰 R$ ${e.valorTotal}`;
+			            select.appendChild(opt);
+			        });
+			        
+			    } catch (erro) {
+			        console.error("Erro no painel de entradas:", erro);
+			        select.innerHTML = '<option value="">-- ERRO AO CARREGAR NOTAS --</option>';
+			    }
+			}
+
+			// 📄 Função 2: Lê o ID selecionado no combo box e chama a DANFE Consolidada do seu utils.js
+			function imprimirDanfePeloPainel() {
+			    const idEntrada = document.getElementById('selectEntradaDinamica').value;
+			    
+			    if (!idEntrada) {
+			        alert("⚠️ Por favor, selecione uma Nota Fiscal na lista primeiro!");
+			        return;
+			    }
+			    
+			    // Dispara para o endpoint dinâmico do OpenPDF que você acabou de cravar no Java!
+			    const endpoint = `/api/relatorios/danfe/${idEntrada}`;
+			    window.baixarPdf(endpoint, `DANFE_Consolidada_Nota_${idEntrada}`);
+			}	
+			
+		</script>
+	
+	
+</body>
+</html>

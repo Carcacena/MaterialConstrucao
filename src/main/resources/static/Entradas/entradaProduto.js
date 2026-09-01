@@ -80,6 +80,7 @@ async function carregarProdutosPorFornecedor() {
 }
 
 async function salvarEntrada() {
+
     const elNota = document.getElementById('numeroNota');
     const elSerie = document.getElementById('serie');
     const elChave = document.getElementById('chaveAcesso');
@@ -97,8 +98,13 @@ async function salvarEntrada() {
     const dataRecebimento = elData.value;
     const fornecedorId = elForn.value;
 
-    if (!numeroNota || !chaveAcesso || !dataRecebimento || !fornecedorId || itensNota.length === 0) {
-        alert("⚠️ Erro de Validação:\nPor favor, preencha o cabeçalho da nota e insira pelo menos um item no grid.");
+    if (!numeroNota || !chaveAcesso || !dataRecebimento ||
+        !fornecedorId || itensNota.length === 0) {
+
+        alert(
+            "⚠️ Erro de Validação:\n" +
+            "Por favor, preencha o cabeçalho da nota e insira pelo menos um item no grid."
+        );
         return;
     }
 
@@ -111,31 +117,99 @@ async function salvarEntrada() {
         itens: itensNota
     };
 
-	try {
-	        // 🚀 CORREÇÃO 1: Rota limpa, saindo direto da raiz para a API do Java!
-	        const response = await fetch('/api/entradas', {
-	            method: 'POST',
-	            headers: montarHeaders(),
-	            body: JSON.stringify(payloadFiscal)
-	        });
+    try {
 
-	        if (response.ok) {
-	            alert('✅ Sucesso Total!\nNota Fiscal gravada e estoque incrementado no banco local.');
-	            // 🚀 CORREÇÃO 2: Aponta para a pasta nova do seu menu corrigido!
-	            window.location.href = '/menu/menu.html';
-	        } else {
-	            const textoErro = await response.text();
-	            alert('❌ O Servidor Java recusou o registro:\n' + textoErro);
-	        }
+        // 1. GRAVA A ENTRADA E OS ITENS
+        const response = await fetch('/api/entradas', {
+            method: 'POST',
+            headers: montarHeaders(),
+            body: JSON.stringify(payloadFiscal)
+        });
+
+        if (!response.ok) {
+            const textoErro = await response.text();
+
+            alert(
+                '❌ O Servidor Java recusou o registro:\n' +
+                textoErro
+            );
+            return;
+        }
+
+        // 2. PEGA A ENTRADA QUE O JAVA ACABOU DE GRAVAR
+        const entradaSalva = await response.json();
+
+        if (!entradaSalva || !entradaSalva.id) {
+            throw new Error(
+                "A entrada foi gravada, mas o servidor não retornou o ID."
+            );
+        }
+
+        console.log("Entrada gravada. ID:", entradaSalva.id);
+
+        // 3. GARANTE QUE O TOTAL DA NOTA ESTÁ ATUALIZADO
+        calcularTotalNota();
+
+        const pegarValor = (id) => {
+            const campo = document.getElementById(id);
+            return campo ? (parseFloat(campo.value) || 0) : 0;
+        };
+
+        // 4. MONTA EXATAMENTE O EntradaImpostosDTO
+        const impostos = {
+            baseCalculoIcms: pegarValor("baseCalculoIcms"),
+            valorIcms: pegarValor("valorIcms"),
+            baseCalculoIcmsSt: pegarValor("baseCalculoIcmsSt"),
+            valorIcmsSt: pegarValor("valorIcmsSt"),
+            valorTotalProdutos: pegarValor("valorTotalProdutos"),
+            valorFrete: pegarValor("valorFrete"),
+            valorSeguro: pegarValor("valorSeguro"),
+            valorDesconto: pegarValor("valorDesconto"),
+            outrasDespesasAcessorias: pegarValor("outrasDespesasAcessorias"),
+            valorIpi: pegarValor("valorIpi"),
+            valorTotalNota: pegarValor("valorTotalNota")
+        };
+
+        console.log("Impostos enviados:", impostos);
+
+        // 5. GRAVA OS IMPOSTOS LIGADOS À ENTRADA CRIADA
+        const responseImpostos = await fetch(
+            `/api/entradas/${entradaSalva.id}/impostos`,
+            {
+                method: 'POST',
+                headers: montarHeaders(),
+                body: JSON.stringify(impostos)
+            }
+        );
+
+        if (!responseImpostos.ok) {
+            const erroImpostos = await responseImpostos.text();
+
+            alert(
+                "⚠️ A Nota Fiscal foi gravada, mas houve erro ao gravar os impostos:\n" +
+                erroImpostos
+            );
+            return;
+        }
+
+        // 6. SOMENTE AGORA ENCERRA A OPERAÇÃO
+        alert(
+            '✅ Sucesso Total!\n' +
+            'Nota Fiscal, estoque e impostos gravados no banco local.'
+        );
+
+        window.location.href = '/menu/menu.html';
+
     } catch (error) {
-        console.error('Erro de conexão física:', error);
-        alert('❌ Erro de Rede: Verifique se o seu servidor Spring Boot local não caiu.');
+
+        console.error('Erro ao gravar a entrada:', error);
+
+        alert(
+            '❌ Erro ao processar a entrada:\n' +
+            error.message
+        );
     }
-    // 💡 REMOVIDO: O redirecionamento solto que estava aqui no final foi apagado 
-    // para que a tela não mude caso ocorra um erro de validação ou de rede.
 }
-
-
 
 
 

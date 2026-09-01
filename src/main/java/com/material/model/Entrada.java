@@ -25,84 +25,54 @@ public class Entrada {
     @Column(name = "data_recebimento", nullable = false)
     private LocalDate dataRecebimento;
 
-    // 🌟 AFINADO: Agora aponta direto para a Entidade Fornecedor que você enviou
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fornecedor_id", nullable = false)
     private Fornecedor fornecedor;
 
-    // 🌟 RELACIONAMENTO MESTRE/DETALHE: Uma Nota para Vários Itens
     @OneToMany(mappedBy = "entrada", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EntradaProdutos> itens = new ArrayList<>();
 
+    // 🌟 ADICIONADO: O elo que faltava para gravar os impostos em cascata automática
+    @OneToOne(mappedBy = "entrada", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EntradaImpostos impostos;
+
+    // ======================
+    // MÉTODOS AUXILIARES DE COORDENAÇÃO (BI-DIRECIONAL)
+    // ======================
     
     public void setItens(List<EntradaProdutos> novosItens) {
-        this.itens.clear(); // Limpa mantendo a mesma referência de coleção interna
+        this.itens.clear(); 
         if (novosItens != null) {
-            // Vincula de volta cada item para manter a integridade bidirecional
             for (EntradaProdutos item : novosItens) {
                 item.setEntrada(this); 
             }
-            this.itens.addAll(novosItens); // Adiciona os novos elementos com segurança
+            this.itens.addAll(novosItens); 
         }
     }
-    
-    
-    
+
+    // 🌟 ADICIONADO: Método utilitário para amarrar os dois lados do relacionamento 1:1
+    public void setImpostos(EntradaImpostos novosImpostos) {
+        this.impostos = novosImpostos;
+        if (novosImpostos != null) {
+            novosImpostos.setEntrada(this); // Injeta o ID do cabeçalho na FK do filho
+        }
+    }
     
     // ======================
     // GETTERS E SETTERS
     // ======================
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNumeroNota() {
-        return numeroNota;
-    }
-
-    public void setNumeroNota(String numeroNota) {
-        this.numeroNota = numeroNota;
-    }
-
-    public String getSerie() {
-        return serie;
-    }
-
-    public void setSerie(String serie) {
-        this.serie = serie;
-    }
-
-    public String getChaveAcesso() {
-        return chaveAcesso;
-    }
-
-    public void setChaveAcesso(String chaveAcesso) {
-        this.chaveAcesso = chaveAcesso;
-    }
-
-    public LocalDate getDataRecebimento() {
-        return dataRecebimento;
-    }
-
-    public void setDataRecebimento(LocalDate dataRecebimento) {
-        this.dataRecebimento = dataRecebimento;
-    }
-
-    public Fornecedor getFornecedor() {
-        return fornecedor;
-    }
-
-    public void setFornecedor(Fornecedor fornecedor) {
-        this.fornecedor = fornecedor;
-    }
-
-    public List<EntradaProdutos> getItens() {
-        return itens;
-    }
-
-   
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getNumeroNota() { return numeroNota; }
+    public void setNumeroNota(String numeroNota) { this.numeroNota = numeroNota; }
+    public String getSerie() { return serie; }
+    public void setSerie(String serie) { this.serie = serie; }
+    public String getChaveAcesso() { return chaveAcesso; }
+    public void setChaveAcesso(String chaveAcesso) { this.chaveAcesso = chaveAcesso; }
+    public LocalDate getDataRecebimento() { return dataRecebimento; }
+    public void setDataRecebimento(LocalDate dataRecebimento) { this.dataRecebimento = dataRecebimento; }
+    public Fornecedor getFornecedor() { return fornecedor; }
+    public void setFornecedor(Fornecedor fornecedor) { this.fornecedor = fornecedor; }
+    public List<EntradaProdutos> getItens() { return itens; }
+    public EntradaImpostos getImpostos() { return impostos; } // Adicionado getter
 }

@@ -1,6 +1,6 @@
 CREATE TABLE entrada_impostos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    entrada_id BIGINT NOT NULL UNIQUE, -- CORRIGIDO: Alterado de INT para BIGINT
+    entrada_id BIGINT NOT NULL UNIQUE, 
     base_calculo_icms DECIMAL(12,2),
     valor_icms DECIMAL(12,2),
     base_calculo_icms_st DECIMAL(12,2),

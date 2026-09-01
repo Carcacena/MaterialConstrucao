@@ -3,6 +3,8 @@ package com.material.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "entrada_impostos")
 public class EntradaImpostos {
@@ -13,6 +15,7 @@ public class EntradaImpostos {
 
     @OneToOne
     @JoinColumn(name = "entrada_id", nullable = false, unique = true)
+    @JsonIgnore
     private Entrada entrada;
 
     @Column(name = "base_calculo_icms", precision = 12, scale = 2)

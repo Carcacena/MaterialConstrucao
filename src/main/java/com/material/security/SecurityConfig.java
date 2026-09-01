@@ -97,7 +97,8 @@ public class SecurityConfig {
                .requestMatchers("/carrinho/public/pedido/**").permitAll() // Exceção do PDF
              	   .requestMatchers(
             				    "/menu/**", // 👈 Liberando a nova pasta com o HTML e o JS do menu juntos!
-            				    "/Entradas/**", "/Fornecedores/**", "/Clientes/**", "/Produtos/**", "/vendas/**", "/css/**", "/js/**",
+            				    "/Entradas/**", "/Fornecedores/**", 
+            				    "/Clientes/**", "/Produtos/**", "/relatorios/**", "/vendas/**", "/css/**", "/js/**",
             				    "/api/**"
             				).permitAll()   
             		   
