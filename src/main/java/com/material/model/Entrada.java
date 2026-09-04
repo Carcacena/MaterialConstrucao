@@ -13,9 +13,12 @@ public class Entrada {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "numero_nota", nullable = false, length = 20)
-    private String numeroNota;
-
+  
+    @Column(name = "numero_nota", length = 20)
+    private String numeroNota; // No Java usamos camelCase!
+    @Column(name = "status")
+    
+    private Integer status = 1; // 1 = Ativa, 2 = Devolvida 
     @Column(length = 5)
     private String serie;
 
@@ -75,4 +78,17 @@ public class Entrada {
     public void setFornecedor(Fornecedor fornecedor) { this.fornecedor = fornecedor; }
     public List<EntradaProdutos> getItens() { return itens; }
     public EntradaImpostos getImpostos() { return impostos; } // Adicionado getter
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+    
+    
+    
+    
+    
 }

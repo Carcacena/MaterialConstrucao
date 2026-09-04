@@ -5,9 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List; // 🚀 ESSALINHA É CRUCIAL PARA O VERMELHO SUMIR!
 
-@Repository
-public interface EntradaProdutosRepository extends JpaRepository<EntradaProdutos, Long> {
     
-    // 🎯 Ensina o Spring a buscar todos os itens vinculados ao ID da entrada
-    List<EntradaProdutos> findByEntradaId(Long entradaId);
-}
+	@Repository
+	public interface EntradaProdutosRepository extends JpaRepository<EntradaProdutos, Long> {
+
+	    // 🌟 ADICIONE APENAS ESTA LINHA ISOLADA:
+	    // O Spring gera o SELECT * FROM entrada_produtos WHERE entrada_id = ? automaticamente!
+	    List<EntradaProdutos> findByEntradaId(Long entradaId);
+	}

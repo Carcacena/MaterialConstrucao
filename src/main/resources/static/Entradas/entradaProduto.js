@@ -211,7 +211,84 @@ async function salvarEntrada() {
     }
 }
 
+// CONTROLE DO MENU: Abre ou fecha ao clicar
+function alternarMenuSuspenso() {
+    const menu = document.getElementById("menuSuspensoAcoes");
+    menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+}
 
+function fecharMenuSuspenso() {
+    document.getElementById("menuSuspensoAcoes").style.display = "none";
+}
+
+// Fecha se clicar fora dele
+window.addEventListener("click", function(event) {
+    const menu = document.getElementById("menuSuspensoAcoes");
+    if (!event.target.closest('.btn-salvar') && menu && menu.style.display === "block") {
+        fecharMenuSuspenso();
+    }
+});
+
+// AÇÃO 1: Limpa completamente a tela (Cancelar)
+function limparTelaEntradaCompleta() {
+    if (confirm("Deseja realmente limpar todos os campos digitados?")) {
+        document.getElementById("numeroNota").value = "";
+        document.getElementById("serie").value = "";
+        document.getElementById("chaveAcesso").value = "";
+        document.getElementById("fornecedorId").value = "";
+        document.getElementById('dataRecebimento').valueAsDate = new Date();
+        document.getElementById("selectProduto").innerHTML = '<option value="">Selecione o Fornecedor primeiro...</option>';
+        document.getElementById("qtdEntrada").value = "1";
+        document.getElementById("precoCusto").value = "";
+
+        // Limpa os campos ocultos do quadro de impostos
+        const camposImpostos = ["baseCalculoIcms", "valorIcms", "baseCalculoIcmsSt", "valorIcmsSt", "valorTotalProdutos", "valorFrete", "valorSeguro", "valorDesconto", "outrasDespesasAcessorias", "valorIpi", "valorTotalNota"];
+        camposImpostos.forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = "";
+        });
+
+        // Limpa o grid de itens
+        itensNota = [];
+        const tbody = document.getElementById("tabelaItens").querySelector("tbody");
+        if (tbody) tbody.innerHTML = "";
+        
+        alert("Tela limpa com sucesso!");
+    }
+}
+
+// AÇÃO 2: Dispara a devolução lógica (Muda para Status 2 e retira do estoque)
+async function dispararDevolucaoEntradaPorNumero() {
+    const numeroNotaParaEstornar = prompt("Digite o NÚMERO exato da Nota Fiscal que deseja DEVOLVER:");
+    if (!numeroNotaParaEstornar) return;
+	 const prosseguir = confirm(`⚠️ ALERTA DE ESTORNO DE ESTOQUE:\n\nEsta ação localizará a Nota nº ${numeroNotaParaEstornar} no MySQL, SUBTRAIRÁ as quantidades do estoque e mudará o status da nota para DEVOLVIDO (Status 2).\n\nDeseja continuar?`);
+    
+    if (prosseguir) {
+        try {
+            // Usa a sua função nativa de cabeçalhos com token JWT
+            const headersSeguros = montarHeaders();
+
+			// ⚡ CORREÇÃO DO FETCH: Adicione a barra '/' antes de 'api/'
+			const response = await fetch(
+			    `/api/entradas/devolver-nota/${numeroNotaParaEstornar}`,
+			    {
+			        method: "PUT",
+			        headers: headersSeguros
+			    }
+			);   if (!response.ok) {
+                const erroTexto = await response.text();
+                throw new Error(erroTexto || "Ocorreu um erro no processamento do Java.");
+            }
+
+            alert(`✅ Sucesso! A nota ${numeroNotaParaEstornar} agora está como DEVOLVIDA (Status 2) e o estoque foi corrigido.`);
+            location.reload(); // Recarrega a página limpa
+
+        } catch (erro) {
+            console.error("Erro no estorno:", erro);
+            alert("❌ Falha na Devolução: " + erro.message);
+        }
+    }
+}
 
 
 

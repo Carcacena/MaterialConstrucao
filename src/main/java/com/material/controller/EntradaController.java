@@ -42,4 +42,31 @@ public class EntradaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao processar a entrada de estoque.");
         }
     }
+    
+ 
+    
+    @PutMapping("/devolver-nota/{numeroNota}")
+    public ResponseEntity<?> devolverNota(
+            @PathVariable String numeroNota) {
+
+        try {
+
+            Entrada entradaDevolvida =
+                    entradaService.devolverNota(numeroNota);
+
+            return ResponseEntity.ok(entradaDevolvida);
+
+        } catch (RuntimeException e) {
+
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+    
+    
+    
+    
+    
+    
 }

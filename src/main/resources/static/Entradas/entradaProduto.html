@@ -179,7 +179,40 @@
 			style="background: #7f8c8d; cursor: pointer; margin-top: 10px;">
 			Impostos + Frete
 		</button>
+		<!-- 🌟 MENU SUSPENSO DE AÇÕES DA NOTA FISCAL -->
+		<div style="position: relative; display: inline-block; width: 100%; margin-top: 15px;">
+		    
+		    <!-- Botão Gatilho Principal (Laranja Padrão) -->
+		    <button type="button" class="btn-salvar" onclick="alternarMenuSuspenso()" style="margin: 0; background: #e67e22; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px;">
+		        <span>⚙️ Ações e Controle da Nota</span>
+		        <span>▼</span>
+		    </button>
 
+		    <!-- O Menu Oculto que aparece ao clicar -->
+		    <div id="menuSuspensoAcoes" style="display: none; position: absolute; bottom: 100%; left: 0; width: 100%; background: #25422e; border: 2px solid #e67e22; border-radius: 4px; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); z-index: 999;">
+		        
+		        <button type="button" onclick="salvarEntrada(); fecharMenuSuspenso();" style="margin: 0; padding: 12px; background: transparent; border-bottom: 1px solid #1e3525; border-radius: 0; width: 100%; text-align: left; color: #4af37a; font-weight: bold; cursor: pointer;">
+		            💾 Gravar Nota Fiscal (Status 1)
+		        </button>
+		        
+		        <button type="button" onclick="limparTelaEntradaCompleta(); fecharMenuSuspenso();" style="margin: 0; padding: 12px; background: transparent; border-bottom: 1px solid #1e3525; border-radius: 0; width: 100%; text-align: left; color: #ff4a4a; font-weight: bold; cursor: pointer;">
+		            ❌ Cancelar e Limpar Tela (Sem mexer no Banco)
+		        </button>
+		        
+		        <button type="button" onclick="dispararDevolucaoEntradaPorNumero(); fecharMenuSuspenso();" style="margin: 0; padding: 12px; background: transparent; border-radius: 0; width: 100%; text-align: left; color: #ffb74d; font-weight: bold; cursor: pointer;">
+		            ↩️ Devolver Nota Cadastrada (Status 2 - Estorno)
+		        </button>
+		        
+		    </div>
+		</div>
+		
+		
+		
+		
+		
+		
+		
+		
 
 		<!-- 🌟 QUADRO DE IMPOSTOS FLUTUANTE E ARRASTÁVEL -->
 		<div id="modalImpostos" class="modal-flutuante"
@@ -243,6 +276,7 @@
 				<button type="button" onclick="fecharModalImpostos()"
 					style="width:100%; margin-top:8px; padding:10px; background:#7f8c8d; color:white; border:none; border-radius:4px; cursor:pointer;">Fechar</button>
 			</div>
+			
 		</div>
 	</div>
 

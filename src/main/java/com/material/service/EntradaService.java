@@ -19,16 +19,19 @@ import java.util.List;
 
 @Service
 public class EntradaService {
+	
+	 @Autowired
+	    private EntradaRepository entradaRepository;
 
-    @Autowired
-    private EntradaRepository entradaRepository;
+	    @Autowired
+	    private FornecedorRepository fornecedorRepository;
 
-    @Autowired
-    private FornecedorRepository fornecedorRepository;
+	    @Autowired
+	    private ProdutoRepository produtoRepository;
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
-
+	    @Autowired
+	    private EntradaMovimentoService entradaMovimentoService;
+ 
     @Transactional
     public Entrada registrarEntrada(EntradaRequestDTO dto) {
         // 1. Localiza o Fornecedor da Nota
@@ -78,9 +81,101 @@ public class EntradaService {
         }
 
         // Associa a lista de itens criados à entrada
-        entrada.setItens(itensDaEntrada);
+        //entrada.setItens(itensDaEntrada);
 
         // Salva novamente para consolidar os itens (CascadeType.ALL cuidará de gravar na tabela entrada_produtos)
+        //return entradaRepository.save(entrada);
+        
+        entrada.setItens(itensDaEntrada);
+
+        Entrada entradaSalva = entradaRepository.save(entrada);
+
+        // 📚 Guarda no histórico: STATUS 1 = ENTRADA
+        entradaMovimentoService.registrarEntrada(entradaSalva);
+
+        return entradaSalva;
+        
+        
+        
+        
+        
+        
+        
+    }
+    
+    @Transactional
+    public Entrada devolverNota(String numeroNota) {
+
+        // 1. Localiza a nota
+        Entrada entrada = entradaRepository.findByNumeroNota(numeroNota)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Nota Fiscal nº " + numeroNota + " não encontrada."
+                        ));
+
+        // 2. Impede estorno duplicado
+        if (Integer.valueOf(2).equals(entrada.getStatus())) {
+            throw new RuntimeException(
+                    "A Nota Fiscal nº " + numeroNota + " já foi devolvida."
+            );
+        }
+
+        // 3. Percorre os produtos desta entrada
+        for (EntradaProdutos item : entrada.getItens()) {
+
+            Produto produto = item.getProduto();
+            int quantidade = item.getQuantidade();
+
+            // PRODUTO A GRANEL
+            if (Boolean.TRUE.equals(produto.getAGranel())) {
+
+                BigDecimal qtdDevolver =
+                        BigDecimal.valueOf(quantidade);
+
+                BigDecimal estoqueAtual =
+                        produto.getEstoque() == null
+                                ? BigDecimal.ZERO
+                                : produto.getEstoque();
+
+                if (estoqueAtual.compareTo(qtdDevolver) < 0) {
+                    throw new RuntimeException(
+                            "Estoque insuficiente para devolver o produto: "
+                                    + produto.getNome()
+                    );
+                }
+
+                produto.setEstoque(
+                        estoqueAtual.subtract(qtdDevolver)
+                );
+
+            } else {
+
+                // PRODUTO NORMAL
+                if (produto.getEstoqueAtual() < quantidade) {
+                    throw new RuntimeException(
+                            "Estoque insuficiente para devolver o produto: "
+                                    + produto.getNome()
+                    );
+                }
+
+                produto.setEstoqueAtual(
+                        produto.getEstoqueAtual() - quantidade
+                );
+            }
+
+            produtoRepository.save(produto);
+        }
+
+        // 4. Marca a nota como devolvida
+        entrada.setStatus(2);
+
+        // 5. Preserva a entrada no histórico
         return entradaRepository.save(entrada);
     }
+    
+    
+    
+    
+    
+    
 }

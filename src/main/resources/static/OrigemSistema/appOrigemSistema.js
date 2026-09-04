@@ -79,8 +79,8 @@ function acionarIncluir() {
     if (form) form.reset();
     
     document.getElementById("id").value = "";
-    document.getElementById("tituloFormulario").textContent = "Cadastrar Fornecedor";
-    document.getElementById("btnSalvar").textContent = "Salvar Fornecedor";
+    document.getElementById("tituloFormulario").textContent = "Cadastrar Origem";
+    document.getElementById("btnSalvar").textContent = "Salvar Origem";
     document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
     
     bloquearFormulario(false);
