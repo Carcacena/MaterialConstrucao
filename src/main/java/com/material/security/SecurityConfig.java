@@ -98,7 +98,13 @@ public class SecurityConfig {
              	   .requestMatchers(
             				    "/menu/**", // 👈 Liberando a nova pasta com o HTML e o JS do menu juntos!
             				    "/Entradas/**", "/Fornecedores/**", 
-            				    "/Clientes/**", "/Produtos/**", "/relatorios/**", "/vendas/**", "/css/**", "/js/**",
+            				    "/Clientes/**", 
+            				    "/Produtos/**",
+            				    "/relatorios/**", 
+            				    "/vendas/**",
+            				    "/OrigemSistema/**",
+            				    "/css/**",
+            				    "/js/**",
             				    "/api/**"
             				).permitAll()   
             		   

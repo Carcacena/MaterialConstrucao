@@ -29,17 +29,36 @@ public class ClienteController {
         return ResponseEntity.ok(clienteRepository.findAll());
     }
 
-    // 🔵 ATUALIZAR CLIENTE EXISTENTE (PUT)
+  
+ // 🔵 ATUALIZAR CLIENTE EXISTENTE (PUT)
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> atualizar(@PathVariable Long id, @RequestBody Cliente clienteDados) {
+    public ResponseEntity<Cliente> atualizar(
+            @PathVariable Long id,
+            @RequestBody Cliente clienteDados) {
+
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+                .orElseThrow(() ->
+                        new RuntimeException("Cliente não encontrado"));
 
-        // Atualiza os atributos simples mapeados na Entidade
         cliente.setNome(clienteDados.getNome());
-   //     cliente.setEndereco(clienteDados.getEndereco());
+        cliente.setInscricaoEstadual(clienteDados.getInscricaoEstadual());
+        cliente.setEmail(clienteDados.getEmail());
+        cliente.setTelefone(clienteDados.getTelefone());
 
-        return ResponseEntity.ok(clienteRepository.save(cliente));
+        cliente.setCep(clienteDados.getCep());
+        cliente.setLogradouro(clienteDados.getLogradouro());
+        cliente.setNumero(clienteDados.getNumero());
+        cliente.setComplemento(clienteDados.getComplemento());
+        cliente.setBairro(clienteDados.getBairro());
+        cliente.setCidade(clienteDados.getCidade());
+        cliente.setUf(clienteDados.getUf());
+
+        // CPF/CNPJ NÃO É ALTERADO
+        // cliente.setCnpj(clienteDados.getCnpj());
+
+        Cliente clienteAtualizado = clienteRepository.save(cliente);
+
+        return ResponseEntity.ok(clienteAtualizado);
     }
 
     // 🔴 EXCLUIR CLIENTE DO BANCO (DELETE)

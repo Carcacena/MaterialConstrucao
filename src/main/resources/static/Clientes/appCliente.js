@@ -4,8 +4,7 @@ const API_URL =
         ? "http://localhost:8080"
         : window.location.origin;
 
-let clienteSelecionadoId = null;
-
+let fornecedorSelecionadoId = null;
 // Helper para pegar o token limpo do LocalStorage
 function obterTokenPuro() {
     const dadosUsuarioBrutos = localStorage.getItem("token");
@@ -28,24 +27,34 @@ if (!localStorage.getItem("token")) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    carregarClientes();
-    const form = document.getElementById("formCliente");
+
+    carregarFornecedores();
+
+    const form = document.getElementById("formFornecedor");
+
     if (form) {
-        form.addEventListener("submit", cadastrarCliente);
+        form.addEventListener("submit", cadastrarFornecedor);
     }
-    
-    // Ouvidor para busca automática de CEP
+
+    // Busca automática quando o CEP completar 8 números
     const cepInput = document.getElementById("cep");
+
     if (cepInput) {
-        cepInput.addEventListener("blur", buscarCepAutomatico);
+
         cepInput.addEventListener("keyup", (e) => {
+
             const cepLimpo = e.target.value.replace(/\D/g, "");
+
             if (cepLimpo.length === 8) {
                 buscarCepAutomatico();
             }
+
         });
+
     }
+
     bloquearFormulario(true);
+
 });
 
 function bloquearFormulario(status) {
@@ -59,20 +68,20 @@ function bloquearFormulario(status) {
     });
 
     const btnSalvar = document.getElementById("btnSalvar");
-    const formContainer = document.getElementById("formCliente");
+    const formContainer = document.getElementById("formFornecedor");
     if (btnSalvar) btnSalvar.disabled = status;
     if (formContainer) formContainer.style.opacity = status ? "0.5" : "1";
 }
 
 function acionarIncluir() {
-    clienteSelecionadoId = null;
-    const form = document.getElementById("formCliente");
+    FornecedorSelecionadoId = null;
+    const form = document.getElementById("formFornecedor");
     if (form) form.reset();
     
     document.getElementById("id").value = "";
-    document.getElementById("tituloFormulario").textContent = "Cadastrar Cliente";
+    document.getElementById("tituloFormulario").textContent = "Cadastrar Fornecedor";
     document.getElementById("btnSalvar").textContent = "Salvar Cliente";
-    document.querySelectorAll("#tabelaClientes tr").forEach(r => r.classList.remove("selecionado"));
+    document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
     
     bloquearFormulario(false);
     ajustarTipoFormulario();
@@ -81,39 +90,53 @@ function acionarIncluir() {
     if (nomeInput) nomeInput.focus();
 }
 
-async function buscarCepAutomatico() {
-    const cepInput = document.getElementById("cep");
-    if (!cepInput) return;
 
-    const cepObtido = cepInput.value.replace(/\D/g, "");
-    if (cepObtido.length !== 8) return;
+async function buscarCepAutomatico() { 
+    const cepInput = document.getElementById("cep"); 
+    if (!cepInput) return; 
 
-    try {
-        const response = await fetch(`https://viacep.com.br{cepObtido}/json/`);
-        if (!response.ok) throw new Error("Erro ao buscar CEP");
+    const cepObtido = cepInput.value.replace(/\D/g, ""); 
+    if (cepObtido.length !== 8) return; 
 
-        const dadosEndereco = await response.json();
-        if (dadosEndereco.erro) {
-            alert("CEP não encontrado nas bases dos Correios!");
-            return;
-        }
-
-        document.getElementById("logradouro").value = dadosEndereco.logradouro || "";
-        document.getElementById("bairro").value = dadosEndereco.bairro || "";
-        document.getElementById("cidade").value = dadosEndereco.localidade || "";
+    try { 
+        const response = await fetch(`https://viacep.com.br/ws/${cepObtido}/json/`); 
         
-        // ⚡ MÁGICA DO DROPDOWN: injeta a UF direto no select de 27 estados
-        const ufSelect = document.getElementById("uf");
-        if (ufSelect) ufSelect.value = dadosEndereco.uf || "";
+        if (!response.ok) { 
+            throw new Error("Erro na requisição da API"); 
+        } 
 
-        const numeroInput = document.getElementById("numero");
-        if (numeroInput) numeroInput.focus();
-    } catch (error) {
-        console.error("Falha na API ViaCEP:", error);
-    }
+        const dadosEndereco = await response.json(); 
+
+		if (dadosEndereco.erro) {
+
+		    alert("CEP não encontrado nas bases dos Correios!");
+
+		    cepInput.value = "";
+		    cepInput.focus();
+
+		    return;
+		}
+
+        // Preenche os campos verificando se eles existem na tela para evitar erros
+        if (document.getElementById("logradouro")) document.getElementById("logradouro").value = dadosEndereco.logradouro || ""; 
+        if (document.getElementById("bairro")) document.getElementById("bairro").value = dadosEndereco.bairro || ""; 
+        if (document.getElementById("cidade")) document.getElementById("cidade").value = dadosEndereco.localidade || ""; 
+
+        // Injeta a UF direto no select
+        const ufSelect = document.getElementById("uf"); 
+        if (ufSelect) ufSelect.value = dadosEndereco.uf || ""; 
+
+        // Move o foco para o campo número
+        const numeroInput = document.getElementById("numero"); 
+        if (numeroInput) numeroInput.focus(); 
+
+    } catch (error) { 
+        console.error("Falha na API ViaCEP:", error); 
+        alert("Erro ao buscar o CEP. Tente digitar manualmente.");
+    } 
 }
 
-async function carregarClientes() {
+async function carregarFornecedores() {
     const tokenPuro = obterTokenPuro();
     if (!tokenPuro) return;
 
@@ -132,26 +155,26 @@ async function carregarClientes() {
             return;
         }
 
-        if (!response.ok) throw new Error("Erro ao buscar clientes");
+        if (!response.ok) throw new Error("Erro ao buscar fornecedores");
 
-        const clientes = await response.json();
-        renderizarTabelaClientes(clientes);
+        const fornecedores = await response.json();
+        renderizarTabelaFornecedores(fornecedores);
     } catch (error) {
         console.error("Erro:", error);
     }
 }
 
-function renderizarTabelaClientes(clientes) {
-    const tbody = document.getElementById("tabelaClientes");
+function renderizarTabelaFornecedores(fornecedores) {
+    const tbody = document.getElementById("tabelaFornecedores");
     if (!tbody) return;
     tbody.innerHTML = "";
 
-    if (clientes.length === 0) {
+    if (fornecedores.length === 0) {
         tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum cliente cadastrado.</td></tr>`;
         return;
     }
 
-    clientes.forEach(cli => {
+    fornecedores.forEach(cli => {
         const tr = document.createElement("tr");
         tr.dataset.id = cli.id;
         tr.dataset.nome = cli.nome;
@@ -182,70 +205,76 @@ function renderizarTabelaClientes(clientes) {
         `;
 
         tr.addEventListener("click", () => {
-            document.querySelectorAll("#tabelaClientes tr").forEach(r => r.classList.remove("selecionado"));
+            document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
             tr.classList.add("selecionado");
-            clienteSelecionadoId = cli.id;
+            fornecedorSelecionadoId = cli.id;
         });
 
         tbody.appendChild(tr);
     });
 }
 
-async function cadastrarCliente(event) {
-    if (event) event.preventDefault();
-    const tokenPuro = obterTokenPuro();
-    if (!tokenPuro) return;
+async function cadastrarFornecedor(event) {
+	 if (event) event.preventDefault();
+	    const tokenPuro = obterTokenPuro();
+	    if (!tokenPuro) return;
 
-    const clienteDados = {
-        nome: document.getElementById("nome").value,
-        cnpj: document.getElementById("documento").value.replace(/\D/g, ""), 
-        email: document.getElementById("email").value,
-        telefone: document.getElementById("telefone").value,
-        cep: document.getElementById("cep").value.replace(/\D/g, ""),
-        logradouro: document.getElementById("logradouro").value,
-        numero: document.getElementById("numero").value,
-        complemento: document.getElementById("complemento").value,
-        bairro: document.getElementById("bairro").value,
-        cidade: document.getElementById("cidade").value,
-        uf: document.getElementById("uf").value
-    };
+	    const fornecedorDados = {
+	        nome: document.getElementById("nome").value,
+	        cnpj: document.getElementById("documento").value.replace(/\D/g, ""), 
+	        email: document.getElementById("email").value,
+	        telefone: document.getElementById("telefone").value,
+	        cep: document.getElementById("cep").value.replace(/\D/g, ""),
+	        logradouro: document.getElementById("logradouro").value,
+	        numero: document.getElementById("numero").value,
+	        complemento: document.getElementById("complemento").value,
+	        bairro: document.getElementById("bairro").value,
+	        cidade: document.getElementById("cidade").value,
+	        uf: document.getElementById("uf").value
+	    };
 
-    const url = clienteSelecionadoId ? `${API_URL}/api/clientes/${clienteSelecionadoId}` : `${API_URL}/api/clientes`;
-    const metodo = clienteSelecionadoId ? "PUT" : "POST";
+	    const url = fornecedorSelecionadoId ? `${API_URL}/api/clientes/${fornecedorSelecionadoId}` :
+		 `${API_URL}/api/clientes`;
+	    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
 
-    try {
-        const response = await fetch(url, {
-            method: metodo,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${tokenPuro}`
-            },
-            body: JSON.stringify(clienteDados)
-        });
+	    try {
+	        const response = await fetch(url, {
+	            method: metodo,
+	            headers: {
+	                "Content-Type": "application/json",
+	                "Authorization": `Bearer ${tokenPuro}`
+	            },
+	            body: JSON.stringify(fornecedorDados)
+	        });
 
-        if (response.ok) {
-            alert(clienteSelecionadoId ? "✅ Cliente alterado!" : "✅ Cliente cadastrado!");
-            acionarIncluir();
-            carregarClientes();
-        } else {
-            const textoErro = await response.text();
-            alert("❌ Erro ao salvar cliente:\n" + textoErro);
-        }
-    } catch (e) {
-        console.error("Erro na requisição:", e);
-        alert("❌ Erro de rede ao tentar se conectar ao servidor.");
-    }
-}
+	        if (response.ok) {
+	            alert(fornecedorSelecionadoId ? "✅ Cliente alterado!" : "✅ Cliente cadastrado!");
+	            acionarIncluir();
+	            carregarFornecedores();
+	        } else {
+	            const textoErro = await response.text();
+	            alert("❌ Erro ao salvar fornecedor:\n" + textoErro);
+	        }
+	    } catch (e) {
+	        console.error("Erro na requisição:", e);
+	        alert("❌ Erro de rede ao tentar se conectar ao servidor.");
+	    }
+	}
 
 function acionarAlterar() {
-    if (!clienteSelecionadoId) {
+    if (!fornecedorSelecionadoId) {
         alert("⚠️ Selecione um cliente na tabela primeiro!");
         return;
     }
-    const linhaSelecionada = document.querySelector("#tabelaClientes tr.selecionado");
-    if (linhaSelecionada) {
-        bloquearFormulario(false);
+	
+  
+	 const linhaSelecionada = document.querySelector
+	 	("#tabelaFornecedores tr.selecionado");
 
+   
+	
+	 if (linhaSelecionada) {
+        bloquearFormulario(false);
         document.getElementById("id").value = linhaSelecionada.dataset.id || "";
         document.getElementById("nome").value = linhaSelecionada.dataset.nome || "";
         document.getElementById("email").value = linhaSelecionada.dataset.email || "";
@@ -275,23 +304,23 @@ function acionarAlterar() {
 }
 
 async function acionarExcluir() {
-    if (!clienteSelecionadoId) {
-        alert("⚠️ Selecione um cliente na tabela para excluir!");
+    if (!fornecedorSelecionadoId) {
+        alert("⚠️ Selecione um fornecedor na tabela para excluir!");
         return;
     }
-    if (!confirm("Tem certeza que deseja remover este cliente?")) return;
+    if (!confirm("Tem certeza que deseja remover este fornecedor?")) return;
 
     const tokenPuro = obterTokenPuro();
     try {
-        const response = await fetch(`${API_URL}/api/clientes/${clienteSelecionadoId}`, {
+        const response = await fetch(`${API_URL}/api/clientes/${fornecedorSelecionadoId}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${tokenPuro}` }
         });
 
         if (response.ok) {
-            alert("🗑️ Cliente removido com sucesso!");
+            alert("🗑️ Fornecedor removido com sucesso!");
             acionarIncluir();
-            carregarClientes();
+            carregarFornecedores();
         } else {
             alert("❌ Falha ao excluir.");
         }
@@ -335,23 +364,19 @@ function aplicarMascaraDocumento(el) {
     }
     el.value = v;
 }
-
 function aplicarMascaraCEP(el) {
-    let v = el.value.replace(/\D/g, "");
-    v = v.substring(0, 8);
-    v = v.replace(/^(\d{2})(\d)/, "$1.$2");
-    v = v.replace(/(\d{3})(\d{1,3})$/, "$1-$2");
+    let v = el.value.replace(/\D/g, ""); // Remove tudo que não for dígito
+    v = v.substring(0, 8);               // Limita a 8 números
+    
+    // Aplica a máscara 00.000-000
+    if (v.length > 5) {
+        v = v.replace(/^(\d{2})(\d{3})(\d)/, "$1.$2-$3");
+    } else if (v.length > 2) {
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2");
+    }
+    
     el.value = v;
 }
-
-
-
-
-
-
-
-
-
 
 
 

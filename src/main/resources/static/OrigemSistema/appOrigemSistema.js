@@ -141,7 +141,7 @@ async function carregarFornecedores() {
     if (!tokenPuro) return;
 
     try {
-        const response = await fetch(`${API_URL}/api/fornecedores`, {
+        const response = await fetch(`${API_URL}/api/origemsistema`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${tokenPuro}`,
@@ -233,7 +233,11 @@ async function cadastrarFornecedor(event) {
 	        uf: document.getElementById("uf").value
 	    };
 
-	    const url = fornecedorSelecionadoId ? `${API_URL}/api/fornecedores/${fornecedorSelecionadoId}` : `${API_URL}/api/fornecedores`;
+		
+		const url = fornecedorSelecionadoId ?
+		 `${API_URL}/api/origemsistema/${fornecedorSelecionadoId}`
+		  : `${API_URL}/api/origemsistema`;
+  
 	    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
 
 	    try {
@@ -311,7 +315,7 @@ async function acionarExcluir() {
 
     const tokenPuro = obterTokenPuro();
     try {
-        const response = await fetch(`${API_URL}/api/fornecedores/${fornecedorSelecionadoId}`, {
+        const response = await fetch(`${API_URL}/api/origemsistema/${fornecedorSelecionadoId}`, {
             method: "DELETE",
             headers: { "Authorization": `Bearer ${tokenPuro}` }
         });

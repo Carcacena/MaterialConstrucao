@@ -233,7 +233,7 @@
 <body>
 	<div class="container-sistema">
 		<div class="titulo-pagina">
-			<h2 style="margin: 0;">👥 Gerenciamento de Clientes</h2>
+			<h2 style="margin: 0;">👥 Gerenciamento de Clientes<h2>
 		</div>
 		<!-- ==========================================
 		     PARTE 2: FORMULÁRIO E DROPDOWN DE UFs
@@ -241,8 +241,8 @@
 		<!-- Formulário de Entrada -->
 		<div class="coluna-formulario">
 			<div class="box-custom">
-				<h4 id="tituloFormulario">Cadastrar Cliente</h4>
-				<form id="formCliente">
+				<h4 id="tituloFormulario">Cadastrar Clientes</h4>
+				<form id="formFornecedor">
 					<!-- Campo Oculto para ID -->
 					<input type="hidden" id="id">
 
@@ -254,7 +254,7 @@
 
 					<!-- Seleção do Tipo de Pessoa (Física ou Jurídica) -->
 					<div class="campo-grupo">
-						<label class="form-label">Tipo de Cliente:</label>
+						<label class="form-label">Tipo de Cliente :</label>
 						<div style="display: flex; gap: 15px; margin-bottom: 10px;">
 							<label>
 								<input type="radio" name="tipoPessoa" value="CPF" checked
@@ -279,7 +279,7 @@
 						<div class="campo-grupo">
 							<label for="email" class="form-label">E-mail</label>
 							<input type="email" class="form-control" id="email" maxlength="100"
-								placeholder="Ex: cliente@email.com">
+								placeholder="Ex: fornecedor@email.com">
 						</div>
 						<div class="campo-grupo">
 							<label for="telefone" class="form-label">Telefone</label>
@@ -290,6 +290,7 @@
 
 					<!-- Linha de CEP e UF (Dropdown Oficial) -->
 					<div class="linha-campos">
+						<!-- 💡 Certifique-se de usar a classe de linha se quiser os dois lado a lado -->
 						<div class="campo-grupo" style="flex: 2;">
 							<label for="cep" class="form-label">CEP</label>
 							<input type="text" class="form-control" id="cep" required maxlength="10"
@@ -298,7 +299,6 @@
 
 						<div class="campo-grupo" style="flex: 1;">
 							<label for="uf" class="form-label">UF</label>
-							<!-- Dropdown com todos os estados brasileiros legítimos -->
 							<select class="form-control" id="uf" required>
 								<option value="">--</option>
 								<option value="AC">AC</option>
@@ -330,7 +330,7 @@
 								<option value="TO">TO</option>
 							</select>
 						</div>
-					</div>
+					</div> <!-- 🌟 A tag fechava aqui corretamente agora, sem sobras -->
 
 					<!-- Linha de Logradouro e Número -->
 					<div class="linha-campos">
@@ -365,16 +365,13 @@
 						</div>
 					</div>
 
-					<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Cliente</button>
+					<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Fornecedor</button>
 				</form>
 			</div>
 		</div>
 
 
-		<!-- ==========================================
-				     PARTE 3: LISTAGEM, MENU FLUTUANTE E SCRIPTS
-				     ========================================== -->
-		<!-- Listagem de Clientes -->
+		<!-- Listagem de Fornecedores -->
 		<div class="coluna-tabela">
 			<div class="box-custom">
 				<h4>Clientes Cadastrados</h4>
@@ -395,8 +392,8 @@
 								<th>Cidade</th>
 							</tr>
 						</thead>
-						<tbody id="tabelaClientes">
-							<!-- Preenchido dinamicamente via appCliente.js -->
+						<tbody id="tabelaFornecedores">
+							<!-- Preenchido dinamicamente via appFornecedor.js -->
 						</tbody>
 					</table>
 				</div>
@@ -409,6 +406,7 @@
 		<div id="meuPainelHeader" class="painel-header">::: MENU :::</div>
 		<div class="painel-corpo">
 			<button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()"><u>I</u>ncluir</button>
+
 			<button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()"><u>A</u>lterar</button>
 			<button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()"><u>E</u>xcluir</button>
 			<button class="btn-menu-vertical btn-voltar"
@@ -451,9 +449,15 @@
 		}
 	</script>
 
+
 	<!-- Injeção dos scripts da casa -->
+	<!-- 🚀 Bastidores 100% afinados, limpos e corrigidos -->
+
+	<!-- 🚀 Bastidores 100% afinados, limpos e corrigidos -->
 	<script src="/componentes-js/utils.js"></script>
-	<script src="/Clientes/appCliente.js"></script>
+	<script src="/Clientes/appCliente.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
+
+
 </body>
 
 </html>

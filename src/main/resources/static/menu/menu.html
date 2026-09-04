@@ -1,130 +1,144 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-	<meta charset="UTF-8">
-	<title>Menu - Material de Construção</title>
-	<style>
-		body {
-			font-family: Arial, sans-serif;
-			background: linear-gradient(135deg, #2c3e50, #4caf50);
-			color: white;
-			text-align: center;
-			padding: 40px;
-			margin: 0;
-			height: 100vh;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.box {
-			background: rgba(0, 0, 0, 0.45);
-			padding: 35px;
-			border-radius: 12px;
-			min-width: 280px;
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-		}
-
-		h2 {
-			margin-bottom: 25px;
-		}
-
-		button {
-			display: block;
-			width: 100%;
-			margin: 12px 0;
-			padding: 12px;
-			border: none;
-			background: #ff9800;
-			color: white;
-			cursor: pointer;
-			border-radius: 6px;
-			font-size: 15px;
-			transition: 0.3s;
-		}
-
-		/* ⚡ Estilo exclusivo para destacar o botão do PDV Comercial */
-		button.btn-pdv {
-			background: #2e7d32;
-			font-weight: bold;
-			border: 1px solid #4caf50;
-		}
-
-		/* 📊 Estilo para destacar os Relatórios em azul-gerencial */
-		button.btn-relatorios {
-			background: #0288d1;
-			font-weight: bold;
-			border: 1px solid #03a9f4;
-		}
-
-		button:hover {
-			background: #4CAF50;
-			transform: scale(1.03);
-		}
-
-		hr {
-			margin: 20px 0;
-			border: 1px solid rgba(255, 255, 255, 0.2);
-		}
-
-		.info {
-			margin-top: 15px;
-			font-size: 13px;
-			color: #ddd;
-		}
-	</style>
+    <meta charset="UTF-8">
+    <title>Menu - Material de Construção</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e272e, #2f3542);
+            color: white;
+            text-align: center;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .box {
+            background: rgba(0, 0, 0, 0.65);
+            padding: 25px;
+            border-radius: 16px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 22px;
+            font-size: 24px;
+            color: #4caf50;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 10px;
+            border: none;
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        button.btn-pdv {
+            background: #2e7d32;
+            border: 1px solid #4caf50;
+            font-size: 15px;
+        }
+        button.btn-relatorios {
+            background: #0288d1;
+            border: 1px solid #03a9f4;
+        }
+        button.btn-secundario {
+            background: #4b5563;
+        }
+        button.btn-sair {
+            background: #d63031;
+            margin-top: 10px;
+        }
+        .info {
+            margin-top: 18px;
+            font-size: 12px;
+            color: #a4b0be;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 12px;
+        }
+    </style>
 </head>
-
 <body>
-	<div class="box">
-		<h2>🌳 Sistema Material Construção</h2>
 
-		<button class="btn-pdv" onclick="irVendas()">⚡ Lançar Venda (PDV)</button>
-		<hr>
-		
-		<button onclick="irExpandida()">🌲 Fornecedores</button>
-		
-		<button class="btn-laranja" onclick="irProdutos()">📦 Cadastro de Produto</button>
-		<hr>
-	
-		<button onclick="irClientes()">🌲 Clientes</button>
-		
-		<button class="btn-laranja" onclick="irEntradas()">📦 Entrada de Produto (Nota Fiscal)</button>
-		<hr>
+    <div class="box">
+        <h2>🌳 Material Construção</h2>
+        
+        <div class="grid-buttons">
+            <!-- Destaque Principal -->
+            <button class="btn-pdv full-width" onclick="irVendas()">⚡ Lançar Venda (PDV)</button>
+            
+            <!-- Cadastros / Operações -->
+            <button onclick="irProdutos()">📦 Produtos</button>
+            <button onclick="irEntradas()">📥 Entradas (NF)</button>
+            
+            <button class="btn-secundario" onclick="irClientes()">👥 Clientes</button>
+            <button class="btn-secundario" onclick="irFornecedores()">🚚 Fornecedores</button>
+            
+            <!-- Gerencial -->
+            <button class="btn-relatorios full-width" onclick="irRelatorios()">📊 Relatórios Gerenciais (PDF)</button>
+            <button class="btn-secundario full-width" onclick="irOrigemSistema()">🛠️ Origem do Sistema</button>
+            
+            <!-- Saída -->
+            <button class="btn-sair full-width" onclick="sair()">❌ Sair do Sistema</button>
+        </div>
 
-		<!-- 📊 NOVO: Botão para acessar a central de relatórios em PDF -->
-		<button class="btn-relatorios" onclick="irRelatorios()">📊 Relatórios Gerenciais (PDF)</button>
-		<hr>
+        <div class="info">Usuário autenticado via JWT 🔑</div>
+    </div>
 
-		<button onclick="sair()">🚪 Sair</button>
-		<div class="info">Usuário autenticado com JWT 🔑</div>
-	</div>
+    <script>
+        // 🔑 PROTEÇÃO DE ACESSO
+        const token = localStorage.getItem("token");
+        if (!token) {
+            window.location.href = "/login.html";
+        }
 
-	<!-- 💡 SÓ AS FUNÇÕES SOLTAS AQUI DENTRO DO MENU.HTML, SEM O MENU.JS! -->
-	<script>
-		// 🔑 PROTEÇÃO DE ACESSO
-		const token = localStorage.getItem("token");
-		if (!token) {
-			window.location.href = "/login.html";
-		}
+        // 🚀 NAVEGAÇÃO
+        function irVendas() { window.location.href = "/vendas/vendas.html"; }
+        function irFornecedores() { window.location.href = "/Fornecedores/crudFornecedor.html"; }
+        function irProdutos() { window.location.href = "/Produtos/crudProduto.html"; }
+        function irClientes() { window.location.href = "/Clientes/crudCliente.html"; }
+        function irEntradas() { window.location.href = "/Entradas/entradaProduto.html"; }
+        function irOrigemSistema() { window.location.href = "/OrigemSistema/crudOrigemSistema.html"; }
+        function irRelatorios() { window.location.href = "/relatorios/painelRelatorios.html"; }
 
-		// 🚀 NAVEGAÇÃO
-		function irVendas() { window.location.href = "/vendas/vendas.html"; }
-		function irExpandida() { window.location.href = "/Fornecedores/crudFornecedor.html"; }
-		function irProdutos() { window.location.href = "/Produtos/crudProduto.html"; }
-		function irClientes() { window.location.href = "/Clientes/crudCliente.html"; }
-		function irEntradas() { window.location.href = "/Entradas/entradaProduto.html"; }
-		
-		// 📊 Rota para a nova central de relatórios gerenciais
-		function irRelatorios() { window.location.href = "/relatorios/painelRelatorios.html"; }
-
-		// 🚪 LOGOUT
-		function sair() {
-			localStorage.removeItem("token");
-			window.location.href = "/login.html";
-		}
-	</script>
+        // 🚪 LOGOUT
+        function sair() {
+            localStorage.removeItem("token");
+            window.location.href = "/login.html";
+        }
+    </script>
 </body>
-
 </html>
