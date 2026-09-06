@@ -61,6 +61,24 @@ public class Entrada {
         }
     }
     
+    public java.math.BigDecimal getValorTotal() {
+        // Se a nota tiver impostos gravados, pega o valor total que está lá
+        if (this.impostos != null && this.impostos.getValorTotalNota() != null) {
+            return this.impostos.getValorTotalNota();
+        }
+        
+        // Caso não tenha a tabela de impostos preenchida ainda, calcula somando os itens
+        if (this.itens != null && !this.itens.isEmpty()) {
+            return this.itens.stream()
+                .map(item -> item.getTotal() != null ? item.getTotal() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        }
+        
+        return java.math.BigDecimal.ZERO;
+    }
+    
+    
+    
     // ======================
     // GETTERS E SETTERS
     // ======================

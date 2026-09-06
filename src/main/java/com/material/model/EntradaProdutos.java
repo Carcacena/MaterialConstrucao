@@ -24,6 +24,14 @@ public class EntradaProdutos {
 
     @Column(name = "preco_custo", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoCusto;
+    
+ // ✨ ADICIONADO: Calcula o total do item multiplicando quantidade pelo preço de custo
+    public BigDecimal getTotal() {
+        if (this.quantidade != null && this.precoCusto != null) {
+            return this.precoCusto.multiply(BigDecimal.valueOf(this.quantidade));
+        }
+        return BigDecimal.ZERO;
+    }
 
     // Getters e Setters
     public Long getId() { return id; }

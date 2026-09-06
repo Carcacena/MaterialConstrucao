@@ -291,5 +291,195 @@ async function dispararDevolucaoEntradaPorNumero() {
 }
 
 
+function estornarNotaViaPainel(id) {
+	 if (confirm('Aviso Crítico: Deseja realmente estornar esta nota fiscal? O sistema irá retirar esses produtos do estoque físico da loja.')) {
+	        fetch(`/api/entradas/estornar/${id}`, {
+	            method: 'POST',
+	            headers: montarHeaders() // ⚡ UNIFICADO: Usando sua função padrão do sistema!
+	        })
+	        .then(res => {
+	            if (res.ok) {
+	                alert('Nota estornada com sucesso e estoque atualizado!');
+	                document.getElementById('selectNotaGerencial').dispatchEvent(new Event('change'));
+	            } else {
+	                res.text().then(text => alert("Erro: " + text));
+	            }
+	        })
+	        .catch(err => alert("Erro na requisição de estorno: " + err));
+	    }
+	}
+
+
+
+function fecharPainelGerencialFlutuante() {
+    document.getElementById('modalPainelGerencial').style.display = 'none';
+    document.getElementById('detalhesNotaGerencial').style.display = 'none';
+    document.getElementById('selectNotaGerencial').value = "";
+}
+
+// 📦 FUNÇÃO AUXILIAR: Deixa o Painel Gerencial Arrastável pelo mouse
+function tornarPainelArrastavel() {
+    const header = document.getElementById("modalPainelHeader");
+    const modal = document.getElementById("modalPainelGerencial");
+
+    if (!header || !modal) return;
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    header.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Pega a posição inicial do mouse
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        // Chama a função sempre que o mouse se mover
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // Calcula a nova posição do cursor
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        // Define a nova posição do modal na tela
+        modal.style.top = (modal.offsetTop - pos2) + "px";
+        modal.style.left = (modal.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        // Para de mover quando o botão do mouse é solto
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+// ✨ COMPATIBILIDADE FORÇADA: Deixa a função exposta na raiz para o HTML ler direto!
+window.filtrarNotas = function(event) {
+    if (event) event.preventDefault(); // Impede o formulário de dar refresh na página
+
+    const dataInicio = document.getElementById('filtroDataInicio').value;
+    const dataFim = document.getElementById('filtroDataFim').value;
+    const selectNota = document.getElementById('selectNotaGerencial');
+
+    if (!dataInicio || !dataFim) {
+        alert('Por favor, defina o período de datas completo.');
+        return;
+    }
+
+    console.log(`Buscando notas no MySQL entre ${dataInicio} e ${dataFim}...`);
+
+    fetch(`/api/entradas/filtrar?inicio=${dataInicio}&fim=${dataFim}`, {
+        method: 'GET',
+        headers: montarHeaders()
+    })
+    .then(res => res.json())
+    .then(notas => {
+        if (!selectNota) return;
+        selectNota.innerHTML = '<option value="">-- Selecione uma Nota Fiscal --</option>';
+        
+        if (notas.length === 0) {
+            alert('Nenhuma nota fiscal encontrada no MySQL para o período.');
+            return;
+        }
+        
+        console.log(`${notas.length} notas carregadas do banco!`);
+        notas.forEach(nota => {
+            const option = document.createElement('option');
+            option.value = nota.id;
+            option.textContent = nota.label;
+            selectNota.appendChild(option);
+        });
+    })
+    .catch(err => alert("Erro ao filtrar notas no banco local: " + err));
+};
+// ⚡ EVENTO: Dispara toda vez que o pião troca de nota no Dropdown do Painel
+document.getElementById('selectNotaGerencial').addEventListener('change', function() {
+	const entradaId = this.value;
+	    const containerDetalhes = document.getElementById('detalhesNotaGerencial');
+
+	    // Valida se o ID está vazio ou se não é um número válido (Evita disparar texto 'itens')
+	    if (!entradaId || isNaN(entradaId)) {
+	        if (containerDetalhes) containerDetalhes.style.display = 'none';
+	        return;
+	    }
+	    
+	    // Continua com o fetch normal...
+	    console.log(`Buscando produtos agrupados para o Lote ID: ${entradaId} no MySQL...`);
+
+  
+    // Faz o fetch para a API Java buscar os produtos e o status da nota
+	// 🟩 CORRIGIDO: Trocado as aspas por CRASEs (o acento grave do teclado ` `)
+	fetch(`/api/entradas/${entradaId}/itens`, {
+	    method: 'GET',
+	    headers: montarHeaders()
+	})
+    .then(res => {
+        if (!res.ok) throw new Error("Erro ao buscar dados do lote no servidor Java.");
+        return res.json();
+    })
+    .then(data => {
+        // Preenche o cabeçalho de auditoria do lote
+        document.getElementById('txtFornecedorNota').textContent = data.fornecedor;
+        document.getElementById('txtTotalNotaBanco').textContent = data.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+        // Limpa e redesenha a tabela de produtos
+        const tbody = document.getElementById('tbodyItensNota');
+        tbody.innerHTML = '';
+
+        data.itens.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding: 10px; border-bottom: 1px solid #25422e; color: #fff;">${item.produtoDescricao}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #25422e; text-align: center; color: #fff;">${item.quantidade}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #25422e; color: #fff;">R$ ${item.precoCusto.toFixed(2)}</td>
+                <td style="padding: 10px; border-bottom: 1px solid #25422e; color: #fff;">R$ ${item.total.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Injeta os botões de ação na base do painel (Igualzinho à tela de vendas!)
+        const containerAcao = document.getElementById('containerAcaoNota');
+        if (data.status === 1) { // Nota Ativa no banco
+            containerAcao.innerHTML = `
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="estornarNotaViaPainel(${entradaId})" style="background: #a855f7; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        ↩️ Devolver Lote (Estornar)
+                    </button>
+                    <button type="button" onclick="imprimirDanfeDoLote(${entradaId})" style="background: #22c55e; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                        🖨️ Imprimir DANFE (PDF)
+                    </button>
+                </div>
+            `;
+        } else { // Nota Devolvida (Status 2)
+            containerAcao.innerHTML = `
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span style="color: #ff4a4a; font-weight: bold; font-size: 14px;">🟥 ESTE LOTE JÁ FOI DEVOLVIDO</span>
+                    <button type="button" onclick="imprimirDanfeDoLote(${entradaId})" style="background: #22c55e; color: white; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px;">
+                        🖨️ Imprimir Cópia PDF
+                    </button>
+                </div>
+            `;
+        }
+
+        // Mostra o quadro com tudo renderizado na tela
+        containerDetalhes.style.display = 'block';
+    })
+    .catch(err => alert("Erro ao carregar detalhes do lote: " + err));
+});
+
+// Função que chama o seu utils.js compartilhado para emitir o documento
+function imprimirDanfeDoLote(id) {
+    if (typeof window.baixarPdf === 'function') {
+        window.baixarPdf(`/api/entradas/${id}/pdf`, `DANFE_NOTA_${id}`);
+    } else {
+        alert("Erro: Função 'baixarPdf' do arquivo utils.js não foi localizada na memória.");
+    }
+}
+
 
 

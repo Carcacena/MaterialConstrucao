@@ -1,7 +1,5 @@
 package com.material.repository;
 
-
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +27,7 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
 
     // 🔄 Localiza a entrada para devolução
     Optional<Entrada> findByNumeroNota(String numeroNota);
+
+    // ✨ NOVO: Método simples que o Spring gera automaticamente para buscar por Status
+    List<Entrada> findByStatus(Integer status);
 }

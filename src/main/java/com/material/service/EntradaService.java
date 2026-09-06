@@ -15,7 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class EntradaService {
@@ -96,11 +99,7 @@ public class EntradaService {
         return entradaSalva;
         
         
-        
-        
-        
-        
-        
+         
     }
     
     @Transactional
@@ -173,9 +172,129 @@ public class EntradaService {
         return entradaRepository.save(entrada);
     }
     
+    public List<Map<String, Object>> listarNotasAtivasResumo() {
+        // 1. Busca todas as notas com status 1 (Apenas as gravadas que aceitam estorno)
+        List<Entrada> entradas = entradaRepository.findByStatus(1);
+        
+        // 2. Transforma a lista de entidades em uma lista de mapas leves para o frontend
+        return entradas.stream().map(entrada -> {
+            Map<String, Object> map = new java.util.HashMap<>();
+            
+            // CORRIGIDO: Era "自由", mudamos para "put"
+            map.put("id", entrada.getId()); 
+            
+            // Monta o texto que vai aparecer amigável no select do balcão
+            String textoExibicao = String.format("NF: %s | Fornecedor: %s | Data: %s | Total: R$ %s",
+                entrada.getNumeroNota(),
+                entrada.getFornecedor().getNome(), // Se na sua classe Fornecedor for 'getNome()', está perfeito!
+                entrada.getDataRecebimento() != null ? entrada.getDataRecebimento().toString() : "Sem Data",
+                entrada.getValorTotal() != null ? entrada.getValorTotal().toString() : "0.00"
+            );
+            
+            map.put("label", textoExibicao);
+            return map;
+        }).collect(java.util.stream.Collectors.toList());
+    }
+   
+    // ↩️ METODO CRÍTICO: Executa o estorno da nota e devolve/subtrai o estoque físico
+    @org.springframework.transaction.annotation.Transactional
+    public Entrada estornarEntrada(Long entradaId) {
+        // 1. Busca a entrada pelo ID
+        Entrada entrada = entradaRepository.findById(entradaId)
+                .orElseThrow(() -> new RuntimeException("Nota de entrada não encontrada com o ID: " + entradaId));
+
+        // 2. Valida se ela já foi estornada antes para evitar duplicidade de estorno
+        if (entrada.getStatus() != null && entrada.getStatus() == 2) {
+            throw new RuntimeException("Aviso: Esta nota fiscal já foi estornada anteriormente no sistema.");
+        }
+
+        // 3. Varre a lista de itens da nota e devolve (subtrai) o estoque físico de cada produto
+        if (entrada.getItens() != null) {
+            for (com.material.model.EntradaProdutos item : entrada.getItens()) {
+                com.material.model.Produto produto = item.getProduto();
+                
+                if (produto != null) {
+                    // Pega o estoque atual e subtrai a quantidade que havia entrado pela nota
+                	int estoqueAtual = produto.getEstoqueAtual();
+                	int qtdNota = item.getQuantidade() != null ? item.getQuantidade() : 0;
+
+                	int novoEstoque = estoqueAtual - qtdNota;  
+                    // Alerta preventivo se o estoque for ficar negativo (opcional, mas seguro pro balcão)
+                    if (novoEstoque < 0) {
+                        System.out.println("⚠️ Alerta: Estoque do produto ID " + produto.getId() + " ficou negativo (" + novoEstoque + ") após estorno.");
+                    }
+                    
+                    produto.setEstoqueAtual(novoEstoque);
+                    // Como o produtoRepository deve estar injetado no seu service, salvamos o novo saldo
+                    produtoRepository.save(produto);
+                }
+            }
+        }
+
+        // 4. Muda o status do cabeçalho da nota para 2 (Estornada)
+        entrada.setStatus(2);
+        
+        // 5. Salva a nota atualizada e retorna para o controller
+        return entradaRepository.save(entrada);
+    }
     
-    
-    
+    // 🔍 NOVO MÉTODO: Filtra as notas fiscais por período para o select do painel flutuante
+    public List<java.util.Map<String, Object>> buscarEntradasPorPeriodo(java.time.LocalDate inicio, java.time.LocalDate fim) {
+        
+        // 1. Executa a sua query nativa do EntradaRepository que retorna a lista de DTOs
+        List<com.material.dto.EntradaPeriodoDTO> entradasDto = entradaRepository.buscarEntradasPorPeriodo(inicio, fim);
+        
+        // 2. Converte os DTOs em um mapa leve para o JavaScript ler sem complicação
+        return entradasDto.stream().map(dto -> {
+            java.util.Map<String, Object> map = new java.util.HashMap<>();
+            
+            // Garanta que seu EntradaPeriodoDTO tenha esses métodos getters criados!
+            map.put("id", dto.getId()); 
+            
+            // Verifica se a nota está ativa ou estornada (opcional, assume ativa se o DTO não trouxer o status)
+            String statusTexto = "🟩 Ativa"; 
+            
+            // Monta o texto amigável pro pião ler na lista suspensa do balcão
+            String label = String.format("Nota: %s | Fornecedor: %s | Dt: %s | Total: R$ %s | [%s]",
+                    dto.getNumeroNota(),
+                    dto.getFornecedorNome(), // Nome do getter do fornecedor no seu EntradaPeriodoDTO
+                    dto.getDataRecebimento() != null ? dto.getDataRecebimento().toString() : "Sem Data",
+                 //   dto.getValorTotalNota() != null ? dto.getValorTotalNota().toString() : "0.00",
+                   		dto.getValorTotal() != null ? dto.getValorTotal().toString() : "0.00",
+                    		
+                   		statusTexto);
+                    
+            map.put("label", label);
+            return map;
+        }).collect(java.util.stream.Collectors.toList());
+    }
+ // 🟩 ADICIONADO: Garante que o Hibernate mantenha a conexão aberta para ler a lista de itens sem quebrar!
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Map<String, Object> buscarItensDaEntrada(Long entradaId) {
+        
+        // 1. Busca a entrada pelo ID
+        Entrada entrada = entradaRepository.findById(entradaId)
+                .orElseThrow(() -> new RuntimeException("Nota de entrada não encontrada com o ID: " + entradaId));
+
+        Map<String, Object> resultado = new java.util.HashMap<>();
+        
+        resultado.put("fornecedor", entrada.getFornecedor() != null ? entrada.getFornecedor().getNome() : "Não Informado");
+        resultado.put("valorTotal", entrada.getValorTotal()); 
+        resultado.put("status", entrada.getStatus());
+
+        // 2. Converte a lista de itens (Essa linha que dava o estouro sem o @Transactional)
+        List<Map<String, Object>> itensMap = entrada.getItens().stream().map(item -> {
+            Map<String, Object> i = new java.util.HashMap<>();
+            i.put("produtoDescricao", item.getProduto() != null ? item.getProduto().getNome() : "Produto Sem Descrição");
+            i.put("quantidade", item.getQuantidade());
+            i.put("precoCusto", item.getPrecoCusto());
+            i.put("total", item.getTotal());
+            return i;
+        }).collect(java.util.stream.Collectors.toList());
+
+        resultado.put("itens", itensMap);
+        return resultado;
+    }
     
     
 }
