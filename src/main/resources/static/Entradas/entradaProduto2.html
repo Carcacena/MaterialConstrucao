@@ -2,8 +2,6 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Adicionado para melhor adaptação em telas menores -->
 	<title>Entrada de Produto (Nota Fiscal)</title>
 	<style>
 		body {
@@ -97,8 +95,6 @@
 		.painel-itens-nota {
 			max-height: 220px;
 			overflow-y: auto;
-			overflow-x: auto;
-			/* Garante que a tabela não quebre para os lados se tiver muitas colunas */
 			margin-top: 15px;
 			border: 1px solid #e67e22;
 			border-radius: 4px;
@@ -166,7 +162,6 @@
 			transform: scale(1.02);
 		}
 
-		/* Classes de cores mantidas conforme seu envio */
 		.btn-verde {
 			background: #2ecc71;
 		}
@@ -183,14 +178,13 @@
 			background: #7f8c8d;
 		}
 	</style>
-</head> <!-- Fechamento correto da tag head -->
+</head>
 
-<body> <!-- Abertura correta do corpo da página -->
 
+<body>
 	<div class="container">
 		<h2>📦 Registrar Entrada de Mercadoria (Manual)</h2>
 
-		<!-- Dados Gerais da Nota -->
 		<div class="row">
 			<div class="col">
 				<label>Número da Nota Fiscal</label>
@@ -221,7 +215,6 @@
 
 		<h2>🛒 Itens da Nota</h2>
 
-		<!-- Seção de Adição de Itens -->
 		<div class="row" style="background: #25422e; padding: 10px; border-radius: 4px;">
 			<div class="col" style="flex: 2;">
 				<label>Produto</label>
@@ -239,13 +232,11 @@
 			</div>
 			<div class="col" style="justify-content: flex-end;">
 				<button type="button" onclick="adicionarItem()"
-					style="background: #4af37a; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; color: #1e3525;">
-					+ Add
-				</button>
+					style="background: #4af37a; border: none; padding: 10px; border-radius: 4px; font-weight: bold; cursor: pointer; color: #1e3525;">+
+					Add</button>
 			</div>
 		</div>
 
-		<!-- Tabela de Itens Adicionados -->
 		<div class="painel-itens-nota">
 			<table id="tabelaItens">
 				<thead>
@@ -261,47 +252,66 @@
 			</table>
 		</div>
 
-		<!-- Botão Adicional de Custos -->
 		<button type="button" class="btn-salvar" id="btnImpostos" onclick="abrirModalImpostos()"
 			style="background: #7f8c8d; cursor: pointer; margin-top: 10px;">
 			Impostos + Frete
 		</button>
-	</div> <!-- Fim da div class="container" (Apenas 1 fechamento necessário aqui) -->
 
-	<!-- 🟩 MODELAGEM HORIZONTAL E FLUTUANTE DAS AÇÕES (Removida de dentro do container para corrigir posicionamento) -->
+		<!-- 🟩 NOVA MODELAGEM HORIZONTAL DAS AÇÕES (Igual ao padrão visual da Saída) -->
+		<div
+			style="background: #16281c; padding: 15px; border-radius: 4px; border: 2px solid #e67e22; margin-top: 15px;">
 
-	<!-- BOTÃO FLUTUANTE -->
-	<div id="botaoMenuNota" class="botao-flutuante-nota" onclick="toggleMenuNota()">
-		⚙ AÇÕES
+
+			<!-- BOTÃO FLUTUANTE -->
+			<div id="botaoMenuNota" class="botao-flutuante-nota" onclick="toggleMenuNota()">
+				⚙ AÇÕES
+			</div>
+
+			<!-- MENU FLUTUANTE -->
+			<div id="menuFlutuanteNota" class="menu-flutuante-nota">
+				<div class="menu-header-nota">::: CONTROLE DA NOTA :::</div>
+
+				<button class="btn-menu-nota btn-verde" onclick="salvarEntrada()">
+					💾 Gravar Nota Fiscal (Status 1)
+				</button>
+
+				<button class="btn-menu-nota btn-vermelho" onclick="cancelarOperacao()">
+					❌ Cancelar e Limpar Tela
+				</button>
+
+				<button class="btn-menu-nota btn-azul" onclick="togglePainelGerencial()">
+					🔎 Painel Gerencial (Consultar / DANFE)
+				</button>
+
+				<button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'">
+					📦 Produtos
+				</button>
+
+				<button class="btn-menu-nota btn-cinza"
+					onclick="window.location.href='/Fornecedores/crudFornecedor.html'">
+					🚚 Fornecedores
+				</button>
+			</div>
+
+
+
+
+
+		</div>
+	</div>
+	</div>
 	</div>
 
-	<!-- MENU FLUTUANTE -->
-	<!-- MENU FLUTUANTE -->
-	<div id="menuFlutuanteNota" class="menu-flutuante-nota">
-	    
-	    <!-- Novo cabeçalho alinhado com o botão de Fechar -->
-	    <div class="menu-header-nota">
-	        <span>::: CONTROLE DA NOTA :::</span>
-	        <button type="button" class="btn-fechar-menu" onclick="toggleMenuNota()">X</button>
-	    </div>
 
-	    <!-- Seus botões originais continuam aqui embaixo... -->
-	    <button class="btn-menu-nota btn-verde" onclick="salvarEntrada()"> 💾 Gravar Nota Fiscal (Status 1) </button>
-	    <button class="btn-menu-nota btn-vermelho" onclick="cancelarOperacao()"> ❌ Cancelar e Limpar Tela </button>
-	    <button class="btn-menu-nota btn-azul" onclick="togglePainelGerencial()"> 🔎 Painel Gerencial (Consultar / DANFE) </button>
-	    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'"> 📦 Produtos </button>
-	    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Fornecedores/crudFornecedor.html'"> 🚚 Fornecedores </button>
-	</div>
 
-	<!-- 🌟 1. QUADRO DE IMPOSTOS FLUTUANTE E ARRASTÁVEL -->
+
+	<!-- 🌟 1. QUADRO DE IMPOSTOS FLUTUANTE E ARRASTÁVEL (Mantido do seu jeito) -->
 	<div id="modalImpostos" class="modal-flutuante"
 		style="display: none; position: fixed; top: 15%; left: 35%; width: 340px; max-height: 85vh; background: #1e3525; border-radius: 8px; overflow-y: auto; border: 2px solid #e67e22; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-
 		<div id="modalImpostosHeader"
 			style="padding: 15px 20px 5px 20px; cursor: move; background: #16281c; border-bottom: 1px solid #25422e;">
 			<h2 style="margin:0; font-size: 18px; color: #e67e22;">🧾 Impostos e Encargos (Arraste-me)</h2>
 		</div>
-
 		<div style="padding: 20px;">
 			<div class="col" style="margin-bottom:10px;">
 				<label>Base de Cálculo ICMS</label>
@@ -359,7 +369,7 @@
 	</div>
 
 
-	<!-- 🌟 2. PAINEL GERENCIAL FLUTUANTE E ARRASTÁVEL -->
+	<!-- 🌟 2. PAINEL GERENCIAL FLUTUANTE E ARRASTÁVEL (AGORA ENVELOPADO E COM FECHAMENTO PROTEGIDO) -->
 	<div id="modalPainelGerencial" class="modal-flutuante"
 		style="display: none; position: fixed; top: 10%; left: 25%; width: 650px; max-height: 85vh; background: #1e3525; border-radius: 8px; overflow-y: auto; border: 2px solid #e67e22; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
@@ -378,19 +388,23 @@
 					<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Data
 						Início:</label>
 					<input type="date" id="filtroDataInicio"
-						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333; background:#fff;">
+						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333;">
 				</div>
 
 				<div style="flex: 1;">
 					<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Data Fim:</label>
 					<input type="date" id="filtroDataFim"
-						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333; background:#fff;">
+						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333;">
 				</div>
 
+				<!-- Botão de Filtragem com margem de 1/2 cm (19px) -->
 				<button type="button" id="btnFiltrarEntradas" onclick="filtrarNotas(event)" class="btn-salvar"
-					style="margin-left: 19px; background: #4af37a; color: #1e3525; padding: 10px 20px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; height: 48px; width: auto; margin-top: 0;">
+					style="margin-left: 19px; background: #4af37a; color: #1e3525; padding: 10px 20px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; height: 48px;">
 					🔍 Filtrar
 				</button>
+
+
+
 			</div>
 
 			<!-- Seletor de Notas Encontradas -->
@@ -398,7 +412,7 @@
 				<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Selecione a Nota
 					Fiscal no Período:</label>
 				<select id="selectNotaGerencial"
-					style="width: 100%; padding: 10px; border: 2px solid #e67e22; border-radius: 4px; font-weight: bold; color:#333; background:#fff;">
+					style="width: 100%; padding: 10px; border: 2px solid #e67e22; border-radius: 4px; font-weight: bold; color:#333;">
 					<option value="">-- Selecione uma Nota Fiscal --</option>
 				</select>
 			</div>
@@ -406,11 +420,12 @@
 			<!-- Detalhes Dinâmicos da Nota Selecionada -->
 			<div id="detalhesNotaGerencial"
 				style="display: none; background: #16281c; padding: 15px; border-radius: 6px; border: 1px solid #25422e; margin-top: 15px;">
+
 				<p style="font-weight: bold; margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #fff;">
 					Fornecedor do Lote: <span id="txtFornecedorNota" style="color: #4af37a;">-</span>
 				</p>
 
-				<!-- Tabela de Produtos do Lote -->
+				<!-- Tabela de Produtos do Lote (Apenas as 4 colunas limpas) -->
 				<div style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;">
 					<table style="width: 100%; border-collapse: collapse; font-size: 14px; color: white;">
 						<thead>
@@ -422,36 +437,46 @@
 								<th style="padding: 10px; border-bottom: 2px solid #e67e22;">Total</th>
 							</tr>
 						</thead>
+						<!-- ⚡ ID CRUCIAL: Onde as linhas do MySQL vão se desenhar -->
 						<tbody id="tbodyItensNota"></tbody>
 					</table>
 				</div>
 
-				<!-- Base do Painel Interno -->
+				<!-- Base do Painel: Botões e Totalizador -->
 				<div
 					style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #25422e; padding-top: 15px;">
+
+					<!-- ⚡ ID CRUCIAL: Onde vai surgir o botão roxo único de estorno do lote via JS -->
 					<div id="containerAcaoNota"></div>
+
 					<div style="text-align: right; font-weight: bold; font-size: 16px; color: #4af37a;">
 						TOTAL DO LOTE: R$ <span id="txtTotalNotaBanco">0,00</span>
 					</div>
 				</div>
-			</div>
+			</div> <!-- Fim dos Detalhes Dinâmicos -->
 
-		</div>
-	</div>
+		</div> <!-- Fim da Div de Padding interno -->
+	</div> <!-- Fim do Modal Principal -->
 
 
-	<!-- Rodapé Externo com Totalizador Geral da Tela Atual -->
+
+	<!-- Rodapé com Totalizador e Ações Críticas da Nota -->
 	<div
-		style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; border-top: 2px solid #e67e22; padding-top: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">
-		<div id="containerAcaoNotaGeral">
-			<!-- ID alterado para evitar conflito com o painel interno -->
+		style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #25422e; padding-top: 15px;">
+		<div id="containerAcaoNota">
+			<!-- Botão de Devolver / Status da nota injetado via JS -->
 		</div>
-		<div style="text-align: right; font-weight: bold; font-size: 18px; color: #4af37a;">
-			TOTAL DA NF ATUAL: R$ <span id="txtTotalNotaGeral">0,00</span>
+		<div style="text-align: right; font-weight: bold; font-size: 16px; color: #4af37a;">
+			TOTAL DA NF: R$ <span id="txtTotalNotaBanco">0,00</span>
 		</div>
 	</div>
+	</div>
+	</div>
+	</div> <!-- 🔒 Fe
+	
+	
 
-	<!-- 🌟 O Painel Gerencial foi atualizado com as suas novas colunas (Status, Ação, Devolução) -->
+	<!-- 🌟 ADICIONE ESTE BLOCO NO FINAL DO SEU HTML (Antes de fechar a tag </body>) -->
 	<div id="modalPainelGerencial" class="modal-flutuante"
 		style="display: none; position: fixed; top: 10%; left: 25%; width: 650px; max-height: 85vh; background: #1e3525; border-radius: 8px; overflow-y: auto; border: 2px solid #e67e22; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
@@ -471,15 +496,15 @@
 					<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Data
 						Início:</label>
 					<input type="date" id="filtroDataInicio"
-						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333; background:#fff;">
+						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333;">
 				</div>
 				<div style="flex: 1;">
 					<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Data Fim:</label>
 					<input type="date" id="filtroDataFim"
-						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333; background:#fff;">
+						style="width:100%; padding: 8px; border-radius:4px; border:1px solid #ccc; color:#333;">
 				</div>
-				<button type="button" id="btnFiltrarEntradas" onclick="filtrarNotas(event)"
-					style="background:#4af37a; color:#1e3525; border:none; padding:10px 20px; border-radius:4px; font-weight:bold; cursor:pointer; height: 35px;">🔍
+				<button type="button" id="btnFiltrarEntradas"
+					style="background:#4af37a; color:#1e3525; border:none; padding:10px 20px; border-radius:4px; font-weight:bold; cursor:pointer;">🔍
 					Filtrar</button>
 			</div>
 
@@ -488,7 +513,7 @@
 				<label style="display:block; font-size:12px; font-weight:bold; margin-bottom:5px;">Selecione a Nota
 					Fiscal no Período:</label>
 				<select id="selectNotaGerencial"
-					style="width: 100%; padding: 10px; border: 2px solid #e67e22; border-radius: 4px; font-weight: bold; color:#333; background:#fff;">
+					style="width: 100%; padding: 10px; border: 2px solid #e67e22; border-radius: 4px; font-weight: bold; color:#333;">
 					<option value="">-- Selecione uma Nota Fiscal --</option>
 				</select>
 			</div>
@@ -519,36 +544,28 @@
 					</table>
 				</div>
 
-				<!-- Rodapé do Lote Consultado -->
+				<!-- Rodapé com Totalizador e Ações -->
 				<div
 					style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #25422e; padding-top: 15px;">
 					<div id="containerAcaoNota">
 						<!-- Botão de Devolver injetado via JS -->
 					</div>
 					<div style="text-align: right; font-weight: bold; font-size: 16px; color: #4af37a;">
-						TOTAL DO LOTE: R$ <span id="txtTotalNotaBanco">0,00</span>
+						TOTAL DA NF: R$ <span id="txtTotalNotaBanco">0,00</span>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- Rodapé Externo com Totalizador Geral da Tela de Cadastro Atual -->
-	<div
-		style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; border-top: 2px solid #e67e22; padding-top: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">
-		<div id="containerAcaoNotaGeral"></div>
-		<div style="text-align: right; font-weight: bold; font-size: 18px; color: #4af37a;">
-			TOTAL DA NF ATUAL: R$ <span id="txtTotalNotaGeral">0,00</span>
-		</div>
+
 	</div>
 
 	<script>
+
 		let itensNota = [];
 
-		// Inicializa o campo de data de recebimento com o dia atual
-		if (document.getElementById('dataRecebimento')) {
-			document.getElementById('dataRecebimento').valueAsDate = new Date();
-		}
+		document.getElementById('dataRecebimento').valueAsDate = new Date();
 
 		function montarHeaders() {
 			const meusHeaders = {'Content-Type': 'application/json'};
@@ -565,10 +582,8 @@
 			}
 			return meusHeaders;
 		}
-
 		function adicionarItem() {
 			const prodSelect = document.getElementById('selectProduto');
-			if (!prodSelect) return;
 			const produtoId = prodSelect.value;
 			const produtoTexto = prodSelect.options[prodSelect.selectedIndex].text;
 			const qtd = parseFloat(document.getElementById('qtdEntrada').value);
@@ -588,36 +603,38 @@
 			const tabela = document.getElementById('tabelaItens').getElementsByTagName('tbody')[0];
 			const novaLinha = tabela.insertRow();
 			novaLinha.innerHTML = `
-						    <td>
-						        ${produtoTexto}
-						        <label style="margin-left: 15px; color: #ff4a4a; font-size: 12px; cursor:pointer;">
-						            <input type="checkbox" class="check-excluir-item"> Excluir
-						        </label>
-						    </td>
-						    <td>${qtd}</td>
-						    <td>R$ ${custo.toFixed(2)}</td>
-						    <td>R$ ${(qtd * custo).toFixed(2)}</td>
-						`;
+			            <td>
+			                ${produtoTexto}
+			                <label style="margin-left: 15px;">
+			                    <input type="checkbox" class="check-excluir-item">
+			                    Excluir
+			                </label>
+			            </td>
+			            <td>${qtd}</td>
+			            <td>R$ ${custo.toFixed(2)}</td>
+			            <td>R$ ${(qtd * custo).toFixed(2)}</td>
+			        `;
 
 			prodSelect.value = '';
 			document.getElementById('qtdEntrada').value = '1';
 			document.getElementById('precoCusto').value = '';
 
+			// 🧮 Atualiza o cálculo do painel de impostos automaticamente
 			atualizarTotalProdutosDoModal();
 		}
+
+
 
 		// ----------------------------------------------------
 		// 🎛️ CONTROLE DOS IMPOSTOS E TELA FLUTUANTE
 		// ----------------------------------------------------
 		function abrirModalImpostos() {
-			const modal = document.getElementById("modalImpostos");
-			if (modal) modal.style.display = "block";
+			document.getElementById("modalImpostos").style.display = "block";
 			atualizarTotalProdutosDoModal();
 		}
 
 		function fecharModalImpostos() {
-			const modal = document.getElementById("modalImpostos");
-			if (modal) modal.style.display = "none";
+			document.getElementById("modalImpostos").style.display = "none";
 		}
 
 		function salvarImpostos() {
@@ -637,20 +654,11 @@
 			if (campoProdutos) {
 				campoProdutos.value = somaTotalProdutos.toFixed(2);
 			}
-
-			const txtTotalGeral = document.getElementById("txtTotalNotaGeral");
-			if (txtTotalGeral) {
-				txtTotalGeral.innerText = somaTotalProdutos.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-			}
-
 			calcularTotalNota();
 		}
 
 		function calcularTotalNota() {
-			const pegarFloat = (id) => {
-				const el = document.getElementById(id);
-				return el ? (parseFloat(el.value) || 0) : 0;
-			};
+			const pegarFloat = (id) => parseFloat(document.getElementById(id).value) || 0;
 
 			const produtos = pegarFloat("valorTotalProdutos");
 			const frete = pegarFloat("valorFrete");
@@ -667,19 +675,21 @@
 			}
 		}
 
-		// Lógica nativa para tornar elementos arrastáveis
+		// Torna a janela de impostos arrastável
+		dragElement(document.getElementById("modalImpostos"));
+
 		function dragElement(elmnt) {
 			if (!elmnt) return;
-			let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-			const header = document.getElementById(elmnt.id + "Header");
-			if (header) {
-				header.onmousedown = dragMouseDown;
+			var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+			if (document.getElementById(elmnt.id + "Header")) {
+				document.getElementById(elmnt.id + "Header").onmousedown = dragMouseDown;
 			} else {
 				elmnt.onmousedown = dragMouseDown;
 			}
 
 			function dragMouseDown(e) {
 				e = e || window.event;
+				if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
 				e.preventDefault();
 				pos3 = e.clientX;
 				pos4 = e.clientY;
@@ -702,140 +712,63 @@
 				document.onmouseup = null;
 				document.onmousemove = null;
 			}
+		} // 🔒 Chave da função dragElement fechada de forma isolada!
+
+		// ✨ GLOBALIZADO: Agora anexamos a função direto no escopo do navegador (window) 
+		// Isso garante que o botão 'onclick' do HTML consiga achar o método de qualquer lugar!
+		window.abrirPainelGerencialFlutuante = function () {
+			const painel = document.getElementById('modalPainelGerencial');
+			if (!painel) {
+				console.error("Erro: O elemento HTML 'modalPainelGerencial' não foi localizado.");
+				return;
+			}
+
+			// Exibe o painel gerencial na tela
+			painel.style.display = 'block';
+
+			// 📅 Preenche as datas padrão automaticamente pro pião do balcão
+			const campoInicio = document.getElementById('filtroDataInicio');
+			const campoFim = document.getElementById('filtroDataFim');
+			if (campoInicio) campoInicio.value = "2026-09-01";
+			if (campoFim) campoFim.value = "2026-09-05";
+
+		};
+	</script>
+	<script>
+		// 🔑 PROTEÇÃO DE ACESSO
+		const token = localStorage.getItem("token");
+		if (!token) {
+			window.location.href = "/login.html";
 		}
 
-		dragElement(document.getElementById("modalImpostos"));
-		dragElement(document.getElementById("modalPainelGerencial"));
+		// 🚀 NAVEGAÇÃO
+		function irVendas() {window.location.href = "/vendas/vendas.html";}
+		function irFornecedores() {window.location.href = "/Fornecedores/crudFornecedor.html";}
+		function irProdutos() {window.location.href = "/Produtos/crudProduto.html";}
+		function irClientes() {window.location.href = "/Clientes/crudCliente.html";}
+		function irEntradas() {window.location.href = "/Entradas/entradaProduto.html";}
+		function irOrigemSistema() {window.location.href = "/OrigemSistema/crudOrigemSistema.html";}
+		function irRelatorios() {window.location.href = "/relatorios/painelRelatorios.html";}
 
-		// ----------------------------------------------------
-				// ⚙️ CONTROLE DO MENU FLUTUANTE DE AÇÕES
-				// ----------------------------------------------------
-				function toggleMenuNota() {
-					const menu = document.getElementById("menuFlutuanteNota");
-					if (!menu) return;
-					
-					if (menu.style.display === "block") {
-						menu.style.display = "none";
-					} else {
-						menu.style.display = "block";
-					}
-				}
-
-				// Fecha o menu flutuante caso o usuário clique fora dele
-				window.addEventListener("click", function(event) {
-					const menu = document.getElementById("menuFlutuanteNota");
-					const botao = document.getElementById("botaoMenuNota");
-					if (menu && botao && menu.style.display === "block") {
-						if (!menu.contains(event.target) && !botao.contains(event.target)) {
-							menu.style.display = "none";
-						}
-					}
-				});
-
-				// ----------------------------------------------------
-				// 🔎 CONTROLE DO PAINEL GERENCIAL (ABRIR / FECHAR)
-				// ----------------------------------------------------
-				function togglePainelGerencial() {
-					const painel = document.getElementById("modalPainelGerencial");
-					if (!painel) return;
-					
-					// Abre o painel e fecha o menu para limpar a visão
-					painel.style.display = "block";
-					fecharMenuNotaSeAberto();
-				}
-
-				function fecharPainelGerencialFlutuante() {
-					const painel = document.getElementById("modalPainelGerencial");
-					if (painel) painel.style.display = "none";
-				}
-
-				function fecharMenuNotaSeAberto() {
-					const menu = document.getElementById("menuFlutuanteNota");
-					if (menu) menu.style.display = "none";
-				}
-
-				// ----------------------------------------------------
-				// 💾 INTEGRAÇÕES DO BACKEND / OPERAÇÕES DA TELA
-				// ----------------------------------------------------
-				function filtrarNotas(event) {
-					if (event) event.preventDefault();
-					const dataInicio = document.getElementById("filtroDataInicio").value;
-					const dataFim = document.getElementById("filtroDataFim").value;
-					
-					console.log(`Filtrando notas no período de ${dataInicio} até ${dataFim}`);
-					// Exibe a div de detalhes após buscar no banco
-					const detalhes = document.getElementById("detalhesNotaGerencial");
-					if (detalhes) detalhes.style.display = "block";
-					
-					// TODO: Fazer o fetch para a API do seu backend trazendo as linhas para o #tbodyItensNota
-				}
-
-				function salvarEntrada() {
-					if (itensNota.length === 0) {
-						alert("❌ Erro: Não é possível salvar uma nota sem nenhum produto inserido!");
-						return;
-					}
-					
-					const dadosNota = {
-						numero: document.getElementById("numeroNota").value,
-						serie: document.getElementById("serie").value,
-						chave: document.getElementById("chaveAcesso").value,
-						fornecedorId: document.getElementById("fornecedorId").value,
-						dataRecebimento: document.getElementById("dataRecebimento").value,
-						itens: itensNota
-					};
-
-					console.log("Enviando dados da nota ao servidor...", dadosNota);
-					// TODO: Inserir a rota fetch correspondente para salvar no MySQL (POST)
-					alert("🚀 Comando de gravação enviado com sucesso!");
-					fecharMenuNotaSeAberto();
-				}
-
-				function cancelarOperacao() {
-					if (confirm("⚠️ Tem certeza que deseja limpar toda a tela? Os dados digitados serão perdidos.")) {
-						// Reseta os inputs normais
-						document.getElementById("numeroNota").value = "";
-						document.getElementById("serie").value = "";
-						document.getElementById("chaveAcesso").value = "";
-						document.getElementById("fornecedorId").value = "";
-						document.getElementById("dataRecebimento").valueAsDate = new Date();
-						
-						// Limpa a tabela de itens cadastrados
-						const tabela = document.getElementById("tabelaItens").getElementsByTagName('tbody')[0];
-						if (tabela) tabela.innerHTML = "";
-						itensNota = [];
-						
-						// Reseta o painel de totais
-						atualizarTotalProdutosDoModal();
-						fecharMenuNotaSeAberto();
-						alert("🧹 Tela limpa e operação cancelada!");
-					}
-				}
-
-				function carregarProdutosPorFornecedor() {
-					const fornecedorId = document.getElementById("fornecedorId").value;
-					const selectProduto = document.getElementById("selectProduto");
-					if (!selectProduto) return;
-
-					if (!fornecedorId) {
-						selectProduto.innerHTML = '<option value="">Selecione o Fornecedor primeiro...</option>';
-						return;
-					}
-
-					selectProduto.innerHTML = '<option value="">Buscando produtos vinculados...</option>';
-					// TODO: Fazer o fetch trazendo os produtos cadastrados para este fornecedor específico
-				}
-			</script>
-		<script src="/Entradas/entradaProduto.js"></script>
-			<script src="/componentes-js/utils.js"></script>
-			<script src="/Produtos/appProduto.js"></script>
-			<script src="/Fornecedores/appFornecedor.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
-
-			
-			
-		</body>
-		</html>
+		// 🚪 LOGOUT
+		function sair() {
+			localStorage.removeItem("token");
+			window.location.href = "/login.html";
+		}
+	</script>
 
 
 
-	
+
+
+
+
+	<script src="/Entradas/entradaProduto.js"></script>
+	<script src="/componentes-js/utils.js"></script>
+	<script src="/Produtos/appProduto.js"></script>
+	<script src="/Fornecedores/appFornecedor.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
+
+
+</body>
+
+</html>
