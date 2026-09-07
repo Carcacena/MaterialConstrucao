@@ -79,7 +79,7 @@ function acionarIncluir() {
     if (form) form.reset();
     
     document.getElementById("id").value = "";
-    document.getElementById("tituloFormulario").textContent = "Cadastrar Origem";
+    document.getElementById("tituloFormulario").textContent = "Cadastrar Fornecedor";
     document.getElementById("btnSalvar").textContent = "Salvar Origem";
     document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
     
@@ -87,8 +87,8 @@ function acionarIncluir() {
     ajustarTipoFormulario();
     
     const nomeInput = document.getElementById("nome");
-    if (nomeInput) nomeInput.focus();
-}
+		  if (nomeInput) nomeInput.focus();
+		}
 
 
 async function buscarCepAutomatico() { 
@@ -155,7 +155,7 @@ async function carregarFornecedores() {
             return;
         }
 
-        if (!response.ok) throw new Error("Erro ao buscar fornecedores");
+        if (!response.ok) throw new Error("Erro ao buscar origem");
 
         const fornecedores = await response.json();
         renderizarTabelaFornecedores(fornecedores);
@@ -170,7 +170,7 @@ function renderizarTabelaFornecedores(fornecedores) {
     tbody.innerHTML = "";
 
     if (fornecedores.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum fornecedor cadastrado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum origem cadastrado.</td></tr>`;
         return;
     }
 
@@ -233,11 +233,8 @@ async function cadastrarFornecedor(event) {
 	        uf: document.getElementById("uf").value
 	    };
 
-		
-		const url = fornecedorSelecionadoId ?
-		 `${API_URL}/api/origemsistema/${fornecedorSelecionadoId}`
-		  : `${API_URL}/api/origemsistema`;
-  
+	    const url = fornecedorSelecionadoId ? `${API_URL}/api/origemsistema/${fornecedorSelecionadoId}` 
+		: `${API_URL}/api/origemsistema`;
 	    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
 
 	    try {

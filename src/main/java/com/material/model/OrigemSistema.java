@@ -14,9 +14,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * 
+ */
 @Entity
 @Table(name = "origemsistema")
 public class OrigemSistema {
@@ -76,11 +80,19 @@ public class OrigemSistema {
 	    @Column(nullable = false, length = 2)
 	    private String uf;
 	    
-	    @OneToMany(
-	        mappedBy = "origemsistema",
-	        cascade = CascadeType.ALL
-	    )
-	  
+	    @NotNull(message = "O status de unidade ativa é obrigatório")
+	    @Column(name = "unidade_ativa", nullable = false)
+	    private Boolean unidadeAtiva = true; // Inicia como true (ativa) por padrão
+	    
+	    
+	    
+	    public Boolean getUnidadeAtiva() {
+			return unidadeAtiva;
+		}
+		public void setUnidadeAtiva(Boolean unidadeAtiva) {
+			this.unidadeAtiva = unidadeAtiva;
+		}
+	
 	    // --- GETTERS E SETTERS ---
 
 	    public Long getId() { return id; }

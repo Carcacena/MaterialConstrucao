@@ -41,7 +41,7 @@ public class OrigemSistemaController {
 	    @PutMapping("/{id}")
 	    public ResponseEntity<OrigemSistema> atualizar(
 	            @PathVariable Long id,
-	            @RequestBody Fornecedor fornecedorDados) {
+	            @RequestBody OrigemSistema fornecedorDados) {
 
 	        return origemsistemaRepository.findById(id)
 	        		  .map(origemsistema-> {
@@ -59,7 +59,8 @@ public class OrigemSistemaController {
 	        			  origemsistema.setComplemento(fornecedorDados.getComplemento());
 	        			  origemsistema.setBairro(fornecedorDados.getBairro());
 	        			  origemsistema.setCidade(fornecedorDados.getCidade());
-
+	        			  origemsistema.setUnidadeAtiva(fornecedorDados.getUnidadeAtiva());
+	        			
 	                OrigemSistema atualizado =
 	                            origemsistemaRepository.save(origemsistema);
 
