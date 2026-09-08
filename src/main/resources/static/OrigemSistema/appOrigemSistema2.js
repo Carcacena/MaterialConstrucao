@@ -74,17 +74,12 @@ function bloquearFormulario(status) {
 }
 
 function acionarIncluir() {
-    fornecedorSelecionadoId = null; // Corrigido para iniciar com letra minúscula (caso sua variável global seja minúscula)
+    FornecedorSelecionadoId = null;
     const form = document.getElementById("formFornecedor");
     if (form) form.reset();
     
     document.getElementById("id").value = "";
-    
-    // ⚡ INCLUSÃO: Garante que o campo de Origem Ativa também seja limpo/resetado para o padrão
-    const inputOrigem = document.getElementById("origemSistema");
-    if (inputOrigem) inputOrigem.value = ""; 
-
-    document.getElementById("tituloFormulario").textContent = "Cadastrar Origem";
+    document.getElementById("tituloFormulario").textContent = "Cadastrar Fornecedor";
     document.getElementById("btnSalvar").textContent = "Salvar Origem";
     document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
     
@@ -92,8 +87,8 @@ function acionarIncluir() {
     ajustarTipoFormulario();
     
     const nomeInput = document.getElementById("nome");
-    if (nomeInput) nomeInput.focus();
-}
+		  if (nomeInput) nomeInput.focus();
+		}
 
 
 async function buscarCepAutomatico() { 
@@ -175,8 +170,7 @@ function renderizarTabelaFornecedores(fornecedores) {
     tbody.innerHTML = "";
 
     if (fornecedores.length === 0) {
-        // ⚡ Ajustado para 12 colunas para não quebrar a tabela visualmente
-        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;">Nenhum origem cadastrado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum origem cadastrado.</td></tr>`;
         return;
     }
 
@@ -194,12 +188,8 @@ function renderizarTabelaFornecedores(fornecedores) {
         tr.dataset.bairro = cli.bairro || "";
         tr.dataset.cidade = cli.cidade || "";
         tr.dataset.complemento = cli.complemento || "";
-        
-        // ⚡ CONVERSÃO: Descobre se o Java mandou true/false ou S/N e padroniza
-        const textoOrigem = (cli.origemSistema === true || cli.origemSistema === "S") ? "S" : "N";
-        tr.dataset.origemsistema = textoOrigem;
 
-        // 🌟 Tabela corrigida com as 12 colunas completas batendo com a tela
+        // 🌟 Tabela limpa com 11 colunas exatas
         tr.innerHTML = `
             <td>${cli.id}</td>
             <td>${cli.nome || ""}</td>
@@ -212,90 +202,64 @@ function renderizarTabelaFornecedores(fornecedores) {
             <td>${cli.numero || ""}</td>
             <td>${cli.bairro || ""}</td>
             <td>${cli.cidade || ""}</td>
-            <!-- ⚡ 12ª COLUNA ADICIONADA: Agora o S ou N aparece no campo 'Origem' -->
-            <td style="font-weight: bold; text-align: center;">${textoOrigem}</td>
         `;
 
         tr.addEventListener("click", () => {
             document.querySelectorAll("#tabelaFornecedores tr").forEach(r => r.classList.remove("selecionado"));
             tr.classList.add("selecionado");
             fornecedorSelecionadoId = cli.id;
-
-            // ⚡ Ao clicar na linha, já joga o "S" ou "N" de volta para o input do formulário
-            const inputOrigem = document.getElementById("unidadeAtiva");
-            if (inputOrigem) {
-                inputOrigem.value = tr.dataset.origemsistema;
-            }
         });
 
         tbody.appendChild(tr);
     });
 }
+
 async function cadastrarFornecedor(event) {
-    if (event) event.preventDefault();
-    const tokenPuro = obterTokenPuro();
-    if (!tokenPuro) return;
+	 if (event) event.preventDefault();
+	    const tokenPuro = obterTokenPuro();
+	    if (!tokenPuro) return;
 
-    // 1. Captura o valor do campo de origem (pode vir "S", "N", "1" ou "0")
-    const inputOrigem = document.getElementById("origemSistema");
-    let valorOrigem = inputOrigem ? inputOrigem.value.toUpperCase().trim() : "N";
-    
-    // Normaliza: se vier "1", transforma em "S" (Sim)
-    if (valorOrigem === "1") valorOrigem = "S"; 
-    if (valorOrigem === "0") valorOrigem = "N";
+	    const fornecedorDados = {
+	        nome: document.getElementById("nome").value,
+	        cnpj: document.getElementById("documento").value.replace(/\D/g, ""), 
+	        email: document.getElementById("email").value,
+	        telefone: document.getElementById("telefone").value,
+	        cep: document.getElementById("cep").value.replace(/\D/g, ""),
+	        logradouro: document.getElementById("logradouro").value,
+	        numero: document.getElementById("numero").value,
+	        complemento: document.getElementById("complemento").value,
+	        bairro: document.getElementById("bairro").value,
+	        cidade: document.getElementById("cidade").value,
+	        uf: document.getElementById("uf").value
+	    };
 
-    // 2. Captura o valor do ID (se houver, para caso de atualização)
-    const inputId = document.getElementById("id");
-    const idReg = inputId && inputId.value ? parseInt(inputId.value) : null;
+	    const url = fornecedorSelecionadoId ? `${API_URL}/api/origemsistema/${fornecedorSelecionadoId}` 
+		: `${API_URL}/api/origemsistema`;
+	    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
 
-    const fornecedorDados = {
-        id: idReg,
-        nome: document.getElementById("nome").value,
-        cnpj: document.getElementById("documento").value.replace(/\D/g, ""), 
-        email: document.getElementById("email").value,
-        telefone: document.getElementById("telefone").value,
-        cep: document.getElementById("cep").value.replace(/\D/g, ""),
-        logradouro: document.getElementById("logradouro").value,
-        numero: document.getElementById("numero").value,
-        complemento: document.getElementById("complemento").value,
-        bairro: document.getElementById("bairro").value,
-        cidade: document.getElementById("cidade").value,
-        uf: document.getElementById("uf").value,
-        
-        // ⚡ CORREÇÃO DO ERRO: Envia sempre como booleano puro do JavaScript (true/false)
-        unidadeAtiva: true, 
-        
-        // Envia a String formatada ("S" ou "N") para o DTO
-        origemSistema: valorOrigem 
-    };
+	    try {
+	        const response = await fetch(url, {
+	            method: metodo,
+	            headers: {
+	                "Content-Type": "application/json",
+	                "Authorization": `Bearer ${tokenPuro}`
+	            },
+	            body: JSON.stringify(fornecedorDados)
+	        });
 
-    const url = fornecedorSelecionadoId ? `${API_URL}/api/origemsistema/${fornecedorSelecionadoId}` 
-                                        : `${API_URL}/api/origemsistema`;
-    const metodo = fornecedorSelecionadoId ? "PUT" : "POST";
-
-    try {
-        const response = await fetch(url, {
-            method: metodo,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${tokenPuro}`
-            },
-            body: JSON.stringify(fornecedorDados)
-        });
-
-        if (response.ok) {
-            alert(fornecedorSelecionadoId ? "✅ Registro alterado com sucesso!" : "✅ Registro cadastrado com sucesso!");
-            acionarIncluir();
-            carregarFornecedores();
-        } else {
-            const textoErro = await response.text();
-            alert("❌ Erro ao salvar:\n" + textoErro);
-        }
-    } catch (e) {
-        console.error("Erro na requisição:", e);
-        alert("❌ Erro de rede ao tentar se conectar ao servidor.");
-    }
-}
+	        if (response.ok) {
+	            alert(fornecedorSelecionadoId ? "✅ Fornecedor alterado!" : "✅ Fornecedor cadastrado!");
+	            acionarIncluir();
+	            carregarFornecedores();
+	        } else {
+	            const textoErro = await response.text();
+	            alert("❌ Erro ao salvar fornecedor:\n" + textoErro);
+	        }
+	    } catch (e) {
+	        console.error("Erro na requisição:", e);
+	        alert("❌ Erro de rede ao tentar se conectar ao servidor.");
+	    }
+	}
 
 function acionarAlterar() {
     if (!fornecedorSelecionadoId) {
@@ -303,9 +267,13 @@ function acionarAlterar() {
         return;
     }
 	
-    const linhaSelecionada = document.querySelector("#tabelaFornecedores tr.selecionado");
+  
+	 const linhaSelecionada = document.querySelector
+	 	("#tabelaFornecedores tr.selecionado");
 
-    if (linhaSelecionada) {
+   
+	
+	 if (linhaSelecionada) {
         bloquearFormulario(false);
         document.getElementById("id").value = linhaSelecionada.dataset.id || "";
         document.getElementById("nome").value = linhaSelecionada.dataset.nome || "";
@@ -318,12 +286,6 @@ function acionarAlterar() {
         document.getElementById("complemento").value = linhaSelecionada.dataset.complemento || "";
         document.getElementById("bairro").value = linhaSelecionada.dataset.bairro || "";
         document.getElementById("cidade").value = linhaSelecionada.dataset.cidade || "";
-
-        // ⚡ INCLUSÃO: Carrega o "S" ou "N" salvo de volta para o input da tela
-        const inputOrigem = document.getElementById("unidadeAtiva");
-        if (inputOrigem) {
-            inputOrigem.value = linhaSelecionada.dataset.origemsistema || "N";
-        }
 
         const docPuro = linhaSelecionada.dataset.cnpj || "";
         const inputDoc = document.getElementById("documento");

@@ -12,6 +12,7 @@ CREATE TABLE origemsistema (
     bairro VARCHAR(80) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
     uf VARCHAR(2) NOT NULL,
-    -- ⚡ INCLUSÃO: Alinhado com o 'private Boolean unidadeAtiva = true;' do Java
-    unidade_ativa BOOLEAN NOT NULL DEFAULT TRUE 
+    unidade_ativa BOOLEAN NOT NULL DEFAULT TRUE,
+    -- ⚡ Aqui está o controle de onde o sistema está instalado fisicamente
+    origem_sistema BOOLEAN NOT NULL DEFAULT FALSE
 );

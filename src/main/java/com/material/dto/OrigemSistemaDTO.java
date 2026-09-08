@@ -1,13 +1,7 @@
 package com.material.dto;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
 public class OrigemSistemaDTO {
 	
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
     private String cnpj;
@@ -17,109 +11,134 @@ public class OrigemSistemaDTO {
     private String cep;
     private String logradouro;
     private String numero;
-	    private String complemento;
+    private String complemento;
     private String bairro;
     private String cidade;
     private String uf;
     
-    
-public String getNome() {
-		return nome;
-	}
+    // ⚡ INCLUSÕES IMPORTANTES: Campos para receber os dados de status e origem da tela
+    private Boolean unidadeAtiva;
+    private String origemSistema; // Recebe o "S" ou "N" direto da String digitada no seu input HTML
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
+    // --- GETTERS E SETTERS ---
 
-	public String getCnpj() {
-		return cnpj;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getInscricaoEstadual() {
-		return inscricaoEstadual;
-	}
+    public String getNome() {
+        return nome;
+    }
 
-	public void setInscricaoEstadual(String inscricaoEstadual) {
-		this.inscricaoEstadual = inscricaoEstadual;
-	}
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getCnpj() {
+        return cnpj;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setCnpj(String cnpj) {
+        this.cnpj = cnpj;
+    }
 
-	public String getTelefone() {
-		return telefone;
-	}
+    public String getInscricaoEstadual() {
+        return inscricaoEstadual;
+    }
 
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
+    public void setInscricaoEstadual(String inscricaoEstadual) {
+        this.inscricaoEstadual = inscricaoEstadual;
+    }
 
-	public String getCep() {
-		return cep;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setCep(String cep) {
-		this.cep = cep;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getLogradouro() {
-		return logradouro;
-	}
+    public String getTelefone() {
+        return telefone;
+    }
 
-	public void setLogradouro(String logradouro) {
-		this.logradouro = logradouro;
-	}
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
+    }
 
-	public String getNumero() {
-		return numero;
-	}
+    public String getCep() {
+        return cep;
+    }
 
-	public void setNumero(String numero) {
-		this.numero = numero;
-	}
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
 
-	public String getComplemento() {
-		return complemento;
-	}
+    public String getLogradouro() {
+        return logradouro;
+    }
 
-	public void setComplemento(String complemento) {
-		this.complemento = complemento;
-	}
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
+    }
 
-	public String getBairro() {
-		return bairro;
-	}
+    public String getNumero() {
+        return numero;
+    }
 
-	public void setBairro(String bairro) {
-		this.bairro = bairro;
-	}
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
 
-	public String getCidade() {
-		return cidade;
-	}
+    public String getComplemento() {
+        return complemento;
+    }
 
-	public void setCidade(String cidade) {
-		this.cidade = cidade;
-	}
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
 
-	public String getUf() {
-		return uf;
-	}
+    public String getBairro() {
+        return bairro;
+    }
 
-	public void setUf(String uf) {
-		this.uf = uf;
-	}
-    
-    
-	
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
 
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
+    }
+
+    public Boolean getUnidadeAtiva() {
+        return unidadeAtiva;
+    }
+
+    public void setUnidadeAtiva(Boolean unidadeAtiva) {
+        this.unidadeAtiva = unidadeAtiva;
+    }
+
+    public String getOrigemSistema() {
+        return origemSistema;
+    }
+
+    public void setOrigemSistema(String origemSistema) {
+        this.origemSistema = origemSistema;
+    }
 }

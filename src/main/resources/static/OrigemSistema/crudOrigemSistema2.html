@@ -231,17 +231,14 @@
 </head>
 
 <body>
-
-
-
-	<!-- ============Tela Principal==============================-->
-
-
-
 	<div class="container-sistema">
 		<div class="titulo-pagina">
 			<h2 style="margin: 0;">👥 Gerenciamento do Sistema<h2>
 		</div>
+		<!-- ==========================================
+		     PARTE 2: FORMULÁRIO E DROPDOWN DE UFs
+		     ========================================== -->
+		<!-- Formulário de Entrada -->
 		<div class="coluna-formulario">
 			<div class="box-custom">
 				<h4 id="tituloFormulario">Cadastrar Origem</h4>
@@ -257,7 +254,7 @@
 
 					<!-- Seleção do Tipo de Pessoa (Física ou Jurídica) -->
 					<div class="campo-grupo">
-						<label class="form-label">Tipo de Origem :</label>
+						<label class="form-label">Tipo de Fornecedor:</label>
 						<div style="display: flex; gap: 15px; margin-bottom: 10px;">
 							<label>
 								<input type="radio" name="tipoPessoa" value="CPF" checked
@@ -282,7 +279,7 @@
 						<div class="campo-grupo">
 							<label for="email" class="form-label">E-mail</label>
 							<input type="email" class="form-control" id="email" maxlength="100"
-								placeholder="Ex: origem@email.com">
+								placeholder="Ex: fornecedor@email.com">
 						</div>
 						<div class="campo-grupo">
 							<label for="telefone" class="form-label">Telefone</label>
@@ -292,50 +289,56 @@
 					</div>
 
 					<!-- Linha de CEP e UF (Dropdown Oficial) -->
-					<div class="linha-campos">
-						<!-- 💡 Certifique-se de usar a classe de linha se quiser os dois lado a lado -->
-						<div class="campo-grupo" style="flex: 2;">
-							<label for="cep" class="form-label">CEP</label>
-							<input type="text" class="form-control" id="cep" required maxlength="10"
-								placeholder="Ex: 80.000-000" oninput="aplicarMascaraCEP(this)">
-						</div>
+					<div class="linha-campos"> <!-- 💡 Certifique-se de usar a classe de linha se quiser os dois lado a lado -->
+					    <div class="campo-grupo" style="flex: 2;">
+					        <label for="cep" class="form-label">CEP</label>
+							<input
+							    type="text"
+							    class="form-control"
+							    id="cep"
+							    required
+							    maxlength="10"
+							    placeholder="Ex: 80.000-000"
+							    oninput="aplicarMascaraCEP(this)"
+							>
+					    </div>
 
-						<div class="campo-grupo" style="flex: 1;">
-							<label for="uf" class="form-label">UF</label>
-							<select class="form-control" id="uf" required>
-								<option value="">--</option>
-								<option value="AC">AC</option>
-								<option value="AL">AL</option>
-								<option value="AM">AM</option>
-								<option value="AP">AP</option>
-								<option value="BA">BA</option>
-								<option value="CE">CE</option>
-								<option value="DF">DF</option>
-								<option value="ES">ES</option>
-								<option value="GO">GO</option>
-								<option value="MA">MA</option>
-								<option value="MG">MG</option>
-								<option value="MS">MS</option>
-								<option value="MT">MT</option>
-								<option value="PA">PA</option>
-								<option value="PB">PB</option>
-								<option value="PE">PE</option>
-								<option value="PI">PI</option>
-								<option value="PR">PR</option>
-								<option value="RJ">RJ</option>
-								<option value="RN">RN</option>
-								<option value="RO">RO</option>
-								<option value="RR">RR</option>
-								<option value="RS">RS</option>
-								<option value="SC">SC</option>
-								<option value="SE">SE</option>
-								<option value="SP">SP</option>
-								<option value="TO">TO</option>
-							</select>
-						</div>
+					    <div class="campo-grupo" style="flex: 1;">
+					        <label for="uf" class="form-label">UF</label>
+					        <select class="form-control" id="uf" required>
+					            <option value="">--</option>
+					            <option value="AC">AC</option>
+					            <option value="AL">AL</option>
+					            <option value="AM">AM</option>
+					            <option value="AP">AP</option>
+					            <option value="BA">BA</option>
+					            <option value="CE">CE</option>
+					            <option value="DF">DF</option>
+					            <option value="ES">ES</option>
+					            <option value="GO">GO</option>
+					            <option value="MA">MA</option>
+					            <option value="MG">MG</option>
+					            <option value="MS">MS</option>
+					            <option value="MT">MT</option>
+					            <option value="PA">PA</option>
+					            <option value="PB">PB</option>
+					            <option value="PE">PE</option>
+					            <option value="PI">PI</option>
+					            <option value="PR">PR</option>
+					            <option value="RJ">RJ</option>
+					            <option value="RN">RN</option>
+					            <option value="RO">RO</option>
+					            <option value="RR">RR</option>
+					            <option value="RS">RS</option>
+					            <option value="SC">SC</option>
+					            <option value="SE">SE</option>
+					            <option value="SP">SP</option>
+					            <option value="TO">TO</option>
+					        </select>
+					    </div>
 					</div> <!-- 🌟 A tag fechava aqui corretamente agora, sem sobras -->
-
-					<!-- Linha de Logradouro e Número -->
+					
+						<!-- Linha de Logradouro e Número -->
 					<div class="linha-campos">
 						<div class="campo-grupo" style="flex: 3;">
 							<label for="logradouro" class="form-label">Logradouro / Rua</label>
@@ -366,25 +369,6 @@
 							<input type="text" class="form-control" id="cidade" required maxlength="100"
 								placeholder="Ex: Curitiba">
 						</div>
-						<div class="campo-grupo">
-
-						    <label for="origemSistema" class="form-label">
-						        Origem Ativa (S/N)
-						    </label>
-
-						    <select
-						        class="form-control"
-						        id="origemSistema"
-						        name="origemSistema"
-						        required>
-
-						        <option value="">Selecione...</option>
-						        <option value="true">S - Sim</option>
-						        <option value="false">N - Não</option>
-
-						    </select>
-
-						</div>
 					</div>
 
 					<button type="submit" class="btn-salvar-form" id="btnSalvar">Salvar Origem</button>
@@ -392,10 +376,11 @@
 			</div>
 		</div>
 
+		
 		<!-- Listagem de Fornecedores -->
 		<div class="coluna-tabela">
 			<div class="box-custom">
-				<h4>Origem Cadastradas</h4>
+				<h4>Fornecedores Cadastrados</h4>
 				<div class="tabela-container-scroll">
 					<table class="table-custom">
 						<thead>
@@ -411,8 +396,6 @@
 								<th>Número</th>
 								<th>Bairro</th>
 								<th>Cidade</th>
-								<th>Origem</th>
-
 							</tr>
 						</thead>
 						<tbody id="tabelaFornecedores">
@@ -428,7 +411,9 @@
 	<div id="meuPainelFlutuante" class="painel-flutuante">
 		<div id="meuPainelHeader" class="painel-header">::: MENU :::</div>
 		<div class="painel-corpo">
-			<button class="btn-menu-vertical btn-incluir" onclick="acionarIncluir()"><u>I</u>ncluir</button>
+			<button class="btn-menu-vertical btn-incluir"
+				 onclick="acionarIncluir()"><u>I</u>ncluir</button>
+				 
 			<button class="btn-menu-vertical btn-alterar" onclick="acionarAlterar()"><u>A</u>lterar</button>
 			<button class="btn-menu-vertical btn-excluir" onclick="acionarExcluir()"><u>E</u>xcluir</button>
 			<button class="btn-menu-vertical btn-voltar"
@@ -472,10 +457,10 @@
 	</script>
 
 	<!-- 🚀 Bastidores 100% afinados, limpos e corrigidos -->
-	<script src="/componentes-js/utils.js"></script>
-	<script src="/OrigemSistema/appOrigemSistema.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
-
-
+		<script src="/componentes-js/utils.js"></script>
+		<script src="/OrigemSistema/appOrigemSistema.js"></script> <!-- 🎯 Com 'r', combinando com a pasta física -->
+	
+	
 </body>
 
 </html>
