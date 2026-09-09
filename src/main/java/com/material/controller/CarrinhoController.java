@@ -86,71 +86,7 @@ public class CarrinhoController {
         );
     }
 
-    // 🖨️ 8. EMISSÃO GERENCIAL DO TICKET EM PDF (ROTA PÚBLICA INTEGRADA)
-    @GetMapping("/public/pedido/{numeroPedido}/pdf")
-    public ResponseEntity<byte[]> gerarRelatorioPdf(@PathVariable String numeroPedido) {
-        try {
-            List<Carrinho> itens = carrinhoService.pesquisarTodosItensDoPedido(numeroPedido);
-
-            if (itens == null || itens.isEmpty()) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            Document document = new Document(PageSize.A4);
-            PdfWriter.getInstance(document, out);
-            document.open();
-
-            Font fonteTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
-            Font fonteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12);
-
-            document.add(new Paragraph("SISTEMA MAGIA - BALCÃO DE VENDAS", fonteTitulo));
-            document.add(new Paragraph("Relatório de Conta Corrente do Pedido: " + numeroPedido, fonteNormal));
-            document.add(new Paragraph("----------------------------------------------------------------------------------"));
-
-            double totalGeral = 0;
-            int indice = 1;
-
-            for (Carrinho item : itens) {
-                double preco = item.getPrecoPraticado() != null ? item.getPrecoPraticado().doubleValue() : 0.0;
-                double qtd = item.getQuantidade() != null ? item.getQuantidade().doubleValue() : 0.0;
-                double sub = qtd * preco;
-                totalGeral += sub;
-
-                String nomeProd = "Desconhecido";
-                String idProdTxt = "0";
-
-                if (item.getProduto() != null) {
-                    idProdTxt = String.valueOf(item.getProduto().getId());
-                    if (item.getProduto().getNome() != null) {
-                        nomeProd = item.getProduto().getNome();
-                    }
-                }
-
-                if (nomeProd.equals("Desconhecido") && !idProdTxt.equals("0")) {
-                    nomeProd = "Produto ID: " + idProdTxt;
-                }
-
-                String linha = String.format("%d - %s  |  Qtd: %.3f  |  Preço: R$ %.2f  |  Subtotal: R$ %.2f",
-                        indice++, nomeProd, qtd, preco, sub);
-                document.add(new Paragraph(linha, fonteNormal));
-            }
-
-            document.add(new Paragraph("----------------------------------------------------------------------------------"));
-            document.add(new Paragraph(String.format("VALOR TOTAL DO LOTE NO BANCO: R$ %.2f", totalGeral), fonteTitulo));
-
-            document.close();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDisposition(ContentDisposition.inline().filename("pedido-" + numeroPedido + ".pdf").build());
-
-            return new ResponseEntity<>(out.toByteArray(), headers, HttpStatus.OK);
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+  
     
     @PutMapping("/devolver/item/{itemId}")
     public ResponseEntity<String> devolverItem(@PathVariable Long itemId) {
