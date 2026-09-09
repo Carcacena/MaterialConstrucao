@@ -288,14 +288,15 @@
 	    <!-- Seus botões originais continuam aqui embaixo... -->
 	    <button class="btn-menu-nota btn-verde" onclick="salvarEntrada()"> 💾 Gravar Nota Fiscal (Status 1) </button>
 	    <button class="btn-menu-nota btn-vermelho" onclick="cancelarOperacao()"> ❌ Cancelar e Limpar Tela </button>
-	    <button class="btn-menu-nota btn-azul" onclick="togglePainelGerencial()"> 🔎 Painel Gerencial (Consultar / DANFE) </button>
-	    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'"> 📦 Produtos </button>
+		    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'"> 📦 Produtos </button>
 	    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Fornecedores/crudFornecedor.html'"> 🚚 Fornecedores </button>
 	</div>
 
 	<!-- 🌟 1. QUADRO DE IMPOSTOS FLUTUANTE E ARRASTÁVEL -->
 	<div id="modalImpostos" class="modal-flutuante"
-		style="display: none; position: fixed; top: 15%; left: 35%; width: 340px; max-height: 85vh; background: #1e3525; border-radius: 8px; overflow-y: auto; border: 2px solid #e67e22; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+		style="display: none; position: fixed; top: 15%; left: 35%; width: 340px;
+		
+		 max-height: 85vh; background: #1e3525; border-radius: 8px; overflow-y: auto; border: 2px solid #e67e22; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
 		<div id="modalImpostosHeader"
 			style="padding: 15px 20px 5px 20px; cursor: move; background: #16281c; border-bottom: 1px solid #25422e;">

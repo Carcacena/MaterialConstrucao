@@ -25,7 +25,7 @@ public class EntradaImpostosService {
                 .orElseThrow(() -> new RuntimeException("Nota fiscal não encontrada: " + entradaId));
 
         // Se já existe registro de impostos pra essa nota, reaproveita (evita duplicar)
-        EntradaImpostos impostos = impostosRepository.findByEntradaId(entradaId)
+        EntradaImpostos impostos = impostosRepository.findByEntrada_Id(entradaId)
                 .orElse(new EntradaImpostos());
 
         impostos.setEntrada(entrada);
@@ -45,7 +45,7 @@ public class EntradaImpostosService {
     }
 
     public EntradaImpostos buscarPorEntrada(Long entradaId) {
-        return impostosRepository.findByEntradaId(entradaId)
+        return impostosRepository.findByEntrada_Id(entradaId)
                 .orElseThrow(() -> new RuntimeException("Nenhum imposto lançado para essa nota ainda."));
     }
 }
