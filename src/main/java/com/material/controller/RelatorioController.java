@@ -130,19 +130,12 @@ public class RelatorioController {
 				PdfPCell cNome = new PdfPCell(new Phrase(p.getNome(), fontCorpo));
 				configurarBordaFina(cNome, Element.ALIGN_LEFT, borderCol);
 				table.addCell(cNome);
-				BigDecimal qtde;
 
-				if (Boolean.TRUE.equals(p.getAGranel())) {
+				BigDecimal qtde = p.getAGranel() ? p.getEstoque() : BigDecimal.valueOf(p.getEstoqueAtual());
+				PdfPCell cQtde = new PdfPCell(new Phrase(qtde.toString(), fontCorpo));
+				configurarBordaFina(cQtde, Element.ALIGN_RIGHT, borderCol);
+				table.addCell(cQtde);
 
-				    qtde = p.getEstoque() != null
-				            ? p.getEstoque()
-				            : BigDecimal.ZERO;
-
-				} else {
-
-				    qtde = BigDecimal.valueOf(p.getEstoqueAtual());
-				}
-			
 				BigDecimal custo = p.getPrecoCusto() != null ? p.getPrecoCusto() : BigDecimal.ZERO;
 				PdfPCell cCusto = new PdfPCell(new Phrase("R$ " + String.format("%.2f", custo), fontCorpo));
 				configurarBordaFina(cCusto, Element.ALIGN_RIGHT, borderCol);
@@ -644,14 +637,9 @@ public class RelatorioController {
 	         try {
 	             // 🎯 AJUSTE DE CONTINGÊNCIA: Se o dropdown mandar "6", tentamos buscar o registro exato
 	             List<com.material.model.Carrinho> itens = null;
-	             OrigemSistema matriz = origemSistemaRepository.findAll().stream()
- 						.filter(o -> o.getOrigemSistema() != null && o.getOrigemSistema()).findFirst()
- 						.orElse(new OrigemSistema());
-				Document document = new Document(PageSize.A4, 20, 20, 20, 20);
-			
+	             
 	             try {
-	            		
-        // Força a conversão do texto "6" para o número 6 puro se o seu repositório buscar por ID ou se o número do pedido for interpretado como Long no banco
+	                 // Força a conversão do texto "6" para o número 6 puro se o seu repositório buscar por ID ou se o número do pedido for interpretado como Long no banco
 	                 itens = carrinhoRepository.buscarPedidoComRelacionamentos(numeroPedido);
 	             } catch (Exception e) {
 	                 System.out.println("Busca direta falhou, tentando tratamento alternativo...");
@@ -675,7 +663,7 @@ public class RelatorioController {
 
 	            ByteArrayOutputStream out = new ByteArrayOutputStream();
 	            // Folha A4 com margens profissionais de 20 pontos
-	     //       Document document = new Document(PageSize.A4, 20, 20, 20, 20);
+	            Document document = new Document(PageSize.A4, 20, 20, 20, 20);
 	            PdfWriter.getInstance(document, out);
 	            document.open();
 
@@ -685,21 +673,8 @@ public class RelatorioController {
 	            Font fontDadosNegrito = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Color.DARK_GRAY);
 
 	            Color cinzaBordaElemento = new Color(209, 213, 219);
-	            OrigemSistema origem = origemSistemaRepository
-	                    .findByOrigemSistemaTrueAndUnidadeAtivaTrue()
-	                    .orElseThrow(() ->
-	                            new RuntimeException("Nenhuma origem ativa configurada.")
-	                    );
 
-	            // 🏢 CABEÇALHO DA ORIGEM ATIVA
-	            adicionarCabecalhoOrigem(
-	                    document,
-	                    origem,
-	                    fontDadosNormal
-	            );
-	           
-	             
-	             // Título Superior blindado em Tabela Invisível para perfeito alinhamento
+	            // Título Superior blindado em Tabela Invisível para perfeito alinhamento
 	            PdfPTable tabelaTitulo = new PdfPTable(1);
 	            tabelaTitulo.setWidthPercentage(100);
 	            tabelaTitulo.setSpacingAfter(15f);
@@ -738,9 +713,8 @@ public class RelatorioController {
 	                double sub = qtd * preco;
 	                totalGeral += sub;
 
-	                String nomeProd = item.getProduto() != null
-	                        ? item.getProduto().getNome()
-	                        : "PRODUTO NÃO VINCULADO";
+	                String nomeProd = item.getProduto() != null ? item.getProduto().getNome() : "Produto ID: " + item.getProduto().getId();
+
 	                // 1. Índice
 	                PdfPCell cInd = new PdfPCell(new Phrase(String.valueOf(indice++), fontDadosNormal));
 	                configurarBordaFina(cInd, Element.ALIGN_LEFT, corFundo, cinzaBordaGrid);
@@ -786,33 +760,22 @@ public class RelatorioController {
 	            document.close();
 
 	            byte[] pdfBytes = out.toByteArray();
-
 	            HttpHeaders headers = new HttpHeaders();
-
 	            headers.setContentType(MediaType.APPLICATION_PDF);
+	            headers.setContentDispositionFormData("inline", "DANFE_Saida_" + numeroPedido + ".pdf");
 
-	            headers.setContentDispositionFormData(
-	                    "inline",
-	                    "DANFE_Saida_" + numeroPedido + ".pdf"
-	            );
+	            return ResponseEntity.ok().headers(headers).body(pdfBytes);
 
-	            return ResponseEntity.ok()
-	                    .headers(headers)
-	                    .body(pdfBytes);
-
-	            } catch (Exception e) {
-
-	                e.printStackTrace();
-
-	                return ResponseEntity
-	                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                        .build();
-	            }
-	            }
-
-	          
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	        }
+	    }
 	
-  // ==========================================================
+    // ==========================================================
+    // 🛒 ENDPOINT AJUSTADO: BUSCA PEDIDOS REAIS VIA CARRINHO
+    // ==========================================================
+    // ==========================================================
     // 🛒 ENDPOINT SEGURO: BUSCA PEDIDOS REAIS VIA CARRINHO
     // ==========================================================
     @GetMapping("/vendas/periodo")
@@ -852,12 +815,8 @@ public class RelatorioController {
 
             return ResponseEntity.ok(resultados);
         } catch (Exception e) {
-
             e.printStackTrace();
-
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 	
