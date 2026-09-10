@@ -130,12 +130,19 @@ public class RelatorioController {
 				PdfPCell cNome = new PdfPCell(new Phrase(p.getNome(), fontCorpo));
 				configurarBordaFina(cNome, Element.ALIGN_LEFT, borderCol);
 				table.addCell(cNome);
+				BigDecimal qtde;
 
-				BigDecimal qtde = p.getAGranel() ? p.getEstoque() : BigDecimal.valueOf(p.getEstoqueAtual());
-				PdfPCell cQtde = new PdfPCell(new Phrase(qtde.toString(), fontCorpo));
-				configurarBordaFina(cQtde, Element.ALIGN_RIGHT, borderCol);
-				table.addCell(cQtde);
+				if (Boolean.TRUE.equals(p.getAGranel())) {
 
+				    qtde = p.getEstoque() != null
+				            ? p.getEstoque()
+				            : BigDecimal.ZERO;
+
+				} else {
+
+				    qtde = BigDecimal.valueOf(p.getEstoqueAtual());
+				}
+			
 				BigDecimal custo = p.getPrecoCusto() != null ? p.getPrecoCusto() : BigDecimal.ZERO;
 				PdfPCell cCusto = new PdfPCell(new Phrase("R$ " + String.format("%.2f", custo), fontCorpo));
 				configurarBordaFina(cCusto, Element.ALIGN_RIGHT, borderCol);
@@ -691,8 +698,7 @@ public class RelatorioController {
 	                    fontDadosNormal
 	            );
 	           
-	          
-	            
+	             
 	             // Título Superior blindado em Tabela Invisível para perfeito alinhamento
 	            PdfPTable tabelaTitulo = new PdfPTable(1);
 	            tabelaTitulo.setWidthPercentage(100);
@@ -732,8 +738,9 @@ public class RelatorioController {
 	                double sub = qtd * preco;
 	                totalGeral += sub;
 
-	                String nomeProd = item.getProduto() != null ? item.getProduto().getNome() : "Produto ID: " + item.getProduto().getId();
-
+	                String nomeProd = item.getProduto() != null
+	                        ? item.getProduto().getNome()
+	                        : "PRODUTO NÃO VINCULADO";
 	                // 1. Índice
 	                PdfPCell cInd = new PdfPCell(new Phrase(String.valueOf(indice++), fontDadosNormal));
 	                configurarBordaFina(cInd, Element.ALIGN_LEFT, corFundo, cinzaBordaGrid);
@@ -779,22 +786,33 @@ public class RelatorioController {
 	            document.close();
 
 	            byte[] pdfBytes = out.toByteArray();
+
 	            HttpHeaders headers = new HttpHeaders();
+
 	            headers.setContentType(MediaType.APPLICATION_PDF);
-	            headers.setContentDispositionFormData("inline", "DANFE_Saida_" + numeroPedido + ".pdf");
 
-	            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+	            headers.setContentDispositionFormData(
+	                    "inline",
+	                    "DANFE_Saida_" + numeroPedido + ".pdf"
+	            );
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-	        }
-	    }
+	            return ResponseEntity.ok()
+	                    .headers(headers)
+	                    .body(pdfBytes);
+
+	            } catch (Exception e) {
+
+	                e.printStackTrace();
+
+	                return ResponseEntity
+	                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                        .build();
+	            }
+	            }
+
+	          
 	
-    // ==========================================================
-    // 🛒 ENDPOINT AJUSTADO: BUSCA PEDIDOS REAIS VIA CARRINHO
-    // ==========================================================
-    // ==========================================================
+  // ==========================================================
     // 🛒 ENDPOINT SEGURO: BUSCA PEDIDOS REAIS VIA CARRINHO
     // ==========================================================
     @GetMapping("/vendas/periodo")
@@ -834,8 +852,12 @@ public class RelatorioController {
 
             return ResponseEntity.ok(resultados);
         } catch (Exception e) {
+
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
         }
     }
 	
