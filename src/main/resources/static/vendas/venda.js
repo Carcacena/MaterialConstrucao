@@ -139,24 +139,15 @@ function lidarComAtalhos(e) {
 // ORQUESTRADOR DE INICIALIZAÇÃO DA MESA DE NEGOCIAÇÃO
 // =========================================================================
 function inicializarLogicaVenda() {
-    configurarAtalhosTeclado();
-   
-    // Funções que vamos criar nos módulos específicos:
-    if (typeof carregarClientesPDV === "function") carregarClientesPDV();
-    if (typeof carregarProdutosPDV === "function") carregarProdutosPDV();
-}
 
-    // Inicializa as consultas assíncronas do banco MySQL
-    if (typeof carregarClientesPDV === "function") {
-        carregarClientesPDV();
-    }
+    configurarAtalhosTeclado();
+
+    // Cliente fica por conta do modulo-fechamento.js
 
     if (typeof carregarProdutosPDV === "function") {
         carregarProdutosPDV();
     }
-
-
-
+}
 // Resguarda compatibilidade caso alguma rotina antiga chame a função esvaziada
 function adicionarItemNaLista() {
     console.log("Faturamento direto desativado. Utilizando fluxo em árvore.");

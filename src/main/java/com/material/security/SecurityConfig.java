@@ -88,8 +88,8 @@ public class SecurityConfig {
                    "/mp3/**", 
                    "/favicon.ico", 
                    "/error", 
-                   "/componentes-js/**", // 🌟 ADICIONE ESTA LINHA AQUI!
-                   "/componentes/**" 
+                   "/componentes-js/**" // 🌟 ADICIONE ESTA LINHA AQUI!
+                
                    
                ).permitAll() 
                

@@ -617,56 +617,60 @@
 
 		// Programa principal da Mesa de Negociação
 		async function inicializarTela() {
-			try {
-				await Promise.all([
-					carregarComponente(
-						"container-localizar-produto",
-						"/componentes/localizar-produto.html"
-					),
 
-					carregarComponente(
-						"container-itens-cupom",
-						"/componentes/itens-cupom.html"
-					),
+		    try {
 
-					carregarComponente(
-						"container-fechamento-pedido",
-						"/componentes/fechamento-pedido.html"
-					)
-				]);
+		        await Promise.all([
 
-				configurarPainelArrastavel();
+		            carregarComponente(
+		                "container-localizar-produto",
+		                "/vendas/localizar-produto.html"
+		            ),
 
-				const arquivosLogica = [
-					'/componentes-js/utils.js',          // 🌟 primeiro de todos (está certo)
-					'/vendas/venda.js',                  // ⚡ Corrigido: Aponta para a nova pasta física /vendas
-					'/vendas/modulo-localizar.js',       // ⚡ Corrigido
-					'/vendas/modulo-cupom.js',           // ⚡ Corrigido
-					'/componentes-js/devolucao.js',
-					'/componentes-js/cancelarPedido.js',
-					'/componentes-js/carrinho.js',
-					'/componentes-js/imprimeCarrinho.js', // 🌟 depois do carrinho.js
-					'/vendas/modulo-fechamento.js'        // ⚡ Corrigido
-				];
+		            carregarComponente(
+		                "container-itens-cupom",
+		                "/vendas/itens-cupom.html"
+		            ),
 
-				for (const src of arquivosLogica) {
-					await carregarArquivoJavaScript(src);
-				}
+		            carregarComponente(
+		                "container-fechamento-pedido",
+		                "/vendas/fechamento-pedido.html"
+		            )
 
-				if (typeof inicializarLogicaVenda === "function") {
-					inicializarLogicaVenda();
-				} else {
-					console.error(
-						"A função inicializarLogicaVenda() não foi encontrada."
-					);
-				}
+		        ]);
 
-			} catch (erro) {
-				console.error(
-					"Erro ao inicializar a Mesa de Negociação:",
-					erro
-				);
-			}
+		        configurarPainelArrastavel();
+
+		        const arquivosLogica = [
+
+		            '/componentes-js/utils.js',
+
+		            '/vendas/modulo-localizar.js',
+		            '/vendas/modulo-cupom.js',
+		            '/vendas/devolucao.js',
+		            '/vendas/cancelarPedido.js',
+		            '/vendas/carrinho.js',
+		            '/vendas/imprimeCarrinho.js',
+		            '/vendas/modulo-fechamento.js',
+
+		            '/vendas/venda.js'
+		        ];
+
+		        for (const src of arquivosLogica) {
+		            await carregarArquivoJavaScript(src);
+		        }
+
+		        if (typeof inicializarLogicaVenda === "function") {
+		            inicializarLogicaVenda();
+		        }
+
+		    } catch (erro) {
+
+		        console.error(
+		            "Erro ao inicializar a Mesa de Negociação:",
+		            erro
+		        );
+		    }
 		}
 
 		function configurarPainelArrastavel() {
@@ -808,14 +812,8 @@
 		
 		<!-- 🌐 Bootstrap Híbrido direto da nuvem: Carrega primeiro e dá suporte para os módulos -->
 		
+	<script src="/componentes-js/utils.js"></script>
 
-			<!-- 🎹 Seus módulos locais do balcão de vendas entram em seguida -->
-			<script src="/vendas/modulo-cupom.js" defer></script>
-			<script src="/vendas/modulo-fechamento.js" defer></script>
-			<script src="/vendas/modulo-localizar.js" defer></script
-				
-				
-				
 				
 </body>
 
