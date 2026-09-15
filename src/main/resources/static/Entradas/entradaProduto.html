@@ -278,18 +278,20 @@
 	<!-- MENU FLUTUANTE -->
 	<!-- MENU FLUTUANTE -->
 	<div id="menuFlutuanteNota" class="menu-flutuante-nota">
-	    
-	    <!-- Novo cabeçalho alinhado com o botão de Fechar -->
-	    <div class="menu-header-nota">
-	        <span>::: CONTROLE DA NOTA :::</span>
-	        <button type="button" class="btn-fechar-menu" onclick="toggleMenuNota()">X</button>
-	    </div>
 
-	    <!-- Seus botões originais continuam aqui embaixo... -->
-	    <button class="btn-menu-nota btn-verde" onclick="salvarEntrada()"> 💾 Gravar Nota Fiscal (Status 1) </button>
-	    <button class="btn-menu-nota btn-vermelho" onclick="cancelarOperacao()"> ❌ Cancelar e Limpar Tela </button>
-		    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'"> 📦 Produtos </button>
-	    <button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Fornecedores/crudFornecedor.html'"> 🚚 Fornecedores </button>
+		<!-- Novo cabeçalho alinhado com o botão de Fechar -->
+		<div class="menu-header-nota">
+			<span>::: CONTROLE DA NOTA :::</span>
+			<button type="button" class="btn-fechar-menu" onclick="toggleMenuNota()">X</button>
+		</div>
+
+		<!-- Seus botões originais continuam aqui embaixo... -->
+		<button class="btn-menu-nota btn-verde" onclick="salvarEntrada()"> 💾 Gravar Nota Fiscal (Status 1) </button>
+		<button class="btn-menu-nota btn-vermelho" onclick="cancelarOperacao()"> ❌ Cancelar e Limpar Tela </button>
+		<button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Produtos/crudProduto.html'"> 📦 Produtos
+		</button>
+		<button class="btn-menu-nota btn-cinza" onclick="window.location.href='/Fornecedores/crudFornecedor.html'"> 🚚
+			Fornecedores </button>
 	</div>
 
 	<!-- 🌟 1. QUADRO DE IMPOSTOS FLUTUANTE E ARRASTÁVEL -->
@@ -358,7 +360,6 @@
 				style="width:100%; margin-top:8px; padding:10px; background:#7f8c8d; color:white; border:none; border-radius:4px; cursor:pointer;">Fechar</button>
 		</div>
 	</div>
-
 
 	<!-- 🌟 2. PAINEL GERENCIAL FLUTUANTE E ARRASTÁVEL -->
 	<div id="modalPainelGerencial" class="modal-flutuante"
@@ -514,60 +515,48 @@
 								<th style="padding: 10px; border-bottom: 2px solid #e67e22;">Devolução</th>
 							</tr>
 						</thead>
-						<tbody id="tbodyItensNota">
-							<!-- Itens entram aqui via JS -->
-						</tbody>
+						<tbody id="tbodyItensNota"></tbody>
 					</table>
 				</div>
-
-				<!-- Rodapé do Lote Consultado -->
-				<div
-					style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid #25422e; padding-top: 15px;">
-					<div id="containerAcaoNota">
-						<!-- Botão de Devolver injetado via JS -->
-					</div>
-					<div style="text-align: right; font-weight: bold; font-size: 16px; color: #4af37a;">
-						TOTAL DO LOTE: R$ <span id="txtTotalNotaBanco">0,00</span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+			</div> <!-- fecha detalhesNotaGerencial -->
+		</div> <!-- fecha a div de padding interna -->
+	</div> <!-- 🔴 FALTA ADICIONAR ESTA DIV AQUI PARA FECHAR O #modalPainelGerencial -->
 
 	<!-- Rodapé Externo com Totalizador Geral da Tela de Cadastro Atual -->
 	<div
 		style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; border-top: 2px solid #e67e22; padding-top: 15px; max-width: 800px; margin-left: auto; margin-right: auto;">
-		<div id="containerAcaoNotaGeral"></div>
+		<div id="containerAcaoNotaGeral">
+			<!-- Botões globais de ação injetados via JS -->
+		</div>
 		<div style="text-align: right; font-weight: bold; font-size: 18px; color: #4af37a;">
 			TOTAL DA NF ATUAL: R$ <span id="txtTotalNotaGeral">0,00</span>
 		</div>
 	</div>
-	 <!-- ========================================== -->
-	    <!--  FIM DOS ELEMENTOS VISUAIS DA PÁGINA       -->
-	    <!-- ========================================== -->
 
-	    <!-- 1º: Carrega o seu script de funções auxiliares corrigido -->
-	    <script src="/Entradas/funcoesAuxiliares.js"></script>
+	<!-- ========================================== -->
+	<!--  FIM DOS ELEMENTOS VISUAIS DA PÁGINA       -->
+	<!-- ========================================== -->
 
-	    <!-- 2º: Executa scripts locais específicos da página (opcional) -->
-	    <script>
-	        // Inicializa o campo de data de recebimento com o dia atual assim que o HTML carregar
-	        document.addEventListener("DOMContentLoaded", function() {
-	            const campoData = document.getElementById('dataRecebimento');
-	            if (campoData) {
-	                campoData.valueAsDate = new Date();
-	            }
-	        });
-	    </script>
+	<!-- 1º: Carrega o seu script de funções auxiliares corrigido -->
+	<script src="/Entradas/funcoesAuxiliares.js"></script>
 
-	    <!-- 3º: Demais dependências do seu sistema -->
-	    <script src="/Entradas/entradaProduto.js"></script>
-	    <script src="/componentes-js/utils.js"></script>
-	    <script src="/Produtos/appProduto.js"></script>
-	    <script src="/Fornecedores/appFornecedor.js"></script> <!-- 🎯 Mantendo a pasta física com 'r' -->
+	<!-- 2º: Executa scripts locais específicos da página -->
+	<script>
+		// Inicializa o campo de data de recebimento com o dia atual assim que o HTML carregar
+		document.addEventListener("DOMContentLoaded", function () {
+			const campoData = document.getElementById('dataRecebimento');
+			if (campoData) {
+				campoData.valueAsDate = new Date();
+			}
+		});
+	</script>
 
-	</body>
-	</html>
+	<!-- 3º: Demais dependências do seu sistema -->
+	<script src="/Entradas/entradaProduto.js"></script>
+	<script src="/componentes-js/utils.js"></script>
+	<script src="/Produtos/appProduto.js"></script>
+	<script src="/Fornecedores/appFornecedor.js"></script>
 
+</body>
 
-	
+</html><!-- Rodapé Externo com Totalizador Geral da Tela Atual -->
