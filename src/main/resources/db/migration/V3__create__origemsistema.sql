@@ -12,8 +12,14 @@ CREATE TABLE origemsistema (
     bairro VARCHAR(80) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
     uf VARCHAR(2) NOT NULL,
+    
+    -- Número sequencial herdado
     notafiscal VARCHAR(20) NOT NULL,
+    
+    -- 🌟 INCLUSÃO: Série da Nota Fiscal (Ex: UN, B1, 1, 2)
+    serie VARCHAR(10) NOT NULL DEFAULT '1',
+    
     unidade_ativa BOOLEAN NOT NULL DEFAULT TRUE,
-    -- ⚡ Aqui está o controle de onde o sistema está instalado fisicamente
+    -- ⚡ Controle de onde o sistema está instalado fisicamente
     origem_sistema BOOLEAN NOT NULL DEFAULT FALSE
 );

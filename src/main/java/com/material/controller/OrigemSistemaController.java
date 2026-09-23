@@ -88,6 +88,11 @@ public class OrigemSistemaController {
 					origemsistema.setCidade(dadosNovos.getCidade());
 					origemsistema.setUnidadeAtiva(dadosNovos.getUnidadeAtiva());
 					
+					// 🌟 A LINHA CORRIGIDA: Agora encaixada de forma única e limpa no fluxo
+					origemsistema.setNotafiscal(dadosNovos.getNotafiscal());
+					// 🌟 A LINHA CORRIGIDA: Agora encaixada de forma única e limpa no fluxo
+					origemsistema.setSerie(dadosNovos.getSerie());
+				
 					// ⚡ ATUALIZAÇÃO DA ORIGEM: Atualiza o status vindo da tela
 					origemsistema.setOrigemSistema(dadosNovos.getOrigemSistema());
 
@@ -101,16 +106,6 @@ public class OrigemSistemaController {
 				})
 				.orElse(ResponseEntity.notFound().build());
 	}
-
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> excluir(@PathVariable Long id) {
-		OrigemSistema origem = origemSistemaRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Origem Sistema não encontrado"));
-
-		origemSistemaRepository.delete(origem);
-		return ResponseEntity.noContent().build();
-	}
-
 	/**
 	 * 🖨️ RELATÓRIOS: Adiciona o cabeçalho corporativo da empresa mestre nos documentos PDF
 	 */
@@ -176,6 +171,9 @@ public class OrigemSistemaController {
 	        texto.append("   E-mail: ").append(origem.getEmail());
 	    }
 
+	    if (origem.getSerie() != null) {
+	        texto.append("   Serie: ").append(origem.getSerie());
+	    }
 	    PdfPCell celula = new PdfPCell(
 	        new Phrase(texto.toString(), fontNormal)
 	    );

@@ -74,23 +74,32 @@ public class OrigemSistema {
     @Column(nullable = false, length = 2)
     private String uf;
     
-    @NotBlank(message = "O número é obrigatório")
+ // ... Seus atributos anteriores permanecem os mesmos ...
+
+    @NotBlank(message = "O número da nota fiscal é obrigatório")
     @Column(nullable = false, length = 20)
     private String notafiscal;
-    
-    
+
+    // 🌟 INCLUSÃO: Atributo para capturar a Série Fiscal (UN, B1, etc.)
+    @NotBlank(message = "A série da nota fiscal é obrigatória")
+    @Size(max = 10, message = "A série deve conter no máximo 10 caracteres")
+    @Column(nullable = false, length = 10)
+    //private String serie = "UN";
+    private String serie; 
+
     @NotNull(message = "O status de unidade ativa é obrigatório")
     @Column(name = "unidade_ativa", nullable = false)
     private Boolean unidadeAtiva = true;
 
-    // ⚡ INCLUSÃO: Alinhado com a nova coluna do MySQL para identificar a instalação física atual
     @NotNull(message = "O status de origem do sistema é obrigatório")
     @Column(name = "origem_sistema", nullable = false)
     private Boolean origemSistema = false;
 
     // --- GETTERS E SETTERS PADRÃO ---
 
-    public Long getId() { return id; }
+   
+	
+	public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
     public String getNome() { return nome; }
@@ -135,9 +144,14 @@ public class OrigemSistema {
   	public void setNotafiscal(String notafiscal) {
   		this.notafiscal = notafiscal;
   	}
-    
-
-    public Boolean getUnidadeAtiva() { return unidadeAtiva; }
+ 
+    public String getSerie() {
+		return serie;
+	}
+	public void setSerie(String serie) {
+		this.serie = serie;
+	}
+	public Boolean getUnidadeAtiva() { return unidadeAtiva; }
     public void setUnidadeAtiva(Boolean unidadeAtiva) { this.unidadeAtiva = unidadeAtiva; }
 
   

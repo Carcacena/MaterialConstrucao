@@ -11,7 +11,15 @@ public class Carrinho {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id; 
+    
+    @Column(name = "numero_nota_fiscal")
+    private Integer numeroNotaFiscal;
 
+    // 🌟 INCLUSÃO: Série Fiscal casada com o cadastro mestre da Origem
+    @Column(name = "serie", length = 10, nullable = false)
+    private String serie = "1";
+
+    
     // 🔥 NOVO CAMPO: Mapeamento do isolador de cupons do balcão
     @Column(name = "numero_pedido", nullable = false, length = 20)
     private String numeroPedido;
@@ -56,9 +64,27 @@ public class Carrinho {
     public void setId(Long id) { 
         final Long localId = id;
         this.id = localId; 
-    } 
+   } 
+    
+    
 
-    public Cliente getCliente() { 
+    public Integer getNumeroNotaFiscal() {
+		return numeroNotaFiscal;
+	}
+
+	public String getSerie() {
+		return serie;
+	}
+
+	public void setNumeroNotaFiscal(Integer numeroNotaFiscal) {
+		this.numeroNotaFiscal = numeroNotaFiscal;
+	}
+
+	public void setSerie(String serie) {
+		this.serie = serie;
+	}
+
+	public Cliente getCliente() { 
         return cliente; 
     } 
 

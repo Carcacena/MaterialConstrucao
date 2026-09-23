@@ -1,3 +1,4 @@
+
 // =========================================================================
 // ⚡ CONEXÃO DO MOTOR DO BALCÃO: INTERCEPTORES E GRAVAÇÃO DE FLUXO RÁPIDO
 // =========================================================================
@@ -7,11 +8,11 @@ if (typeof window.API_URL === 'undefined') {
     window.API_URL = "http://localhost:8080";
 }
 
-// Inicia o array do cupom na memória e gera o número do pedido fixo para esta sessão
+// Inicia o cupom na memória
 window.itensCupomMemoria = [];
-if (!window.numeroPedidoAtual) {
-    window.numeroPedidoAtual = `PED-${Date.now()}`;
-}
+
+// Gera o número do primeiro pedido ao abrir a Mesa
+window.numeroPedidoAtual = `PED-${Date.now()}`;
 
 // --- 2. O RECEPTOR DO BOTÃO MOVER (ÁRVORE CENTRAL) ---
 // Modificado para NÃO fazer fetch. Ele apenas joga o item no array local e desenha na tela.
@@ -442,7 +443,5 @@ async function deixarPedidoPendente() {
     alert(`Pedido ${numeroPedido} mantido pendente no MySQL.`);
 
     window.numeroPedidoAtual = `PED-${Date.now()}`;
-
-
-
 }
+

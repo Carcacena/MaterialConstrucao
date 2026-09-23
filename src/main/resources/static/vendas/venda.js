@@ -1,5 +1,18 @@
-// Herdando automaticamente o domínio do Railway em produção
-const API_URL = ""; 
+// =========================================================================
+// 🚀 SISTEMA MAGIA - BALCÃO DE VENDAS INTELIGENTE
+// Módulo Mestre: venda.js (Parte 1 - Inicialização, Login e Modais)
+// =========================================================================
+
+// Configuração inteligente da URL base do servidor
+const API_URL =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+        ? "http://localhost:8080"
+        : window.location.origin;
+
+// Variables Globais de Balcão (Memória Estilo COBOL)
+window.ufOrigemSistemaInstalado = "PR"; // Sincroniza a UF padrão para o cálculo do ICMS interestadual
+window.proximaNotaFiscalPrevista = null;
 
 // =========================================================================
 // CONTROLE DE AUTENTICAÇÃO JWT
@@ -136,19 +149,99 @@ function lidarComAtalhos(e) {
 }
 
 // =========================================================================
+// 🔄 FUNÇÃO FISCAL: Busca a Origem no Banco e projeta a Próxima NF-e no Painel
+// =========================================================================
+async function carregarProximaNotaNoPainel() {
+    if (!token) return;
+
+    try {
+        console.log("🔍 [venda.js] Consultando sequência na Origem do Sistema...");
+        
+        const response = await fetch(`${API_URL}/api/origemsistema`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        if (response.ok) {
+            const listaOrigens = await response.json();
+            console.log("📊 [Auditoria] O Java devolveu estas Origens:", listaOrigens);
+            
+            // ⚡ XEQUE-MATE NA PIRRAÇA: Aceita qualquer variação que o Java ou o MySQL mandarem (true, "S", 1 ou "1")
+            const matrizAtiva = listaOrigens.find(o => 
+                o.origemSistema === true || 
+                o.origem_sistema === true || 
+                o.origemSistema === 1 || 
+                o.origem_sistema === 1 ||
+                o.origemSistema === "1" || 
+                o.origem_sistema === "1" ||
+                o.origemSistemaTela === "S"
+            );
+            
+            if (matrizAtiva) {
+                // Trata as variações do nome do campo notafiscal (Java CamelCase vs MySQL snake_case)
+                const valorNotaFiscal = matrizAtiva.notafiscal || matrizAtiva.nota_fiscal || "";
+                const valorUf = matrizAtiva.uf || "PR";
+
+                if (valorNotaFiscal) {
+                    // Sincroniza a UF global para a auditoria de alíquota interestadual
+                    window.ufOrigemSistemaInstalado = valorUf;
+
+                    // Pega a String '1956' do MySQL, limpa letras e calcula o próximo (+1)
+                    const ultimaNotaGravada = parseInt(valorNotaFiscal.toString().replace(/\D/g, "")) || 0;
+                    const proximaNotaFiscal = ultimaNotaGravada + 1;
+                    
+                    console.log(`📄 [Sucesso] Última Nota: ${ultimaNotaGravada} | Próxima NF-e: ${proximaNotaFiscal}`);
+                    
+                    // Injeta com estilo o número na sua nova caixa 'PRÓX NF'
+                    const painelDisplay = document.getElementById("displayProximaNotaFiscal");
+                    if (painelDisplay) {
+                        painelDisplay.textContent = proximaNotaFiscal;
+                    }
+                    
+                    // Guarda em memória para uso compartilhado das outras janelas
+                    window.proximaNotaFiscalPrevista = proximaNotaFiscal;
+                } else {
+                    console.warn("⚠️ Matriz ativa localizada, mas o campo 'notafiscal' veio vazio.");
+                }
+            } else {
+                console.warn("❌ Nenhuma matriz operacional ativa foi identificada no filtro do JavaScript.");
+            }
+        }
+    } catch (error) {
+        console.error("⚠️ Falha ao projetar numeração fiscal no cabeçalho:", error);
+    }
+}
+
+// =========================================================================
 // ORQUESTRADOR DE INICIALIZAÇÃO DA MESA DE NEGOCIAÇÃO
 // =========================================================================
 function inicializarLogicaVenda() {
-
     configurarAtalhosTeclado();
-
-    // Cliente fica por conta do modulo-fechamento.js
 
     if (typeof carregarProdutosPDV === "function") {
         carregarProdutosPDV();
     }
 }
+
+// ⚡ DISPARADOR AUTOMÁTICO DO SCRIPT: Executa ao carregar o DOM da página
+document.addEventListener("DOMContentLoaded", () => {
+    inicializarLogicaVenda();
+    
+    // Alimenta a caixa verde 'PRÓX NF' em tempo de execução
+    carregarProximaNotaNoPainel();
+});
+
 // Resguarda compatibilidade caso alguma rotina antiga chame a função esvaziada
 function adicionarItemNaLista() {
     console.log("Faturamento direto desativado. Utilizando fluxo em árvore.");
 }
+
+
+
+
+
+
+

@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 public class CarrinhoImpostosDTO {
 
 	private Long transportadoraId;
+	private Integer numeroNotaFiscal; // Retorna o número calculado para a tela
+	
 
 	private BigDecimal baseCalculoIcms;
     private BigDecimal valorIcms;
@@ -18,8 +20,18 @@ public class CarrinhoImpostosDTO {
     private BigDecimal valorIpi;
     private BigDecimal valorTotalPedido;
     private BigDecimal valorTotalNota; // Incluído para casar com a 15ª linha do MySQL
-
+    private String serie;
     // Getters e Setters
+    
+    public Integer getNumeroNotaFiscal() { return numeroNotaFiscal; }
+    public void setNumeroNotaFiscal(Integer n) { this.numeroNotaFiscal = n; }
+
+    public Long getTransportadoraId() { return transportadoraId; }
+    public void setTransportadoraId(Long t) { this.transportadoraId = t; }
+
+    public String getSerie() { return this.serie; }
+    public void setSerie(String serie) { this.serie = serie; }
+    
     public BigDecimal getBaseCalculoIcms() { return baseCalculoIcms; }
     public void setBaseCalculoIcms(BigDecimal v) { this.baseCalculoIcms = v; }
     public BigDecimal getValorIcms() { return valorIcms; }

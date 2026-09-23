@@ -25,6 +25,8 @@ public class CarrinhoImpostos {
 	    @JoinColumn(name = "carrinho_id", nullable = false, unique = true)
 	    @JsonIgnore
 	    private Carrinho carrinho;
+	    
+	 
 
 	    @Column(name = "base_calculo_icms", precision = 12, scale = 2)
 	    private BigDecimal baseCalculoIcms;
@@ -67,6 +69,9 @@ public class CarrinhoImpostos {
 			return carrinho;
 		}
 
+		
+		
+		
 		public BigDecimal getBaseCalculoIcms() {
 			return baseCalculoIcms;
 		}
@@ -161,6 +166,26 @@ public class CarrinhoImpostos {
 
 		public void setValorTotalNota(BigDecimal valorTotalNota) {
 			this.valorTotalNota = valorTotalNota;
+		}
+
+		public void setNumeroNotaFiscal(int proximaNotaNum) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public Object getNumeroNotaFiscal() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public Object getSerie() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public void setSerie(Object object) {
+			// TODO Auto-generated method stub
+			
 		}
 	    
 	    

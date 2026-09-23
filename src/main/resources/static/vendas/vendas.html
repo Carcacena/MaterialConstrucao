@@ -547,9 +547,7 @@
 
 		<div class="grid-caixa">
 
-			<!-- Parte 1: catálogo e árvore
-			<div id="container-localizar-produto" class="bloco-arvore"></div>
-			-->
+			<!-- Parte 1: Catálogo e Árvore Horizontal -->
 			<div class="box-custom bloco-localizar-produto"
 				style="display: flex; flex-direction: column; height: 100%; min-height: 560px;">
 
@@ -557,17 +555,17 @@
 				<div class="cabecalho-arvore"
 					style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); gap: 15px;">
 
-					<!-- Título do Catálogo -->
+					<!-- Título Único do Catálogo -->
 					<div>
 						<h4 style="margin: 0; color: white; font-weight: bold;">🌳 Catálogo de Produtos</h4>
 						<small style="color: #bdc3c7; font-size: 11px;">Abra o produto raiz para visualizar as marcas e
 							preços.</small>
 					</div>
 
-					<!-- 🚀 AFINAÇÃO DA VIOLA: Itens e Quantidade lado a lado, mas modelados na vertical por dentro -->
+					<!-- 🚀 TRIO DE CONTROLE VISUAL: Itens, Quantidade e Próxima NF-e perfeitamente alinhados -->
 					<div style="display: flex; align-items: center; gap: 10px;">
 
-						<!-- Bloco 1: Contador de Itens (Vertical) -->
+						<!-- Bloco 1: Contador de Itens -->
 						<div class="contador-catalogo"
 							style="min-width: 75px; padding: 5px; text-align: center; background: rgba(255, 152, 0, 0.12); border: 1px solid rgba(255, 152, 0, 0.35); border-radius: 8px;">
 							<span id="contadorProdutosCatalogo"
@@ -575,13 +573,74 @@
 							<small style="color: #bdc3c7; font-size: 10px; text-transform: uppercase;">itens</small>
 						</div>
 
-						<!-- Bloco 2: Seletor de Quantidade (Mesmo modelo vertical do bloco de itens) -->
+						<!-- Bloco 2: Seletor de Quantidade -->
 						<div
 							style="min-width: 75px; padding: 5px; text-align: center; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 152, 0, 0.25); border-radius: 8px; display: flex; flex-direction: column; align-items: center;">
 							<input type="number" id="inputQuantidade" value="1" min="1" step="1"
 								style="width: 55px; background: #111; border: none; color: #5eff5e; font-size: 20px; font-weight: bold; text-align: center; outline: none; height: 26px; line-height: 26px; padding: 0;">
 							<small
 								style="color: #bdc3c7; font-size: 10px; text-transform: uppercase; margin-top: 2px;">Qtde</small>
+						</div>
+
+						<!-- ⚡ Mostrador da Próxima Nota Fiscal -->
+						<div class="nota-fiscal"
+						    style="min-width: 85px; padding: 5px; text-align: center;
+						           background: rgba(94, 255, 94, 0.08);
+						           border: 1px solid rgba(94, 255, 94, 0.3);
+						           border-radius: 8px;
+						           display: flex;
+						           flex-direction: column;
+						           align-items: center;">
+
+						    <span id="displayProximaNotaFiscal"
+						        style="width: 65px;
+						               color: #5eff5e;
+						               font-size: 20px;
+						               font-weight: bold;
+						               text-align: center;
+						               height: 26px;
+						               line-height: 26px;">
+						        -
+						    </span>
+
+						    <small
+						        style="color: #bdc3c7;
+						               font-size: 10px;
+						               text-transform: uppercase;
+						               margin-top: 2px;">
+						        NOTA FISCAL
+						    </small>
+						</div>
+
+
+						<!-- ⚡ Mostrador da Série Fiscal -->
+						<div class="contador-nota-fiscal"
+						    style="min-width: 85px; padding: 5px; text-align: center;
+						           background: rgba(94, 255, 94, 0.08);
+						           border: 1px solid rgba(94, 255, 94, 0.3);
+						           border-radius: 8px;
+						           display: flex;
+						           flex-direction: column;
+						           align-items: center;">
+
+						    <span id="displaySerie"
+						        style="width: 65px;
+						               color: #5eff5e;
+						               font-size: 20px;
+						               font-weight: bold;
+						               text-align: center;
+						               height: 26px;
+						               line-height: 26px;">
+						        -
+						    </span>
+
+						    <small
+						        style="color: #bdc3c7;
+						               font-size: 10px;
+						               text-transform: uppercase;
+						               margin-top: 2px;">
+						        SÉRIE
+						    </small>
 						</div>
 
 					</div>
@@ -600,7 +659,6 @@
 					<div
 						style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
 
-
 						<div style="flex: 1;">
 							<div id="textoSelecionadoTitulo"
 								style="color: #5eff5e; font-weight: bold; font-size: 14px; margin-bottom: 2px;">Nenhum
@@ -609,38 +667,18 @@
 								marca para habilitar o botão.</div>
 						</div>
 
-
 						<div>
 							<button id="btnMoverParaCupom" class="btn"
 								style="background: #27ae60; color: white; font-weight: bold; padding: 8px 16px; border: none; border-radius: 6px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; cursor: pointer; display: none;"
 								onclick="acionarMoverProduto()">
-								Mover ➡%EF%B8%8F
+								Mover ➡️
 							</button>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- ⚡ FILTRO ULTRA RÁPIDO DO BALCÃO -->
-			<script>
-				function filtrarArvoreLocalmente() {
-					const termo = document.getElementById("inputPesquisaProduto").value.toLowerCase().trim();
-					const blocosRaiz = document.querySelectorAll("#containerArvoreVendas > div");
-
-					blocosRaiz.forEach(bloco => {
-						const textoBloco = bloco.textContent.toLowerCase();
-						if (textoBloco.includes(termo)) {
-							bloco.style.display = "block";
-						} else {
-							bloco.style.display = "none";
-						}
-					});
-				}
-			</script>
-
-			<!-- Parte 2: itens do cupom 
-			<div id="container-itens-cupom" class="bloco-carrinho"></div>
-			-->
+			<!-- Parte 2: Itens do Cupom / Carrinho -->
 			<div class="box-custom"
 				style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
 				<div>
@@ -673,49 +711,74 @@
 
 	</div>
 
-	<!-- Parte 3: modal de fechamento e painel flutuante -->
-	<!-- Parte 3: modal de fechamento e painel flutuante -->
-		<div id="container-fechamento-pedido"></div>
-		
-		<!-- 🌟 ADICIONADO: Container que vai receber o HTML do arquivo impostos.html -->
-		<div id="container-impostos"></div>
+	<!-- ⚡ FILTRO ULTRA RÁPIDO DO BALCÃO -->
+	<script>
+		function filtrarArvoreLocalmente() {
+			const termo = document.getElementById("inputPesquisaProduto").value.toLowerCase().trim();
+			const blocosRaiz = document.querySelectorAll("#containerArvoreVendas > div");
 
-		<!-- 📦 SCRIPT GLOBAL INJETADO DIRETO NA MESA DE NEGOCIAÇÃO -->
-		<script>
-			// Força a função a existir na raiz global (window), impedindo erros de "not defined"
-			window.togglePainelDoCaixaDirect = function () {
-				const painel = document.getElementById("painelCaixa");
-				if (!painel) return;
-
-				// Pega o estilo real e alterna sem frescura
-				if (painel.style.display === "none") {
-					painel.style.setProperty("display", "block", "important");
+			blocosRaiz.forEach(bloco => {
+				const textoBloco = bloco.textContent.toLowerCase();
+				if (textoBloco.includes(termo)) {
+					bloco.style.display = "block";
 				} else {
-					painel.style.setProperty("display", "none", "important");
+					bloco.style.display = "none";
 				}
-			};
+			});
+		}
+	</script>
 
-			// 🌟 ADICIONADO: Lógica global infalível para abrir o Modal de Impostos
-			window.impostoFrete = function() {
-				console.log("👉 Botão Imposto + Frete clicado!");
-				const modal = document.getElementById("modalImpostos");
-				
-				if (modal) {
-					modal.style.setProperty("display", "block", "important");
-					console.log("🎯 Quadro de impostos exibido na tela.");
-				} else {
-					console.error("❌ Erro: O elemento #modalImpostos não foi encontrado na página! Verifique se o container-impostos e o arquivo impostos.html estão corretos.");
-				}
-			};
+	</div>
+	</div>
 
-			// 🌟 ADICIONADO: Lógica global infalível para fechar o Modal de Impostos
-			window.fecharModalImpostos = function() {
-				const modal = document.getElementById("modalImpostos");
-				if (modal) {
-					modal.style.setProperty("display", "none", "important");
-				}
-			};
-		</script>
+	</div>
+
+	</div>
+
+	<!-- Parte 3: modal de fechamento e painel flutuante -->
+	<div id="container-fechamento-pedido"></div>
+
+	<!-- 🌟 Container dos impostos -->
+	<div id="container-impostos"></div>
+
+	<!-- 💰 Financeiro da Venda -->
+	<div id="container-financeiro"></div>
+	<!-- 📦 SCRIPT GLOBAL INJETADO DIRETO NA MESA DE NEGOCIAÇÃO -->
+	<script>
+		// Força a função a existir na raiz global (window), impedindo erros de "not defined"
+		window.togglePainelDoCaixaDirect = function () {
+			const painel = document.getElementById("painelCaixa");
+			if (!painel) return;
+
+			// Pega o estilo real e alterna sem frescura
+			if (painel.style.display === "none") {
+				painel.style.setProperty("display", "block", "important");
+			} else {
+				painel.style.setProperty("display", "none", "important");
+			}
+		};
+
+		// 🌟 ADICIONADO: Lógica global infalível para abrir o Modal de Impostos
+		window.impostoFrete = function () {
+			console.log("👉 Botão Imposto + Frete clicado!");
+			const modal = document.getElementById("modalImpostos");
+
+			if (modal) {
+				modal.style.setProperty("display", "block", "important");
+				console.log("🎯 Quadro de impostos exibido na tela.");
+			} else {
+				console.error("❌ Erro: O elemento #modalImpostos não foi encontrado na página! Verifique se o container-impostos e o arquivo impostos.html estão corretos.");
+			}
+		};
+
+		// 🌟 ADICIONADO: Lógica global infalível para fechar o Modal de Impostos
+		window.fecharModalImpostos = function () {
+			const modal = document.getElementById("modalImpostos");
+			if (modal) {
+				modal.style.setProperty("display", "none", "important");
+			}
+		};
+	</script>
 
 
 	<script>
@@ -773,68 +836,63 @@
 
 		// Programa principal da Mesa de Negociação
 		async function inicializarTela() {
-		    try {
-		        // 1. Carrega os componentes HTML primeiro
-		        await Promise.all([
-		            /*
-		            carregarComponente(
-		                "container-localizar-produto",
-		                "/vendas/localizar-produto.html"
-		            ),
-		            */
+			try {
+				// 1. Carrega os componentes HTML primeiro
+				await Promise.all([
+				
+					carregarComponente(
+						"container-fechamento-pedido",
+						"/vendas/fechamento-pedido.html"
+					),
 
-		            /*
-		            carregarComponente(
-		                "container-itens-cupom",
-		                "/vendas/itens-cupom.html"
-		            ),
-		            */
+					carregarComponente(
+						"container-impostos",
+						"/vendas/impostos.html"
+						
+					),
+					carregarComponente(
+					    "container-financeiro",
+					    "/vendas/Financeiro/financeiro.html"
+					)
+					
+				]);
 
-		            carregarComponente(
-		                "container-fechamento-pedido",
-		                "/vendas/fechamento-pedido.html"
-		            ),
+				console.log("Componentes HTML carregados com sucesso!");
 
-		            carregarComponente(
-		                "container-impostos",
-		                "/vendas/impostos.html"
-		            )
-		        ]);
+				// 2. Configura os painéis da tela
+				configurarPainelArrastavel();
 
-		        console.log("Componentes HTML carregados com sucesso!");
+				// 3. Lista de arquivos JavaScript de lógica para carregar sequencialmente
+				const arquivosLogica = [
+					'/componentes-js/utils.js',
+					'/vendas/modulo-localizar.js',
+					'/vendas/modulo-cupom.js',
+					'/vendas/DevolverPedido/devolucao.js',
+					'/vendas/LimparCupom/cancelarPedido.js',
+					'/vendas/carrinho-js/carrinho.js',
+					'/vendas/carrinho-js/imprimeCarrinho.js',
+					'/vendas/modulo-fechamento.js',
+					'/vendas/Financeiro/financeiro.js',
+					'/vendas/venda.js'
+			
+				];
 
-		        // 2. Configura os painéis da tela
-		        configurarPainelArrastavel();
+				// Carrega cada script um por um
+				for (const src of arquivosLogica) {
+					await carregarArquivoJavaScript(src);
+				}
 
-		        // 3. Lista de arquivos JavaScript de lógica para carregar sequencialmente
-		        const arquivosLogica = [
-		            '/componentes-js/utils.js',
-		            '/vendas/modulo-localizar.js',
-		            '/vendas/modulo-cupom.js',
-		            '/vendas/devolucao.js',
-		            '/vendas/cancelarPedido.js',
-		            '/vendas/carrinho-js/carrinho.js',
-		            '/vendas/carrinho-js/imprimeCarrinho.js',
-		            '/vendas/modulo-fechamento.js',
-		            '/vendas/venda.js'
-		        ];
+				// 4. Inicializa a lógica principal se a função existir
+				if (typeof inicializarLogicaVenda === "function") {
+					inicializarLogicaVenda();
+				}
 
-		        // Carrega cada script um por um
-		        for (const src of arquivosLogica) {
-		            await carregarArquivoJavaScript(src);
-		        }
-
-		        // 4. Inicializa a lógica principal se a função existir
-		        if (typeof inicializarLogicaVenda === "function") {
-		            inicializarLogicaVenda();
-		        }
-
-		    } catch (erro) {
-		        // Captura qualquer erro que aconteça em todo o processo acima
-		        console.error("Erro ao inicializar a Mesa de Negociação:", erro);
-		    }
+			} catch (erro) {
+				// Captura qualquer erro que aconteça em todo o processo acima
+				console.error("Erro ao inicializar a Mesa de Negociação:", erro);
+			}
 		}
-		
+
 
 		function configurarPainelArrastavel() {
 			const painel = document.getElementById("painelCaixa");
@@ -1064,6 +1122,8 @@
 
 	<script src="/componentes-js/utils.js"></script>
 	<script src="/Entradas/appDevolucao.js"></script>
+	<script src="/Entradas/appDevolucao.js"></script>
+
 
 
 </body>

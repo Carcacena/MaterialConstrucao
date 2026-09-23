@@ -265,7 +265,9 @@ async function cadastrarFornecedor(event) {
         bairro: document.getElementById("bairro").value,
         cidade: document.getElementById("cidade").value,
         uf: document.getElementById("uf").value,
+		
 		notafiscal: document.getElementById("notafiscal").value,
+		serie: document.getElementById("serie").value,
         
         // ⚡ CORREÇÃO DO ERRO: Envia sempre como booleano puro do JavaScript (true/false)
         unidadeAtiva: true, 
@@ -328,7 +330,7 @@ function acionarAlterar() {
         document.getElementById("bairro").value = linhaSelecionada.dataset.bairro || "";
         document.getElementById("cidade").value = linhaSelecionada.dataset.cidade || "";
 		document.getElementById("notafiscal").value = linhaSelecionada.dataset.notafiscal || "";
-		  
+		document.getElementById("serie").value = linhaSelecionada.dataset.serie || "";  
 		
         // ⚡ INCLUSÃO: Carrega o "S" ou "N" salvo de volta para o input da tela
         const inputOrigem = document.getElementById("unidadeAtiva");

@@ -46,7 +46,8 @@ window.abrirModalImpostos = function() {
                 ufCliente = selectUfSimulacao.value; // Pega o estado que o vendedor marcou para entrega na mesa
             } else if (window.clienteAtualPedido && window.clienteAtualPedido.uf) {
                 ufCliente = window.clienteAtualPedido.uf;
-     []       } else if (selectClienteModal) {
+                []
+            } else if (selectClienteModal) {
                 const opcaoSelecionada = selectClienteModal.options[selectClienteModal.selectedIndex];
                 if (opcaoSelecionada && opcaoSelecionada.getAttribute("data-uf")) {
                     ufCliente = opcaoSelecionada.getAttribute("data-uf");
@@ -83,14 +84,14 @@ window.abrirModalImpostos = function() {
                     // 🌟 GATILHO CORRETO: Só carrega os clientes do banco após o HTML existir na árvore do DOM
                     if (typeof window.carregarClientesNoModalImpostos === "function") {
                         window.carregarClientesNoModalImpostos();
-						window.carregarTransportadorasPDV();
+                        window.carregarTransportadorasPDV();
                     }
-					
+
 
                     if (typeof window.configurarImpostosArrastavel === "function") window.configurarImpostosArrastavel();
-					
+
                 }
-		    })
+            })
             .catch(erro => console.error("❌ Erro ao renderizar modal de encargos:", erro));
     } else {
         modal.style.display = "block";
@@ -100,9 +101,9 @@ window.abrirModalImpostos = function() {
         if (typeof window.carregarClientesNoModalImpostos === "function") {
             window.carregarClientesNoModalImpostos();
         }
-		if (typeof window.carregarTransportadorasPDV === "function") {
-		       window.carregarTransportadorasPDV();
-		   }
+        if (typeof window.carregarTransportadorasPDV === "function") {
+            window.carregarTransportadorasPDV();
+        }
 
 
         if (typeof window.configurarImpostosArrastavel === "function") window.configurarImpostosArrastavel();
@@ -157,7 +158,12 @@ async function abrirPainelFechamento() {
         alert("O carrinho está vazio!");
         return;
     }
+	console.log("🔥 TESTE NOVO F10 - LINHA ALTERADA");
 
+	if (typeof window.abrirModalImpostos === "function") {
+	    window.abrirModalImpostos();
+	    return;
+}
     // Ignora erros de elemento não encontrado no script de terceiros
     if (typeof carregarClientesPDV === "function") {
         try { await carregarClientesPDV(); } catch (e) {}
@@ -190,6 +196,7 @@ async function abrirPainelFechamento() {
 }
 window.abrirPainelFechamento = abrirPainelFechamento;
 
+
 async function confirmarFaturamentoDefinitivo() {
     console.log("🚀 Iniciando processo de faturamento definitivo...");
 
@@ -198,8 +205,8 @@ async function confirmarFaturamentoDefinitivo() {
         return;
     }
 
-    const selectCliente = document.getElementById("selectClienteModalImpostos") 
-                       || document.getElementById("selectClienteModal");
+    const selectCliente = document.getElementById("selectClienteModalImpostos")
+        || document.getElementById("selectClienteModal");
     const selectPagamento = document.getElementById("selectPagamentoModal");
 
     const clienteId = Number(selectCliente?.value || 0);
@@ -211,33 +218,32 @@ async function confirmarFaturamentoDefinitivo() {
         alert("❌ Erro Crítico: Número do pedido não foi gerado pelo sistema.");
         return;
     }
-
+	const numeroNotaFiscal = Number(window.proximaNotaFiscalPrevista);
+	const serie = window.serieFiscalAtual;
+	
     try {
         const urlBase = typeof API_URL !== "undefined" ? API_URL : "";
         const tokenSeguro = typeof token !== "undefined" ? token : (typeof window.obterTokenSeguro === "function" ? window.obterTokenSeguro() : "");
 
-        // 🌟 PENTE FINO DINÂMICO: Captura o ID real do carrinho ativo na tela (Ex: o seu ID 11 da foto!)
-        // Se a variável global não estiver setada, tenta ler do primeiro item da lista da memória
-        const idDoCarrinhoNoMysql = window.carrinhoIdAtivo 
-                                 || (window.itensCupomMemoria[0]?.carrinhoId) 
-                                 || (window.itensCupomMemoria[0]?.id)
-                                 || 11; // Fallback de segurança baseado no seu log atual
+        const idDoCarrinhoNoMysql = window.carrinhoIdAtivo
+            || (window.itensCupomMemoria[0]?.carrinhoId)
+            || (window.itensCupomMemoria[0]?.id)
+            || 11;
 
         const inputBaseIcms = document.getElementById("baseCalculoIcms");
         if (inputBaseIcms) {
             console.log(`📝 Montando payload fiscal para o ID Real do Carrinho no MySQL: ${idDoCarrinhoNoMysql}`);
-            
+
             const selectTransp = document.getElementById("selectTransportadoraModalImpostos");
             const idTransportadoraSelecionada = selectTransp && selectTransp.value ? Number(selectTransp.value) : null;
 
-            // PAYLOAD TOTALMENTE CASADO COM AS CHAVES DO SEU BACKEND
             const payloadImpostosDTO = {
                 carrinhoId: Number(idDoCarrinhoNoMysql),
                 numeroPedido: numeroPedido,
                 clienteId: Number(idFinalCliente),
                 formaPagamento: formaPagamento,
                 transportadoraId: idTransportadoraSelecionada,
-                
+
                 baseCalculoIcms: parseFloat(document.getElementById("baseCalculoIcms")?.value) || 0.00,
                 valorIcms: parseFloat(document.getElementById("valorIcms")?.value) || 0.00,
                 baseCalculoIcmsSt: parseFloat(document.getElementById("baseCalculoIcmsSt")?.value) || 0.00,
@@ -252,8 +258,8 @@ async function confirmarFaturamentoDefinitivo() {
                 valorTotalNota: parseFloat(document.getElementById("valorTotalNota")?.value) || 0.00
             };
 
-            console.log(`📤 Enviando DTO completo para a URL RESTful: ${urlBase}/api/carrinhos/${idDoCarrinhoNoMysql}/impostos`, payloadImpostosDTO);       
-            
+            console.log(`📤 Enviando DTO completo para a URL RESTful: ${urlBase}/api/carrinhos/${idDoCarrinhoNoMysql}/impostos`, payloadImpostosDTO);
+
             const respostaImpostos = await fetch(`${urlBase}/api/carrinhos/${idDoCarrinhoNoMysql}/impostos`, {
                 method: "POST",
                 headers: {
@@ -276,13 +282,42 @@ async function confirmarFaturamentoDefinitivo() {
             headers: { "Authorization": `Bearer ${tokenSeguro}` }
         });
 
+        // ⚡ TRATAMENTO ATÔMICO: Lê como TEXTO PURO para aceitar a string "Venda faturada..." do Java
         if (response.ok) {
-            const msgSucesso = await response.text();
-            alert(msgSucesso || "🎉 Venda faturada com sucesso no Spring Boot, piá!");
-            
+            const mensagemSucesso = await response.text();
+            console.log("🎯 [Faturamento] Resposta do Servidor: " + mensagemSucesso);
+
+            // 1. Alerta real de sucesso para o operador de caixa (Exibe a mensagem do Java)
+            alert(`✅ Faturamento Concluído com Sucesso!\n📄 Próxima Nota Fiscal Sincronizada.`);
+
+            // 2. 🔥 LIMPEZA AUTOMÁTICA DA MESA: Limpa os itens da tela sem pedir confirmação secundária
             window.itensCupomMemoria = [];
-            window.numeroPedidoAtual = `PED-${Date.now()}`;
-            if (typeof renderizarCupomDaMemoria === "function") renderizarCupomDaMemoria();
+			window.numeroPedidoAtual = `PED-${Date.now()}`;
+            if (typeof renderizarCupomDaMemoria === "function") {
+	            renderizarCupomDaMemoria();
+            } else if (typeof atualizarRendersVisuaisCupom === "function") {
+                atualizarRendersVisuaisCupom();
+            }
+
+            // 3. Reseta a quantidade padrão para 1
+            const quantidade = document.getElementById("inputQuantidade");
+            if (quantidade) {
+                quantidade.value = "1";
+            }
+
+            // 4. Fecha o modal de faturamento/impostos da tela
+            let modal = document.getElementById("modalImpostos");
+            if (modal) modal.style.display = "none";
+
+            // 5. Atualiza a nossa caixa verde do painel para exibir a nova nota (ex: 1974)
+            if (typeof carregarUfOrigemDoSistemaAtiva === "function") {
+                carregarUfOrigemDoSistemaAtiva();
+            }
+
+        } else {
+            // Se o status HTTP do servidor for de erro de fato (ex: 400 ou 500)
+            const textoErro = await response.text();
+            alert("❌ Erro real na requisição: " + textoErro);
         }
 
     } catch (erro) {
@@ -290,9 +325,7 @@ async function confirmarFaturamentoDefinitivo() {
         alert("Falha ao faturar: erro na sincronização de chaves com o banco. Verifique os logs.");
     }
 }
-
 window.confirmarFaturamentoDefinitivo = confirmarFaturamentoDefinitivo;
-
 
 async function carregarUfOrigemDoSistemaAtiva() {
     try {
@@ -310,11 +343,53 @@ async function carregarUfOrigemDoSistemaAtiva() {
             }
         });
 
-        if (resposta.ok) {
-            const origem = await resposta.json();
-            // Joga o "SP" ou "PR" do banco direto na variável global que a Parte 1 lê
-            window.ufOrigemSistemaInstalado = origem.uf;
-            console.log("🏢 Sucesso! UF de Origem identificada localmente: " + window.ufOrigemSistemaInstalado);
+		if (resposta.ok) {
+
+		    const origem = await resposta.json();
+
+		    // Joga a UF da OrigemSistema ativa na memória
+		    window.ufOrigemSistemaInstalado = origem.uf || "PR";
+
+		    console.log(
+		        "🏢 Sucesso! UF de Origem identificada localmente: "
+		        + window.ufOrigemSistemaInstalado
+		    );
+
+		    // ⚡ Exibe a Série Fiscal da OrigemSistema ativa
+		    const painelSerie = document.getElementById("displaySerie");
+
+		    if (painelSerie) {
+		        painelSerie.textContent = origem.serie || " ";
+		    }
+
+		    // Mantém a série disponível para os demais módulos
+		    window.serieFiscalAtual = origem.serie || "UN";
+
+		    console.log("📑 Série Fiscal ativa: " + window.serieFiscalAtual);
+
+		    // ⚡ MÁGICA VISUAL: Captura o sequencial do banco,
+		    // soma +1 e projeta na caixa "PRÓX NF"
+            // ⚡ MÁGICA VISUAL: Captura o sequencial do banco, soma +1 e projeta na caixa "PRÓX NF"
+            const campoNota = origem.notafiscal || origem.nota_fiscal || "";
+            if (campoNota) {
+                // Lê o '1956' do MySQL, limpa qualquer caractere estranho e computa o incremento (+1)
+                const ultimaNotaGravada = parseInt(campoNota.toString().replace(/\D/g, "")) || 0;
+                const proximaNotaFiscal = ultimaNotaGravada + 1;
+
+                console.log(`📄 [Layout Sincronizado] Última Nota: ${ultimaNotaGravada} | Próxima NF-e: ${proximaNotaFiscal}`);
+
+                // Injeta com precisão o número 1957 no elemento HTML correspondente
+                const painelDisplay = document.getElementById("displayProximaNotaFiscal");
+                if (painelDisplay) {
+                    painelDisplay.textContent = proximaNotaFiscal;
+                }
+
+                // Preserva o valor calculado na memória viva da janela do navegador
+                window.proximaNotaFiscalPrevista = proximaNotaFiscal;
+            } else {
+                console.warn("⚠️ A matriz ativa respondeu, mas o campo 'notafiscal' veio sem valor no JSON.");
+            }
+
         } else {
             console.warn("⚠️ Endpoint /ativa retornou status " + resposta.status + ". Assumindo padrão PR.");
             window.ufOrigemSistemaInstalado = "PR";
@@ -327,7 +402,6 @@ async function carregarUfOrigemDoSistemaAtiva() {
 
 // Inicializa a varredura automática assim que a folha de lógicas do fechamento é carregada
 carregarUfOrigemDoSistemaAtiva();
-
 
 window.fecharModalImpostos = function() {
     const modal = document.getElementById("modalImpostos");
@@ -361,65 +435,11 @@ window.calcularTotalNota = function() {
 
 window.impostoFrete = window.abrirModalImpostos;
 
-async function abrirPainelFechamento() {
-    console.log("👉 [modulo-fechamento.js] Abrindo painel de faturamento...");
-
-    if (!window.itensCupomMemoria || window.itensCupomMemoria.length === 0) {
-        alert("O carrinho está vazio!");
-        return;
-    }
-
-    // Tenta carregar a lista de clientes locais do banco de dados
-    if (typeof carregarClientesPDV === "function") {
-        try {
-            await carregarClientesPDV();
-        } catch (e) {
-            console.warn("Aviso ao carregar clientes do PDV (Tratado):", e);
-        }
-    }
-
-    // Executa a sincronização para o faturamento herdar o cliente selecionado nos impostos
-    if (typeof window.vincularClienteEDefinirAliquota === "function") {
-        window.vincularClienteEDefinirAliquota();
-    }
-
-    // Soma matemática do total do cupom bipedado
-    const totalCupom = window.itensCupomMemoria.reduce((soma, item) => {
-        return soma + (Number(item.quantidade || 0) * Number(item.precoPraticado || 0));
-    }, 0);
-
-    const totalModal = document.getElementById("totalModalDisplay");
-    if (totalModal) {
-        totalModal.textContent = `R$ ${totalCupom.toFixed(2).replace(".", ",")}`;
-    }
-
-    // 🌟 RESOLUÇÃO DO REGISTRO VERMELHO: Força a abertura visual via CSS puro, sem usar a variável 'bootstrap'
-    const modalElemento = document.getElementById("modalFecharPedido");
-    if (modalElemento) {
-        modalElemento.classList.add("show");
-        modalElemento.style.setProperty("display", "block", "important");
-        modalElemento.style.background = "rgba(0,0,0,0.6)"; // Aplica o fundo escuro comercial
-
-        // Configura os botões de fechar (Voltar e o X) para ocultarem a tela sem quebrar
-        const botoesFechar = modalElemento.querySelectorAll("[data-bs-dismiss='modal'], .btn-secondary, .btn-close");
-        botoesFechar.forEach(btn => {
-            btn.onclick = () => {
-                modalElemento.style.setProperty("display", "none", "important");
-                modalElemento.classList.remove("show");
-                console.log("🔒 Painel de faturamento ocultado pelo operador.");
-            };
-        });
-        console.log("🎯 Painel de faturamento exibido com sucesso via engine visual!");
-    } else {
-        console.error("❌ Erro Crítico: O container #modalFecharPedido não existe na árvore HTML.");
-    }
-}
-window.abrirPainelFechamento = abrirPainelFechamento;
 
 window.carregarClientesNoModalImpostos = async function() {
     const select = document.getElementById("selectClienteModalImpostos");
-	const selectTransportadora = document.getElementById("selectTransportadoraModalImpostos");
-	 if (!select) return;
+    const selectTransportadora = document.getElementById("selectTransportadoraModalImpostos");
+    if (!select) return;
 
     try {
         // Alinhamento de segurança com as variáveis do seu modulo-fechamento.js original
@@ -554,7 +574,7 @@ window.sincronizarClienteComFaturamento = function() {
 
 async function carregarTransportadorasPDV() {
     console.log("🔍 [modulo-fechamento.js] Buscando lista de transportadoras locais...");
-    
+
     const selectTransp = document.getElementById("selectTransportadoraModalImpostos");
     if (!selectTransp) {
         console.warn("Aviso: Elemento #selectTransportadoraModalImpostos não localizado na árvore DOM.");
@@ -566,8 +586,8 @@ async function carregarTransportadorasPDV() {
         const tokenSeguro = typeof token !== "undefined" ? token : (typeof window.obterTokenSeguro === "function" ? window.obterTokenSeguro() : "");
 
         // Ajuste a URL abaixo para casar exatamente com o endpoint do seu Controller Java (ex: /transportadoras ou /api/transportadoras)
-		const resposta = await fetch(`${urlBase}/api/clientes`, {
-          method: "GET",
+        const resposta = await fetch(`${urlBase}/api/clientes`, {
+            method: "GET",
             headers: {
                 "Authorization": `Bearer ${tokenSeguro}`,
                 "Content-Type": "application/json"
@@ -589,10 +609,10 @@ async function carregarTransportadorasPDV() {
             const opcao = document.createElement("option");
             opcao.value = transp.id; // ID bigint da tabela
             opcao.text = `${transp.nome || transp.razaoSocial} (${transp.uf || 'BR'})`; // Nome amigável na tela
-            
+
             // Se possuir CNPJ ou dados adicionais, pode embutir como atributo customizado
             opcao.setAttribute("data-uf-transp", transp.uf || "");
-            
+
             selectTransp.appendChild(opcao);
         });
 
@@ -603,106 +623,5 @@ async function carregarTransportadorasPDV() {
 
 // Vincula ao escopo global da janela do navegador
 window.carregarTransportadorasPDV = carregarTransportadorasPDV;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

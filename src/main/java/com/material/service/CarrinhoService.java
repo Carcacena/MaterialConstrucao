@@ -20,15 +20,18 @@ public class CarrinhoService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
-
+    @Autowired
+    
+    private CarrinhoMovimentoService carrinhoMovimentoService;
+  
     // 🔍 Camada de serviço que lê os detalhes do pedido completo trazidos com JOIN FETCH do banco
     public List<Carrinho> listarItensStandby(String numeroPedido) {
         return carrinhoRepository.buscarPedidoComRelacionamentos(numeroPedido);
     }
 
-    // 🟢 Grava o rascunho temporário no MySQL enquanto o cliente pensa
+    // 🟢 Grava o rascunho temporário no MySQL com STATUS = 0 (Em Standby de Balcão)
     public Carrinho salvarItemNoCarrinho(Carrinho carrinho) {
-        carrinho.setStatus(1); // Garante o Status 1: Em Andamento / Standby
+        carrinho.setStatus(0); // 🌟 REGRA NOVA: 0 significa item em montagem no cupom
         return carrinhoRepository.save(carrinho);
     }
 
@@ -38,10 +41,11 @@ public class CarrinhoService {
         carrinhoRepository.deleteByNumeroPedido(numeroPedido);
     }
 
-    // 💸 CONSOLIDA A VENDA: Baixa estoque, vincula o cliente real e muda o status para FATURADO (Status 2)
+    // 💸 CONSOLIDA A VENDA: Baixa estoque, vincula o cliente real e muda o status para FATURADO ATIVO (Status = 1)
     @Transactional
     public void faturarCarrinhoDoPedido(String numeroPedido, Long clienteIdDefinitivo) {
-        List<Carrinho> itensStandby = carrinhoRepository.findByNumeroPedidoAndStatus(numeroPedido, 1);
+        // 🌟 BUSCA BLINDADA: Localiza os itens que estavam em standby (status = 0)
+        List<Carrinho> itensStandby = carrinhoRepository.findByNumeroPedidoAndStatus(numeroPedido, 0);
 
         if (itensStandby.isEmpty()) {
             throw new RuntimeException("Erro: Não há nenhum item pendente para faturamento para este pedido.");
@@ -65,19 +69,24 @@ public class CarrinhoService {
             clienteDefinitivo.setId(clienteIdDefinitivo);
             item.setCliente(clienteDefinitivo);
 
-            item.setStatus(2);
-            carrinhoRepository.save(item);
+            // 🌟 O XEQUE-MATE DO MOTOR DE SAÍDAS: Carimba de forma definitiva o Status = 1 (Nota Fiscal Ativa/Faturada)
+            item.setStatus(1); 
+            //carrinhoRepository.save(item);
+            Carrinho carrinhoSalvo = carrinhoRepository.save(item);
+
+            carrinhoMovimentoService.registrarCarrinho(carrinhoSalvo);
         }
     }
 
-    // 🔄 DEVOLUÇÃO: Estorna estoque e grava novo registro com status 3, sem alterar o original faturado
+    // 🔄 DEVOLUÇÃO: Estorna estoque e grava novo registro com status = 2, sem alterar o faturado original
     @Transactional
     public void devolverItem(Long itemId) {
         Carrinho itemFaturado = carrinhoRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Item não encontrado para devolução."));
 
-        if (itemFaturado.getStatus() != 2) {
-            throw new RuntimeException("Só é possível devolver itens faturados.");
+        // 🌟 ALINHAMENTO: Só aceita devolver se a nota original estiver faturada/ativa (status = 1)
+        if (itemFaturado.getStatus() != 1) {
+            throw new RuntimeException("Só é possível devolver itens que estejam faturados e ativos.");
         }
 
         Produto produto = itemFaturado.getProduto();
@@ -95,10 +104,15 @@ public class CarrinhoService {
         devolucao.setProduto(produto);
         devolucao.setQuantidade(itemFaturado.getQuantidade());
         devolucao.setPrecoPraticado(itemFaturado.getPrecoPraticado());
-        devolucao.setStatus(3); // Devolvido
+        
+        // 🌟 ALINHAMENTO: Carimba o Status = 2 para registrar o estorno/devolução comercial
+        devolucao.setStatus(2); 
         devolucao.setDataCriacao(LocalDateTime.now());
 
-        carrinhoRepository.save(devolucao);
+        //carrinhoRepository.save(devolucao);
+        Carrinho devolucaoSalva = carrinhoRepository.save(devolucao);
+
+        carrinhoMovimentoService.registrarDevolucao(devolucaoSalva);
     }
 
     // 🔄 Versão em lote, pra quando o operador marca várias caixinhas "Devolver" de uma vez
