@@ -1,0 +1,138 @@
+<!-- ⚙️ BOTÃO FIXO NA TELA (Sempre disponível e chamando a função direto) -->
+<button id="btnAbrirPainelCaixa" type="button" onclick="togglePainelDoCaixaDirect()"
+	style="position: fixed; top: 90px; right: 25px; z-index: 1999; background: #ff9800; color: #111; border: none; border-radius: 6px; padding: 8px 13px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+	⚙️ AÇÕES
+</button>
+
+<!-- 🛠️ MENU CRUD VERTICAL FLUTUANTE (Retificado com Absolute e sem a trava do right fixo) -->
+<div id="painelCaixa" class="painel-flutuante"
+	style="display: none; position: absolute; top: 140px; left: calc(100% - 260px); z-index: 1998; background: #2c3e50; border: 2px solid #ff9800; border-radius: 8px; padding: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 220px;">
+
+	<!-- TOPO DO CRUD COM O BOTÃO X (Adicionado cursor: move para arrastar livremente) -->
+	<!-- 🌟 SÓ ADICIONAMOS O ID E O CURSOR NA SUA BARRA SUPERIOR ORIGINAL: -->
+	<div id="modalFecharPedidoHeader" class="modal-header text-white" 
+	     style="border-bottom: 1px dashed rgba(255, 152, 0, 0.4); cursor: move; user-select: none;">
+	    <h5 class="modal-title font-monospace" style="color: #ff9800;">💰 FECHAMENTO DO PEDIDO</h5>
+	    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+	</div>
+
+	<div class="painel-corpo" style="display: flex; flex-direction: column; gap: 8px;">
+		<button class="btn-menu-vertical btn-incluir" onclick="deixarPedidoPendente()">Orçamento (F2)</button>
+		<button class="btn-menu-vertical btn-fechar" onclick="abrirPainelFechamento()">Fechar Pedido (F10)</button>
+		<button class="btn-menu-vertical btn-excluir" onclick="limparTelaCupom()">Limpar Cupom</button>
+		<button class="btn-menu-vertical btn-carrinho" onclick="pesquisaCarrinho()">Pesquisa Carrinho</button>
+
+		<button type="button" class="btn btn-success fw-bold" onclick="confirmarFaturamentoDefinitivo()"
+			style="padding: 10px 20px;">
+			CONFIRMAR FATURAMENTO (F10)
+		</button>
+
+		<button class="btn-menu-vertical btn-voltar" onclick="window.location.href='/menu/menu.html'">
+			<u>V</u>oltar
+		</button>
+	</div>
+</div>
+
+<!-- 📦 SCRIPT GLOBAL INJETADO DIRETO NA MESA DE NEGOCIAÇÃO -->
+<script>
+	// 🌟 1. A SOLUÇÃO DA SEQUÊNCIA: Carga e Injeção Automática do Financeiro
+	window.abrirFormaPagamento = function () {
+		console.log("📡 Buscando e injetando a tela do financeiro.html na sequência...");
+
+		// Captura ou monta a DIV de standby que vai receber o HTML do financeiro
+		let containerFinanceiro = document.getElementById("container-financeiro");
+		if (!containerFinanceiro) {
+			containerFinanceiro = document.createElement("div");
+			containerFinanceiro.id = "container-financeiro";
+			document.body.appendChild(containerFinanceiro);
+		}
+
+		// Faz a busca física do arquivo na subpasta do Spring Boot
+		fetch("/vendas/Financeiro/financeiro.html")
+			.then(response => {
+				if (!response.ok) throw new Error("Não encontrou o arquivo financeiro.html (HTTP " + response.status + ")");
+				return response.text();
+			})
+			.then(htmlConteudo => {
+				// Injeta a estrutura do modal de cartões dentro da página
+				containerFinanceiro.innerHTML = htmlConteudo;
+				console.log("🏆 [Sucesso] Sequência concluída: financeiro.html injetado no balcão!");
+
+				// Força a exibição manual por ID garantindo que as propriedades fiquem ativas
+				const modalFinanceiro = document.getElementById("modalFecharPedido");
+				if (modalFinanceiro) {
+					modalFinanceiro.style.setProperty("display", "block", "important");
+					modalFinanceiro.style.position = "absolute";
+				}
+			})
+			.catch(erro => {
+				console.error("❌ Falha técnica na transição automática do laboratório:", erro);
+				alert("Erro ao carregar a tela do Financeiro. Verifique o caminho da pasta.");
+			});
+	};
+
+	// 2. Alterna a exibição do painel sem frescura
+	window.togglePainelDoCaixaDirect = function () {
+		const painel = document.getElementById("painelCaixa");
+		if (!painel) return;
+
+		if (painel.style.display === "none" || painel.style.display === "") {
+			painel.style.setProperty("display", "block", "important");
+			if (typeof window.fazerPainelCaixaPassear === "function") {
+				window.fazerPainelCaixaPassear();
+			}
+		} else {
+			painel.style.setProperty("display", "none", "important");
+		}
+	};
+
+	// 3. ENGINE DE MOVIMENTO ABSOLUTO NATIVO DO CRUD VERTICAL
+	window.fazerPainelCaixaPassear = function () {
+		const painel = document.getElementById("painelCaixa");
+		const header = document.getElementById("painelCaixaHeader");
+
+		if (!painel || !header) return;
+
+		let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+		header.onmousedown = dragMouseDown;
+
+		function dragMouseDown(e) {
+			e = e || window.event;
+			e.preventDefault();
+			pos3 = e.clientX;
+			pos4 = e.clientY;
+			document.onmouseup = closeDragElement;
+			document.onmousemove = elementDrag;
+		}
+
+		function elementDrag(e) {
+			e = e || window.event;
+			e.preventDefault();
+			pos1 = pos3 - e.clientX;
+			pos2 = pos4 - e.clientY;
+			pos3 = e.clientX;
+			pos4 = e.clientY;
+			
+			// Anula o 'right' fixo para liberar o movimento via coordenadas left/top
+			painel.style.position = "absolute";
+			painel.style.right = "auto";
+			
+			painel.style.top = (painel.offsetTop - pos2) + "px";
+			painel.style.left = (painel.offsetLeft - pos1) + "px";
+		}
+
+		function closeDragElement() {
+			document.onmouseup = null;
+			document.onmousemove = null;
+		}
+	};
+
+	// Ativa o motor do menu vertical em standby na carga da página
+	document.addEventListener("DOMContentLoaded", () => {
+		setTimeout(window.fazerPainelCaixaPassear, 500);
+	});
+</script>
+
+<!-- 🌟 CARGA DO SEU JS QUE NÃO MEXEMOS (Mantido intacto na esteira local) -->
+<script src="/vendas/Financeiro/financeiro.js"></script>

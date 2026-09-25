@@ -624,4 +624,71 @@ async function carregarTransportadorasPDV() {
 // Vincula ao escopo global da janela do navegador
 window.carregarTransportadorasPDV = carregarTransportadorasPDV;
 
+// =========================================================================
+// 🌟 ENGINE DE JANELA FLUTUANTE (Drag and Drop Nativo Sem Biblioteca)
+// =========================================================================
+function ativarPainelFiscalArrastavel() {
+    const modal = document.getElementById("modalImpostos");
+    const header = document.getElementById("modalImpostosHeader");
+
+    if (!modal || !header) {
+        console.log("ℹ️ Elementos do modal flutuante não localizados para ativação da engine visual.");
+        return;
+    }
+
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+    // Vincula o evento de clique do mouse na alça mestre do cabeçalho
+    header.onmousedown = iniciarArrastoJanela;
+
+    function iniciarArrastoJanela(e) {
+        e = e || window.event;
+        e.preventDefault();
+        
+        // Captura a posição inicial do cursor do mouse
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        document.onmouseup = pararArrastoJanela;
+        document.onmousemove = moverJanelaFisica;
+    }
+
+    function moverJanelaFisica(e) {
+        e = e || window.event;
+        e.preventDefault();
+        
+        // Calcula o deslocamento físico do ponteiro nas coordenadas X e Y
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        
+        // Aplica as novas posições no CSS absolute do quadro
+        modal.style.top = (modal.offsetTop - pos2) + "px";
+        modal.style.left = (modal.offsetLeft - pos1) + "px";
+    }
+
+    function pararArrastoJanela() {
+        // Solta os gatilhos quando o operador libera o botão do mouse
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// ⚡ ATIVAÇÃO IMEDIATA: Executa assim que a árvore do DOM terminar a montagem
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(ativarPainelFiscalArrastavel, 300);
+});
+
+// Garante que se a tela reabrir o modal por outras funções, a engine permaneça ativa
+window.ativarPainelFiscalArrastavel = ativarPainelFiscalArrastavel;
+
+
+
+
+
+
+
+
+
 
